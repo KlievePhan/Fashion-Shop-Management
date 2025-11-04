@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+</head>
+<body>
+<h2>Create Your Account</h2>
+
+<p>
+    <strong>Recommended:</strong> Register using Google for faster & secure signup.
+</p>
+
+<!-- Google Register Button (same as login) -->
+<p>
+    <a th:href="@{/oauth2/authorization/google}"
+       style="display:inline-block; padding:10px 20px; background:#db4437; color:white; text-decoration:none; border-radius:5px;">
+        Log in with Google
+    </a>
+</p>
+
+<hr>
+
+<form th:action="@{/register}" method="post">
+    <div>
+        <label>Full Name:</label>
+        <input type="text" name="fullName" required />
+    </div>
+    <div>
+        <label>Email:</label>
+        <input type="email" name="email" required />
+    </div>
+    <div>
+        <label>Password:</label>
+        <input type="password" name="password" required />
+    </div>
+    <div>
+        <button type="submit">Register</button>
+    </div>
+</form>
+
+<p>
+    Already have an account?
+    <a th:href="@{/login}">Login here</a>
+</p>
+
+<!-- Success / Error Messages -->
+<div th:if="${param.success}" style="color:green;">
+    Registration successful! You can now log in.
+</div>
+<div th:if="${param.error}" style="color:red;">
+    Registration failed. Try again.
+</div>
+</body>
+</html>

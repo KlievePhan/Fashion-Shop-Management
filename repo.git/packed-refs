@@ -1,0 +1,10 @@
+# pack-refs with: peeled fully-peeled sorted 
+3887d209140f0f03494501e4ad9b5243915786bf refs/heads/duc_anh
+3887d209140f0f03494501e4ad9b5243915786bf refs/heads/duy_hung
+3887d209140f0f03494501e4ad9b5243915786bf refs/heads/khanh_hoang
+3ff048b0fbc0fcafbbb4b4653e214edc5b30c9c6 refs/heads/main
+3887d209140f0f03494501e4ad9b5243915786bf refs/heads/minh_duc
+5e21f7415bb9f6d1ca6a442dbc98d6d39a5430ad refs/heads/quoc_viet
+3ff048b0fbc0fcafbbb4b4653e214edc5b30c9c6 refs/heads/tuan_anh
+3887d209140f0f03494501e4ad9b5243915786bf refs/heads/viet_anh
+0c98c284db6218057b07544fc637556d1e41a720 refs/pull/1/head
