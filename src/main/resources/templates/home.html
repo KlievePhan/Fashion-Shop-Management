@@ -21,7 +21,8 @@
 
 <body>
   <!-- HEADER using Thymeleaf fragment -->
-  <div th:replace="~{header :: header}"></div>
+  <div th:insert="~{header}">
+  </div>
 
   <!-- PROMO BAR -->
   <div class="promo-bar">Get 15% off on your first order</div>
@@ -156,13 +157,14 @@
 
   <!-- FOOTER using Thymeleaf fragment -->
   <div th:replace="~{footer :: footer}"></div>
-  
+
   <!-- BUY NOW, CUSTOMIZE BUTTONS -->
   <!-- Buy Now -->
-  <a href="shop.html" class="buy-now-btn">
-    <i class="bi bi-cart-fill"></i> Buy Now
+  <a href="/shop"
+     th:classappend="${currentPath != null && currentPath.contains('/shop')} ? 'active' : ''">
+    Shop
   </a>
-  
+
   <!-- Customize -->
   <a href="#" class="customize-btn">
     <i class="bi bi-sliders"></i> Customize
