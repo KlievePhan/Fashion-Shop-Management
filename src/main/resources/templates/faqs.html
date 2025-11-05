@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FAQs - Fashion Shop</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="icon" href="images/store.png" type="image/x-icon">
+
+  <link rel="stylesheet" href="index.css" />
+  <link rel="stylesheet" href="header.css" />
+  <link rel="stylesheet" href="faqs.css" />
+</head>
+
+<body>
+  <!-- HEADER -->
+  <div id="header"></div>
+
+  <!-- PROMO BAR -->
+  <div class="promo-bar">Get 15% off on your first order</div>
+
+  <!-- FAQ HERO SECTION -->
+  <section class="faq-hero">
+    <div class="container">
+      <h1>Frequently Asked Questions</h1>
+      <p>Explore our most commonly asked questions below.</p>
+    </div>
+  </section>
+
+  <!-- MAIN CONTENT -->
+  <main class="container faq-container">
+    <!-- Returns & Exchanges Section -->
+    <section class="faq-section">
+      <h2 class="faq-section-title">Returns & Exchanges</h2>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>What is your return policy?</span>
+          <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="faq-answer">
+          <p>
+            We accept returns within 30 days of purchase. Items must be
+            unworn, unwashed, and in their original condition with all tags
+            attached. Sale items and final sale products are not eligible for
+            return.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>How do I start a return or exchange?</span>
+          <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="faq-answer">
+          <p>
+            To initiate a return or exchange, log into your account and go to
+            "Order History." Select the order you wish to return, click
+            "Return Items," and follow the prompts. You'll receive a prepaid
+            return label via email.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>When will I get my refund?</span>
+          <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="faq-answer">
+          <p>
+            Once we receive your return, please allow 5-7 business days for
+            processing. Your refund will be issued to the original payment
+            method and may take an additional 3-5 business days to appear in
+            your account.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Can I exchange an item for a different size?</span>
+          <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="faq-answer">
+          <p>
+            Yes! You can exchange items for a different size or color. Simply
+            initiate a return and select "Exchange" as your reason. We'll send
+            you the new item as soon as we receive your return.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ordering & Payment Section -->
+    <section class="faq-section">
+      <h2 class="faq-section-title">Ordering & Payment</h2>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>What payment methods do you accept?</span>
+          <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="faq-answer">
+          <p>
+            We accept Visa, Mastercard, AMEX, PayPal, Apple Pay, Google Pay,
+            and Velora gift cards.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Can I apply a promo code or gift card at checkout?</span>
+          <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="faq-answer">
+          <p>
+            Yes, you can apply promo codes and gift cards at checkout. Enter
+            your code in the designated field on the payment page. Please note
+            that only one promo code can be used per order.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Can I modify or cancel my order after placing it?</span>
+          <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="faq-answer">
+          <p>
+            Orders can be modified or cancelled within 1 hour of placement.
+            After that, the order enters our fulfillment process and cannot be
+            changed. Please contact customer service immediately if you need
+            assistance.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Do you offer pre-orders?</span>
+          <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="faq-answer">
+          <p>
+            Yes, select items are available for pre-order. Pre-order items
+            will show an estimated ship date on the product page. Your payment
+            will be processed at the time of order, and items will ship as
+            soon as they become available.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Shipping & Delivery Section -->
+    <section class="faq-section">
+      <h2 class="faq-section-title">Shipping & Delivery</h2>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Where do you ship?</span>
+          <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="faq-answer">
+          <p>
+            We currently ship to all 50 US states, Canada, UK, Australia, and
+            select countries in Europe and Asia. International shipping rates
+            and delivery times vary by destination.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>How long does shipping take?</span>
+          <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="faq-answer">
+          <p>
+            Standard shipping takes 5-7 business days. Express shipping (2-3
+            business days) and overnight shipping are also available at
+            checkout. International orders typically arrive within 10-15
+            business days.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>How can I track my order?</span>
+          <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="faq-answer">
+          <p>
+            Once your order ships, you'll receive a tracking number via email.
+            You can also track your order by logging into your account and
+            viewing your order history.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>What if my package is lost or delayed?</span>
+          <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="faq-answer">
+          <p>
+            If your package hasn't arrived within the expected timeframe,
+            please contact our customer service team. We'll work with the
+            carrier to locate your package or arrange for a replacement or
+            refund.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sizing & Fit Section -->
+    <section class="faq-section">
+      <h2 class="faq-section-title">Sizing & Fit</h2>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>How do I know what size to order?</span>
+          <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="faq-answer">
+          <p>
+            Each product page includes a detailed size guide with
+            measurements. We recommend measuring yourself and comparing your
+            measurements to our size chart for the best fit.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Do your clothes run true to size?</span>
+          <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="faq-answer">
+          <p>
+            Most of our items run true to size. If an item runs small or
+            large, we'll note this in the product description. Customer
+            reviews also often include helpful sizing information.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>What if I'm between sizes?</span>
+          <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="faq-answer">
+          <p>
+            If you're between sizes, we generally recommend sizing up for a
+            more comfortable fit. Check the product description for fit
+            details (slim, regular, relaxed) to help guide your decision.
+          </p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          <span>Can I return or exchange if it doesn't fit?</span>
+          <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="faq-answer">
+          <p>
+            Absolutely! We offer free exchanges on all regular-priced items
+            within 30 days of purchase. Simply follow our return process and
+            select "Exchange" as your reason.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- NEWSLETTER SECTION -->
+  <section class="newsletter-section">
+    <div class="container">
+      <h2>Get 10% Off on Your First Order</h2>
+      <p>
+        Plus exclusive access to product drops, style tips, and insider deals.
+      </p>
+      <div class="newsletter-form">
+        <input type="email" placeholder="ENTER YOUR EMAIL *" class="newsletter-input" />
+        <button class="subscribe-btn">SUBSCRIBE</button>
+      </div>
+
+      <div class="lifestyle-images">
+        <div class="lifestyle-card">
+          <img src="https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=400&h=500&fit=crop"
+            alt="Men's Fashion" />
+        </div>
+        <div class="lifestyle-card">
+          <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=500&fit=crop"
+            alt="Women's Fashion" />
+        </div>
+        <div class="lifestyle-card">
+          <img src="https://images.unsplash.com/photo-1581044777550-4cfa60707c03?w=400&h=500&fit=crop"
+            alt="Urban Style" />
+        </div>
+        <div class="lifestyle-card">
+          <img src="https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=400&h=500&fit=crop"
+            alt="Kids Fashion" />
+        </div>
+      </div>
+
+      <div class="social-follow">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="#E1306C">
+          <path
+            d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+        </svg>
+        <span><strong>Follow us</strong> @VeloraStyle</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <div id="footer"></div>
+
+
+
+  <script src="header_footer.js"></script>
+  <script src="faqs.js"></script>
+</body>
+
+</html>
