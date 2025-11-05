@@ -43,10 +43,12 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
             response.sendRedirect(request.getContextPath() + "/login?error=user_not_found");
             return;
         }
-
-        String redirectTo = user.getProfileCompleted() ? "/" : "/profile/setup";
-        // Prepend context path so redirect works under /fashionshop
-        response.sendRedirect(request.getContextPath() + redirectTo);
+        String contextPath = request.getContextPath();
+        if (user.getProfileCompleted()) {
+            response.sendRedirect(contextPath + "/");
+        } else {
+            response.sendRedirect(contextPath + "/profile/setup");
+        }
     }
 
 }

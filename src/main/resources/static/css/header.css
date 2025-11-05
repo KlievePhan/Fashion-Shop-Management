@@ -93,58 +93,119 @@
 }
 
 /* =====================
-   USER DROPDOWN
+   USER DROPDOWN – VERTICAL + HOVER
 ===================== */
+
 .user-dropdown {
   position: relative;
   cursor: pointer;
+  display: inline-block;
 }
 
+/* Dropdown menu */
 .user-dropdown .dropdown-menu {
   position: absolute;
   top: 38px;
   right: 0;
   background: #fff;
-  border: 1px solid #ddd;
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  min-width: 140px;
-  display: none;
-  flex-direction: column;
-  padding: 8px 0;
-  animation: dropdownFade 0.25s ease;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  min-width: 160px;
+  padding: 6px 0;
   z-index: 2000;
-}
-
-.user-dropdown .dropdown-menu a {
-  padding: 10px 16px;
-  text-decoration: none;
-  color: #333;
-  font-weight: 500;
-  display: block;
-  transition: background 0.3s, color 0.3s;
-}
-
-.user-dropdown .dropdown-menu a:hover {
-  background-color: #f5f5f5;
-  color: red;
-}
-
-/* Hiển thị menu khi mở */
-.user-dropdown.active .dropdown-menu {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: all 0.25s ease;
   display: flex;
+  flex-direction: column; /* VERTICAL STACK */
 }
 
-/* Animation nhỏ */
+/* Show when active or hover */
+.user-dropdown.active .dropdown-menu,
+.user-dropdown:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Menu items */
+.user-dropdown .dropdown-menu a,
+.user-dropdown .dropdown-menu .logout-btn {
+  display: block;
+  padding: 10px 16px;
+  color: #000 !important;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.2s, padding-left 0.2s;
+  text-align: left;
+}
+
+/* HOVER EFFECT */
+.user-dropdown .dropdown-menu a:hover,
+.user-dropdown .dropdown-menu .logout-btn:hover {
+  background-color: #f8f8f8;
+  padding-left: 20px; /* Subtle indent */
+  color: #000 !important;
+}
+
+/* User info section */
+.user-info {
+  padding: 10px 16px 6px;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 4px;
+}
+
+.user-info strong {
+  display: block;
+  font-size: 14px;
+  color: #000;
+  margin-bottom: 2px;
+}
+
+.user-info small {
+  font-size: 12px;
+  color: #555;
+}
+
+/* Logout button */
+.logout-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  font-weight: 500;
+  color: #d32f2f !important; /* Red for logout */
+}
+
+.logout-btn:hover {
+  color: #b71c1c !important;
+  background-color: #ffebee;
+}
+
+/* SLOW DISAPPEAR: Add delay when leaving */
+.user-dropdown .dropdown-menu {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none; /* Prevents interaction during fade */
+}
+
+/* When active: fully visible + interactive */
+.user-dropdown.active .dropdown-menu,
+.user-dropdown:hover .dropdown-menu {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  display: block !important; /* Force show */
+}
+
+/* Keep your fade-in animation */
 @keyframes dropdownFade {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* Responsive */

@@ -1,6 +1,7 @@
 package org.fsm.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
@@ -19,18 +20,24 @@ public class User {
     @Column(name = "google_sub", length = 255, unique = true)
     private String googleSub;
 
+    @NotBlank(message = "Email cannot be empty")
+    @Email(message = "Email format is invalid")
     @Column(nullable = false, length = 255, unique = true)
     private String email;
 
+    @Size(max = 255, message = "Display name too long")
     @Column(name = "display_name", length = 255)
     private String displayName;
 
+    @Size(max = 255, message = "Full name too long")
     @Column(name = "full_name", length = 255)
     private String fullName;
 
+    @Size(min = 6, message = "Password must be at least 6 characters")
     @Column(name = "password", length = 255)
     private String password;
 
+    @Pattern(regexp = "^[0-9]{10,15}$", message = "Phone number must be 10–15 digits")
     @Column(length = 50)
     private String phone;
 
