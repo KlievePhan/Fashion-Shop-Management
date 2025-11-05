@@ -25,17 +25,55 @@ public class HomeController {
     private final PasswordEncoder passwordEncoder; // inject BCryptPasswordEncoder bean
 
     @GetMapping("/")
-    public String home() { return "home"; }
-
-    @GetMapping("/login") public String login() { return "login"; }
-
-    @GetMapping("/register") public String register() { return "register"; }
+    public String home() {
+        return "home";
+    }
+    
+    @GetMapping("/shop")
+    public String shop() {
+        return "shop";
+    }
+    
+    @GetMapping("/about")
+    public String about() {
+        return "about";
+    }
+    
+    @GetMapping("/careers")
+    public String careers() {
+        return "careers";
+    }
+    
+    @GetMapping("/faqs")
+    public String faqs() {
+        return "faqs";
+    }
+    
+    @GetMapping("/contact")
+    public String contact() {
+        return "contact";
+    }
+    
+    @GetMapping("/login")
+    public String login() {
+        return "login_signup";
+    }
+    
+    @GetMapping("/signup")
+    public String signup() {
+        return "login_signup";
+    }
+    
+    @GetMapping("/cart")
+    public String cart() {
+        return "cart";
+    }
 
     @PostMapping("/register")
     public String doRegister(@RequestParam String fullName,
-                             @RequestParam String email,
-                             @RequestParam String password,
-                             Model model) {
+            @RequestParam String email,
+            @RequestParam String password,
+            Model model) {
 
         if (userRepository.findByEmail(email).isPresent()) {
             // redirect back with error param

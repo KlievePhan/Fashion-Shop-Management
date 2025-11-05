@@ -1,0 +1,54 @@
+/* =====================
+   FOOTER STYLES
+===================== */
+footer {
+  background-color: #111;
+  color: #eee;
+  text-align: center;
+  padding: 50px 20px 30px;
+  font-family: "Lato", sans-serif;
+  margin-top: 60px;
+}
+
+footer .footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+footer .footer-links a {
+  color: #ccc;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+footer .footer-links a:hover {
+  color: red;
+}
+
+footer p {
+  font-size: 14px;
+  margin: 0;
+  opacity: 0.8;
+}
+
+/* Social Icons (nếu có) */
+footer .social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+footer .social-icons a {
+  color: #ccc;
+  font-size: 20px;
+  transition: color 0.3s, transform 0.2s;
+}
+
+footer .social-icons a:hover {
+  color: red;
+  transform: scale(1.1);
+}

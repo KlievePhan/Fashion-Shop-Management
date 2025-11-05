@@ -1,0 +1,55 @@
+/* FIXED BUTTONS */
+.buy-now-btn {
+  position: fixed;
+  top: 45%;
+  right: 0;
+  transform: translateY(-50%);
+  background-color: #007bff;
+  color: white;
+  padding: 14px 22px;
+  border: none;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: -2px 0 10px rgba(0, 123, 255, 0.3);
+  transition: all 0.3s ease;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  gap: 8px; /* khoảng cách giữa icon và chữ */
+  text-decoration: none;
+}
+
+.buy-now-btn:hover {
+  background-color: #0056b3;
+  right: 3px;
+}
+
+.customize-btn {
+  position: fixed;
+  top: 55%;
+  right: 0;
+  transform: translateY(-50%);
+  background-color: #000;
+  color: white;
+  border: none;
+  padding: 14px 22px;
+  font-weight: 600;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  cursor: pointer;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.customize-btn:hover {
+  background-color: #333;
+  right: 3px;
+}

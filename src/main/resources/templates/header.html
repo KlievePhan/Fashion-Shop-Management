@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Header Test</title>
+
+  <!-- Kết nối file CSS -->
+  <link rel="stylesheet" th:href="@{/css/header.css}">
+  <link rel="stylesheet" th:href="@{/css/footer.css}">
+
+</head>
+
+<body>
+  <header th:fragment="header" class="header">
+    <div class="icon-store">
+      <a th:href="@{/}" class="logo">
+        <img th:src="@{/images/icons8-grocery-store-50.png}" alt="Logo" class="logo-img" />
+        <span class="logo-text">Fashion Shop</span>
+      </a>
+    </div>
+
+    <nav class="link-home">
+      <a th:href="@{/}">Home</a>
+      <a th:href="@{/shop}">Shop</a>
+      <a th:href="@{/about}">About</a>
+      <a th:href="@{/careers}">Careers</a>
+      <a th:href="@{/faqs}">FAQ's</a>
+      <a th:href="@{/contact}">Contact</a>
+    </nav>
+
+    <div class="user-cart">
+      <!-- USER ICON -->
+      <div class="user-dropdown">
+        <svg width="28" height="28" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round" class="user-icon">
+          <circle cx="12" cy="8" r="4"></circle>
+          <path d="M4 22c0-4 4-6 8-6s8 2 8 6"></path>
+        </svg>
+
+        <div class="dropdown-menu">
+          <a th:href="@{/login}">Login</a>
+          <a th:href="@{/signup}">Signup</a>
+        </div>
+      </div>
+
+      <!-- CART ICON -->
+      <a th:href="@{/cart}" class="cart-link">
+        <svg class="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="black"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 14h20l-2 12H8L6 14z"></path>
+          <path d="M10 14l4-6 4 6"></path>
+        </svg>
+        <span class="badge">0</span>
+      </a>
+    </div>
+  </header>
+</body>
+
+</html>
