@@ -160,10 +160,12 @@
 
   <!-- BUY NOW, CUSTOMIZE BUTTONS -->
   <!-- Buy Now -->
-  <a href="/shop"
-     th:classappend="${currentPath != null && currentPath.contains('/shop')} ? 'active' : ''">
-    Shop
-  </a>
+
+
+  <a th:href="@{/shop}" class="buy-now-btn">
+    <i class="bi bi-cart-fill"></i> Buy Now
+
+  
 
   <!-- Customize -->
   <a href="#" class="customize-btn">
@@ -171,6 +173,7 @@
   </a>
   <!-- JS links using Thymeleaf -->
   <script th:src="@{/js/index.js}"></script>
+  <script th:src="@{/js/header.js}"></script>
 </body>
 
 </html>
