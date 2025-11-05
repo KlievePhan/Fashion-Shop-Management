@@ -19,7 +19,7 @@ body {
 }
 
 .promo-bar {
-  background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+  background: black;
   color: #fff;
   text-align: center;
   padding: 12px 0;
@@ -220,7 +220,7 @@ body {
 .form-input:focus,
 .form-textarea:focus {
   outline: none;
-  border-color: #ff6b9d;
+  border-color: #e4002b;
   background: #ffffff;
   box-shadow: 0 0 0 4px rgba(255, 107, 157, 0.1);
   transform: translateY(-2px);
@@ -254,7 +254,7 @@ body {
 }
 
 .form-button {
-  background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+  background: #e4002b;
   color: #ffffff;
   padding: 18px 70px;
   border: none;
@@ -336,7 +336,7 @@ body {
 .info-icon {
   width: 70px;
   height: 70px;
-  background: linear-gradient(135deg, #ffffff 0%, #ffe5f0 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #f45b5b 100%);
   border-radius: 18px;
   display: flex;
   align-items: center;
@@ -348,7 +348,7 @@ body {
 
 .info-card:hover .info-icon {
   transform: rotate(10deg) scale(1.1);
-  background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+  background: #e4002b;
   box-shadow: 0 12px 35px rgba(255, 107, 157, 0.3);
 }
 
@@ -389,13 +389,13 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ff6b9d;
+  color: #e4002b;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid rgba(255, 107, 157, 0.2);
 }
 
 .social-link:hover {
-  background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+  background: #e4002b;
   color: #ffffff;
   transform: translateY(-5px) rotate(5deg);
   box-shadow: 0 10px 25px rgba(255, 107, 157, 0.3);
