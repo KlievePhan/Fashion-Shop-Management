@@ -160,9 +160,8 @@
 
   <!-- BUY NOW, CUSTOMIZE BUTTONS -->
   <!-- Buy Now -->
-  <a href="/shop"
-     th:classappend="${currentPath != null && currentPath.contains('/shop')} ? 'active' : ''">
-    Shop
+  <a th:href="@{/shop}" class="buy-now-btn">
+    <i class="bi bi-cart-fill"></i> Buy Now
   </a>
 
   <!-- Customize -->

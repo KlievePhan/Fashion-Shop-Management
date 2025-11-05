@@ -6,15 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us - Velora</title>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600&display=swap" rel="stylesheet" />
-    <link rel="icon" href="images/store.png" type="image/x-icon">
-    <link rel="stylesheet" href="about.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="icon" href="../static/images/store.png" type="image/x-icon">
+    <link rel="stylesheet" th:href="@{/css/about.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/fixed_button.css}">
+    <link rel="stylesheet" th:href="@{/css/promo_bar.css}">
+    <link rel="stylesheet" th:href="@{/css/home.css}">
 </head>
 
 <body>
-    <div id="header"></div>
+    <div th:replace="~{header :: header}"></div>
+
     <div class="promo-bar">
         Get 15% off on your first order
     </div>
+
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-overlay"></div>
@@ -229,8 +237,18 @@
             </div>
         </div>
     </section>
-    <div id="footer"></div>
-    <script src="header_footer.js"></script>
+    <!-- BUY NOW, CUSTOMIZE BUTTONS -->
+    <!-- Buy Now -->
+    <a th:href="@{/shop}" class="buy-now-btn">
+        <i class="bi bi-cart-fill"></i> Buy Now
+      </a>
+
+    <!-- Customize -->
+    <a href="#" class="customize-btn">
+        <i class="bi bi-sliders"></i> Customize
+    </a>
+    <div th:replace="~{footer :: footer}"></div>
+    <script th:src="@{/js/header.js}"></script>
 </body>
 
 </html>
