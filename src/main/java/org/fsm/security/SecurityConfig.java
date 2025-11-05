@@ -23,6 +23,9 @@ public class SecurityConfig {
                 http
                                 .authorizeHttpRequests(authz -> authz
                                                 .requestMatchers("/", "/login", "/register", "/error", "/oauth2/**",
+                                                                "/shop/**", "/contact/**", "/about/**", "/careers/**",
+                                                                "/faqs/**",
+                                                                "/products/**",
                                                                 "/css/**", "/js/**", "/images/**")
                                                 .permitAll()
                                                 .requestMatchers("/profile/**").authenticated()
