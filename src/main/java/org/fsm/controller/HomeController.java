@@ -42,10 +42,30 @@ public class HomeController {
         model.addAttribute("currentPath", "/about");
         return "about";
     }
-    @GetMapping("/careers") public String careers() { return "careers"; }
-    @GetMapping("/faqs")    public String faqs()    { return "faqs"; }
-    @GetMapping("/contact") public String contact() { return "contact"; }
-    @GetMapping("/cart")    public String cart()    { return "cart"; }
+
+    @GetMapping("/careers")
+    public String careers(Model model) {
+        model.addAttribute("currentPath", "/careers");
+        return "careers";
+    }
+
+    @GetMapping("/faqs")
+    public String faqs(Model model) {
+        model.addAttribute("currentPath", "/faqs");
+        return "faqs";
+    }
+
+    @GetMapping("/contact")
+    public String contact(Model model) {
+        model.addAttribute("currentPath", "/contact");
+        return "contact";
+    }
+
+    @GetMapping("/cart")
+    public String cart(Model model) {
+        model.addAttribute("currentPath", "/cart");
+        return "cart";
+    }
 
     // === AUTH PAGES ===
     @GetMapping("/login")
@@ -63,8 +83,8 @@ public class HomeController {
     // === MANUAL REGISTRATION ===
     @PostMapping("/register")
     public String doRegister(@Valid @ModelAttribute RegisterRequest request,
-                             BindingResult result,
-                             Model model) {
+            BindingResult result,
+            Model model) {
 
         if (result.hasErrors()) {
             // Send validation errors back to the form
