@@ -43,9 +43,9 @@ public class SecurityConfig {
                         )
                         .formLogin(form -> form
                                 .loginPage("/login")
-                                .loginProcessingUrl("/login")     // POST /login → Spring handles
-                                .usernameParameter("email")       // <input name="email">
-                                .passwordParameter("password")    // <input name="password">
+                                .loginProcessingUrl("/login")
+                                .usernameParameter("email")
+                                .passwordParameter("password")
                                 .defaultSuccessUrl("/", true)
                                 .failureUrl("/login?error=true")
                                 .permitAll()
@@ -79,11 +79,11 @@ public class SecurityConfig {
                                 throw new org.springframework.security.authentication.DisabledException("User is disabled");
                         }
 
-                        return new org.springframework.security.core.userdetails.User(
-                                user.getEmail(),
-                                user.getPassword(),
-                                AuthorityUtils.createAuthorityList(user.getRole().getCode())
-                        );
+                        return org.springframework.security.core.userdetails.User
+                                .withUsername(user.getEmail())
+                                .password(user.getPassword())
+                                .authorities(user.getRole().getCode())
+                                .build();
                 };
         }
 }

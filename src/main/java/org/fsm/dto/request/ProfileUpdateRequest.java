@@ -18,7 +18,7 @@ public class ProfileUpdateRequest {
     @Pattern(regexp = "^(?:\\+?\\d{10,15})?$", message = "Phone must be 10–15 digits (optional)")
     private String phone;
 
-    @Size(max = 2000, message = "Address is too long")
+    @NotBlank(message = "Default address is required")
     private String defaultAddress;
 
     private String avatarUrl;
