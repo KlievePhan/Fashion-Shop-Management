@@ -10,7 +10,11 @@ import java.time.LocalDateTime;
         @UniqueConstraint(columnNames = "google_sub"),
         @UniqueConstraint(columnNames = "email")
 })
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
 
     @Id
@@ -66,5 +70,9 @@ public class User {
     @PreUpdate
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public boolean isActive() {
+        return this.active != null && this.active;
     }
 }

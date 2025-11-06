@@ -18,163 +18,327 @@
   <link rel="stylesheet" th:href="@{/css/promo_bar.css}">
 
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:'Lato',sans-serif; background:linear-gradient(135deg,#f5f7fa 0%,#e8eaf0 100%); min-height:100vh; }
-    .container { max-width:550px; margin:40px auto; }
-    .form-container { background:white; border-radius:20px; box-shadow:0 20px 60px rgba(0,0,0,.1); padding:50px 40px; position:relative; }
-    .form-container::before { content:''; position:absolute; top:0; left:0; right:0; height:5px; background:linear-gradient(90deg,#dc2626 0%,#991b1b 100%); }
-    .form-header h2 { font-size:32px; font-weight:700; color:#1a1a1a; text-align:center; margin-bottom:10px; }
-    .form-header p { color:#6b7280; text-align:center; }
-    .message { padding:12px 20px; border-radius:10px; margin-bottom:25px; font-size:14px; text-align:center; }
-    .message.success { background:#d1fae5; color:#065f46; border:1px solid #6ee7b7; }
-    .message.error { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; }
-    .form-group { margin-bottom:20px; }
-    .input-wrapper { position:relative; }
-    .input-wrapper i { position:absolute; left:15px; top:50%; transform:translateY(-50%); color:#9ca3af; }
-    input { width:100%; padding:14px 15px 14px 45px; border:2px solid #e5e7eb; border-radius:12px; font-size:15px; }
-    input:focus { outline:none; border-color:#dc2626; }
-    .btn-submit { width:100%; padding:15px; background:#dc2626; color:white; border:none; border-radius:12px; font-weight:600; cursor:pointer; }
-    .form-tabs { display:flex; gap:10px; margin-bottom:30px; }
-    .form-tab { flex:1; padding:12px; background:#f3f4f6; border:none; border-radius:10px; font-weight:600; color:#6b7280; }
-    .form-tab.active { background:#dc2626; color:white; }
-    .toggle-form { display:none; }
-    .toggle-form.active { display:block; }
-    .divider { display:flex; align-items:center; margin:30px 0; color:#9ca3af; }
-    .divider::before, .divider::after { content:''; flex:1; height:1px; background:#e5e7eb; }
-    .divider span { padding:0 15px; }
-    .social-btn { display:flex; align-items:center; justify-content:center; padding:12px; border:2px solid #e5e7eb; border-radius:12px; text-decoration:none; color:#1a1a1a; font-weight:600; }
-    .social-btn.google { color:#ea4335; border-color:#ea4335; }
-    .social-btn.google:hover { background:#ea4335; color:white; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e8eaf0 100%);
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 550px;
+      margin: 40px auto;
+    }
+
+    .form-container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .1);
+      padding: 50px 40px;
+      position: relative;
+    }
+
+    .form-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #dc2626 0%, #991b1b 100%);
+    }
+
+    .form-header h2 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1a1a1a;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .form-header p {
+      color: #6b7280;
+      text-align: center;
+    }
+
+    .message {
+      padding: 12px 20px;
+      border-radius: 10px;
+      margin-bottom: 25px;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .message.success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #6ee7b7;
+    }
+
+    .message.error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-wrapper i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9ca3af;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 15px 14px 45px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: 15px;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #dc2626;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 15px;
+      background: #dc2626;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .form-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    .form-tab {
+      flex: 1;
+      padding: 12px;
+      background: #f3f4f6;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      color: #6b7280;
+    }
+
+    .form-tab.active {
+      background: #dc2626;
+      color: white;
+    }
+
+    .toggle-form {
+      display: none;
+    }
+
+    .toggle-form.active {
+      display: block;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 30px 0;
+      color: #9ca3af;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #e5e7eb;
+    }
+
+    .divider span {
+      padding: 0 15px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      text-decoration: none;
+      color: #1a1a1a;
+      font-weight: 600;
+    }
+
+    .social-btn.google {
+      color: #ea4335;
+      border-color: #ea4335;
+    }
+
+    .social-btn.google:hover {
+      background: #ea4335;
+      color: white;
+    }
   </style>
 </head>
 
 <body>
-<!-- HEADER -->
-<div th:replace="~{header :: header}" th:with="currentPath=${currentPath}"></div>
+  <!-- HEADER -->
+  <div th:replace="~{header :: header}" th:with="currentPath=${currentPath}"></div>
 
-<div class="promo-bar">Get 15% off on your first order</div>
+  <div class="promo-bar">Get 15% off on your first order</div>
 
-<div class="container">
-  <div class="form-container">
+  <div class="container">
+    <div class="form-container">
 
-    <!-- TABS -->
-    <div class="form-tabs">
-      <button class="form-tab active" onclick="switchForm('login')">Login</button>
-      <button class="form-tab" onclick="switchForm('register')">Register</button>
-    </div>
-
-    <!-- LOGIN FORM -->
-    <div id="loginForm" class="toggle-form active">
-      <div class="form-header">
-        <h2>Welcome Back</h2>
-        <p>Sign in to continue</p>
+      <!-- TABS -->
+      <div class="form-tabs">
+        <button class="form-tab active" onclick="switchForm('login')">Login</button>
+        <button class="form-tab" onclick="switchForm('register')">Register</button>
       </div>
 
-      <div class="message error" th:if="${param.error}" style="display:block">
-        Invalid email or password
-      </div>
-      <div class="message success" th:if="${param.logout}" style="display:block">
-        Logged out successfully
-      </div>
-
-      <form th:action="@{/login}" method="post">
-        <div class="form-group">
-          <label>Email</label>
-          <div class="input-wrapper">
-            <i class="fas fa-envelope"></i>
-            <input type="email" name="username" placeholder="Enter your email" required />
-          </div>
+      <!-- LOGIN FORM -->
+      <div id="loginForm" class="toggle-form active">
+        <div class="form-header">
+          <h2>Welcome Back</h2>
+          <p>Sign in to continue</p>
         </div>
-        <div class="form-group">
-          <label>Password</label>
-          <div class="input-wrapper">
-            <i class="fas fa-lock"></i>
-            <input type="password" name="password" placeholder="Enter your password" required />
-          </div>
+
+        <div class="message error" th:if="${param.error}" style="display:block">
+          Invalid email or password
         </div>
-        <button type="submit" class="btn-submit">Sign In</button>
-      </form>
-
-      <div class="divider"><span>Or sign in with</span></div>
-      <div style="text-align:center;">
-        <a th:href="@{/oauth2/authorization/google}" class="social-btn google">
-          <i class="fab fa-google"></i> Google
-        </a>
-      </div>
-      <p style="text-align:center; margin-top:20px;">
-        Don't have an account? <a th:href="@{/signup}">Register</a>
-      </p>
-    </div>
-
-    <!-- REGISTER FORM -->
-    <div id="registerForm" class="toggle-form">
-      <div class="form-header">
-        <h2>Create Account</h2>
-        <p>Sign up to get started</p>
-      </div>
-
-      <div class="message error" th:if="${param.error == 'exists'}" style="display:block">
-        Email already exists
-      </div>
-      <div class="message success" th:if="${param.success == 'registered'}" style="display:block">
-        Registered! Please login.
-      </div>
-
-      <form th:action="@{/register}" method="post">
-        <div class="form-group">
-          <label>Full Name</label>
-          <div class="input-wrapper">
-            <i class="fas fa-user-circle"></i>
-            <input type="text" name="fullName" placeholder="Enter your full name" required />
-          </div>
+        <div class="message success" th:if="${param.logout}" style="display:block">
+          Logged out successfully
         </div>
-        <div class="form-group">
-          <label>Email</label>
-          <div class="input-wrapper">
-            <i class="fas fa-envelope"></i>
-            <input type="email" name="email" placeholder="Enter your email" required />
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <div class="input-wrapper">
-            <i class="fas fa-lock"></i>
-            <input type="password" name="password" placeholder="Create a password" required minlength="6" />
-          </div>
-        </div>
-        <button type="submit" class="btn-submit">Sign Up</button>
-      </form>
 
-      <div class="divider"><span>Or sign up with</span></div>
-      <div style="text-align:center;">
-        <a th:href="@{/oauth2/authorization/google}" class="social-btn google">
-          <i class="fab fa-google"></i> Google
-        </a>
+        <form th:action="@{/login}" method="post">
+          <div class="form-group">
+            <label>Email</label>
+            <div class="input-wrapper">
+              <i class="fas fa-envelope"></i>
+              <input type="email" name="email" placeholder="Enter your email" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <div class="input-wrapper">
+              <i class="fas fa-lock"></i>
+              <input type="password" name="password" placeholder="Enter your password" required />
+            </div>
+          </div>
+          <button type="submit" class="btn-submit">Sign In</button>
+        </form>
+
+        <div class="divider"><span>Or sign in with</span></div>
+        <div style="text-align:center;">
+          <a th:href="@{/oauth2/authorization/google}" class="social-btn google">
+            <i class="fab fa-google"></i> Google
+          </a>
+        </div>
+        <p style="text-align:center; margin-top:20px;">
+          Don't have an account? <a th:href="@{/signup}">Register</a>
+        </p>
       </div>
-      <p style="text-align:center; margin-top:20px;">
-        Already have an account? <a th:href="@{/login}">Login</a>
-      </p>
+
+      <!-- REGISTER FORM -->
+      <div id="registerForm" class="toggle-form">
+        <div class="form-header">
+          <h2>Create Account</h2>
+          <p>Sign up to get started</p>
+        </div>
+
+        <div class="message error" th:if="${param.error == 'exists'}" style="display:block">
+          Email already exists
+        </div>
+        <div class="message success" th:if="${param.success == 'registered'}" style="display:block">
+          Registered! Please login.
+        </div>
+
+        <form th:action="@{/register}" method="post">
+          <div class="form-group">
+            <label>Full Name</label>
+            <div class="input-wrapper">
+              <i class="fas fa-user-circle"></i>
+              <input type="text" name="fullName" placeholder="Enter your full name" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <div class="input-wrapper">
+              <i class="fas fa-envelope"></i>
+              <input type="email" name="email" placeholder="Enter your email" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <div class="input-wrapper">
+              <i class="fas fa-lock"></i>
+              <input type="password" name="password" placeholder="Create a password" required minlength="6" />
+            </div>
+          </div>
+          <button type="submit" class="btn-submit">Sign Up</button>
+        </form>
+
+        <div class="divider"><span>Or sign up with</span></div>
+        <div style="text-align:center;">
+          <a th:href="@{/oauth2/authorization/google}" class="social-btn google">
+            <i class="fab fa-google"></i> Google
+          </a>
+        </div>
+        <p style="text-align:center; margin-top:20px;">
+          Already have an account? <a th:href="@{/login}">Login</a>
+        </p>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- FOOTER -->
-<div th:replace="~{footer :: footer}"></div>
+  <!-- FOOTER -->
+  <div th:replace="~{footer :: footer}"></div>
 
-<script>
-  function switchForm(form) {
-    document.querySelectorAll('.toggle-form').forEach(f => f.classList.remove('active'));
-    document.querySelectorAll('.form-tab').forEach(t => t.classList.remove('active'));
-    document.getElementById(form + 'Form').classList.add('active');
-    document.querySelector(`.form-tab[onclick*="${form}"]`).classList.add('active');
-  }
+  <script>
+    function switchForm(form) {
+      document.querySelectorAll('.toggle-form').forEach(f => f.classList.remove('active'));
+      document.querySelectorAll('.form-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(form + 'Form').classList.add('active');
+      document.querySelector(`.form-tab[onclick*="${form}"]`).classList.add('active');
+    }
 
-  // Auto-switch on URL params
-  document.addEventListener('DOMContentLoaded', () => {
-    const url = new URL(window.location);
-    if (url.searchParams.get('error') === 'exists') switchForm('register');
-    if (url.searchParams.get('success') === 'registered') switchForm('login');
-  });
-</script>
+    // Auto-switch on URL params
+    document.addEventListener('DOMContentLoaded', () => {
+      const url = new URL(window.location);
+      if (url.searchParams.get('error') === 'exists') switchForm('register');
+      if (url.searchParams.get('success') === 'registered') switchForm('login');
+    });
+
+    const userDropdown = document.querySelector('.user-dropdown');
+
+    userDropdown.addEventListener('mouseenter', () => {
+      userDropdown.classList.add('active');
+    });
+
+    userDropdown.addEventListener('mouseleave', () => {
+      setTimeout(() => {
+        userDropdown.classList.remove('active');
+      }, 200); // 0.2s delay trước khi ẩn
+    });
+  </script>
+
 </body>
+
 </html>

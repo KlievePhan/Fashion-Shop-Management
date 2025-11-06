@@ -22,48 +22,49 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
+        private final UserRepository userRepository;
+        private final RoleRepository roleRepository;
 
-    @Override
-    public OAuth2User loadUser(OAuth2UserRequest userRequest) {
-        OAuth2User oauth2User = super.loadUser(userRequest);
+        @Override
+        public OAuth2User loadUser(OAuth2UserRequest userRequest) {
+                OAuth2User oauth2User = super.loadUser(userRequest);
 
-        String googleSub = oauth2User.getAttribute("sub");
-        String email = oauth2User.getAttribute("email");
-        String name = oauth2User.getAttribute("name");
-        String picture = oauth2User.getAttribute("picture");
+                String googleSub = oauth2User.getAttribute("sub");
+                String email = oauth2User.getAttribute("email");
+                String name = oauth2User.getAttribute("name");
+                String picture = oauth2User.getAttribute("picture");
 
-        User user = userRepository.findByGoogleSub(googleSub)
-                .or(() -> userRepository.findByEmail(email))
-                .orElseGet(() -> registerNewUser(googleSub, email, name, picture));
+                User user = userRepository.findByGoogleSub(googleSub)
+                                .or(() -> userRepository.findByEmail(email))
+                                .orElseGet(() -> registerNewUser(googleSub, email, name, picture));
 
-        // CRITICAL: Use "sub" or "email" as principal name, but include email in attributes
-        Map<String, Object> attributes = new HashMap<>(oauth2User.getAttributes());
-        attributes.put("email", email);  // Ensure email is always in attributes
+                // CRITICAL: Use "sub" or "email" as principal name, but include email in
+                // attributes
+                Map<String, Object> attributes = new HashMap<>(oauth2User.getAttributes());
+                attributes.put("email", email); // Ensure email is always in attributes
 
-        return new DefaultOAuth2User(
-                List.of(new SimpleGrantedAuthority(user.getRole().getCode())),
-                attributes,
-                "email"  // This tells Spring to use 'email' as principal name
-        );
-    }
+                return new DefaultOAuth2User(
+                                List.of(new SimpleGrantedAuthority(user.getRole().getCode())),
+                                attributes,
+                                "email" // This tells Spring to use 'email' as principal name
+                );
+        }
 
-    private User registerNewUser(String googleSub, String email, String name, String picture) {
-        Role userRole = roleRepository.findByCode("ROLE_USER")
-                .orElseThrow(() -> new ResourceNotFoundException("ROLE_USER not found"));
+        private User registerNewUser(String googleSub, String email, String name, String picture) {
+                Role userRole = roleRepository.findByCode("ROLE_USER")
+                                .orElseThrow(() -> new ResourceNotFoundException("ROLE_USER not found"));
 
-        User newUser = User.builder()
-                .googleSub(googleSub)
-                .email(email)
-                .displayName(name)
-                .fullName(name)
-                .avatarUrl(picture)
-                .role(userRole)
-                .active(true)
-                .profileCompleted(false)
-                .build();
+                User newUser = User.builder()
+                                .googleSub(googleSub)
+                                .email(email)
+                                .displayName(name)
+                                .fullName(name)
+                                .avatarUrl(picture)
+                                .role(userRole)
+                                .active(true)
+                                .profileCompleted(false)
+                                .build();
 
-        return userRepository.save(newUser);
-    }
+                return userRepository.save(newUser);
+        }
 }
