@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fashion Shop Management</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+
+</head>
+
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="logo">
+            <h2>Fashion Shop</h2>
+        </div>
+        <nav class="nav-menu">
+            <a href="#" class="nav-item active" data-section="dashboard">
+                <span class="icon">📊</span>
+                Dashboard
+            </a>
+            <a href="#" class="nav-item" data-section="products">
+                <span class="icon">👕</span>
+                Products
+            </a>
+            <a href="#" class="nav-item" data-section="orders">
+                <span class="icon">📦</span>
+                Orders
+            </a>
+            <a href="#" class="nav-item" data-section="customers">
+                <span class="icon">👥</span>
+                Customers
+            </a>
+            <a href="#" class="nav-item" data-section="analytics">
+                <span class="icon">📈</span>
+                Analytics
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">☰</button>
+                <h1 id="pageTitle">Dashboard</h1>
+            </div>
+            <div class="header-right">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search..." id="searchInput">
+                </div>
+                <div class="user-profile">
+                    <span>Admin</span>
+                    <div class="avatar">A</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="content-section active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon red">💰</div>
+                    <div class="stat-info">
+                        <h3>Total Revenue</h3>
+                        <p class="stat-value">$24,580</p>
+                        <span class="stat-change positive">+12.5%</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-info">
+                        <h3>Orders</h3>
+                        <p class="stat-value">342</p>
+                        <span class="stat-change positive">+8.2%</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">👕</div>
+                    <div class="stat-info">
+                        <h3>Products</h3>
+                        <p class="stat-value">156</p>
+                        <span class="stat-change">0%</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-info">
+                        <h3>Customers</h3>
+                        <p class="stat-value">1,249</p>
+                        <span class="stat-change positive">+15.3%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>Recent Orders</h3>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentOrdersTable">
+                                <tr>
+                                    <td>#ORD-001</td>
+                                    <td>John Doe</td>
+                                    <td>$125.00</td>
+                                    <td><span class="badge success">Purchased</span></td>
+                                </tr>
+                                <tr>
+                                    <td>#ORD-002</td>
+                                    <td>Jane Smith</td>
+                                    <td>$89.50</td>
+                                    <td><span class="badge warning">Pending</span></td>
+                                </tr>
+                                <tr>
+                                    <td>#ORD-003</td>
+                                    <td>Mike Johnson</td>
+                                    <td>$245.00</td>
+                                    <td><span class="badge warning">Pending</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Top Products</h3>
+                    <div class="product-list">
+                        <div class="product-item">
+                            <span class="product-name">Classic T-Shirt</span>
+                            <span class="product-sales">245 sales</span>
+                        </div>
+                        <div class="product-item">
+                            <span class="product-name">Denim Jeans</span>
+                            <span class="product-sales">198 sales</span>
+                        </div>
+                        <div class="product-item">
+                            <span class="product-name">Leather Jacket</span>
+                            <span class="product-sales">156 sales</span>
+                        </div>
+                        <div class="product-item">
+                            <span class="product-name">Summer Dress</span>
+                            <span class="product-sales">143 sales</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Products Section -->
+        <section id="products" class="content-section">
+            <div class="section-header">
+                <h2>Products Management</h2>
+                <button class="btn btn-primary" id="addProductBtn">+ Add Product</button>
+            </div>
+
+            <div class="card">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTable">
+                            <!-- Products will be populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Orders Section -->
+        <section id="orders" class="content-section">
+            <div class="section-header">
+                <h2>Orders Management</h2>
+                <div class="filter-group">
+                    <select class="filter-select" id="orderStatus">
+                        <option value="all">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTable">
+                            <!-- Orders will be populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Customers Section -->
+        <section id="customers" class="content-section">
+            <div class="section-header">
+                <h2>Customers Management</h2>
+            </div>
+
+            <div class="card">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Orders</th>
+                                <th>Total Spent</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customersTable">
+                            <!-- Customers will be populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analytics Section -->
+        <section id="analytics" class="content-section">
+            <div class="section-header">
+                <h2>Analytics</h2>
+            </div>
+
+            <div class="analytics-grid">
+                <div class="card">
+                    <h3>Sales Overview</h3>
+                    <div class="chart-placeholder">
+                        <p>📈 Sales chart visualization</p>
+                        <p class="chart-note">Connect to your Spring Boot backend to display real-time data</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Category Distribution</h3>
+                    <div class="category-stats">
+                        <div class="category-item">
+                            <span class="category-name">T-Shirts</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 45%"></div>
+                            </div>
+                            <span class="category-percent">45%</span>
+                        </div>
+                        <div class="category-item">
+                            <span class="category-name">Jeans</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 30%"></div>
+                            </div>
+                            <span class="category-percent">30%</span>
+                        </div>
+                        <div class="category-item">
+                            <span class="category-name">Jackets</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 15%"></div>
+                            </div>
+                            <span class="category-percent">15%</span>
+                        </div>
+                        <div class="category-item">
+                            <span class="category-name">Accessories</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 10%"></div>
+                            </div>
+                            <span class="category-percent">10%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal for Add/Edit Product -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Product</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="productForm">
+                <div class="form-group">
+                    <label>Product Name</label>
+                    <input type="text" id="productName" required>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="productCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="T-Shirts">T-Shirts</option>
+                        <option value="Jeans">Jeans</option>
+                        <option value="Jackets">Jackets</option>
+                        <option value="Accessories">Accessories</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Price ($)</label>
+                        <input type="number" id="productPrice" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Stock</label>
+                        <input type="number" id="productStock" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+  <script th:src="@{/js/admin.js}"></script>
+</body>
+
+</html>

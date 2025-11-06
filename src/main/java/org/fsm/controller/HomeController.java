@@ -31,6 +31,11 @@ public class HomeController {
         return "home";
     }
 
+     @GetMapping("/admin")
+    public String admin() {
+        return "admin";
+    }
+
     @GetMapping("/shop")
     public String shop(Model model) {
         model.addAttribute("currentPath", "/shop");
