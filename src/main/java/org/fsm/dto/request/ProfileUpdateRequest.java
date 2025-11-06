@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
@@ -21,5 +22,10 @@ public class ProfileUpdateRequest {
     @NotBlank(message = "Default address is required")
     private String defaultAddress;
 
+    // Keep this to store the URL after processing
+    @Size(max = 512, message = "Avatar URL too long")
     private String avatarUrl;
+
+    // Add this to handle file upload
+    private MultipartFile avatar; // Matches <input type="file" name="avatar">
 }

@@ -38,6 +38,25 @@
     .btn-submit:hover { background:#b91c1c; transform:translateY(-1px); }
     .field-error { color:#dc2626; font-size:13px; margin-top:5px; display:block; }
     .avatar-preview { width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid #e5e7eb; }
+    .avatar-section {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .avatar-large {
+      width: 22%;
+      aspect-ratio: 1 / 1; /* Keeps it a perfect square */
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #e5e7eb;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .avatar-large:hover {
+      transform: scale(1.05);
+    }
+
   </style>
 </head>
 
@@ -52,22 +71,68 @@
   <div class="form-container">
 
     <div class="form-header">
-      <h2>Complete Your Profile</h2>
+      <h2 th:text="${currentPath != null and currentPath.contains('edit') ? 'Edit Your Profile' : 'Complete Your Profile'}">
+        Complete Your Profile
+      </h2>
       <p>Help us personalize your experience</p>
     </div>
 
-    <!-- FORM -->
-    <form th:action="@{/profile/setup}" th:object="${userForm}" method="post">
+    <!-- SUCCESS / ERROR MESSAGES -->
+    <div class="message success" th:if="${param.success}" style="display:block">
+      Profile saved successfully!
+    </div>
+    <div class="message error" th:if="${errorMessage}" style="display:block">
+      <span th:text="${errorMessage}">Error</span>
+    </div>
 
-      <!-- REPLACE #fields WITH result.hasErrors() -->
-      <div class="message error" th:if="${result?.hasErrors()}" style="display:block">
-        Please fix the errors below.
+    <!-- FIXED: Use BindingResult instead of #fields -->
+    <div class="message error" th:if="${result?.hasErrors()}" style="display:block">
+      Please fix the errors below.
+    </div>
+
+    <!-- ==== AVATAR SECTION (TOP) ==== -->
+    <div class="avatar-section">
+      <!-- Current avatar (large) -->
+      <img th:if="${currentAvatarUrl != null && !#strings.isEmpty(currentAvatarUrl)}"
+           th:src="@{/{url}(url=${currentAvatarUrl})}"
+           alt="Current Avatar"
+           class="avatar-large"
+           onerror="this.src='@{/images/default_avatar.png}'" />
+
+      <!-- Default avatar when none -->
+      <img th:unless="${currentAvatarUrl != null && !#strings.isEmpty(currentAvatarUrl)}"
+           th:src="@{/images/default_avatar.png}"
+           alt="Default Avatar"
+           class="avatar-large" />
+
+      <!-- File input (under the picture) -->
+      <div class="form-group" style="margin-top:15px;">
+        <label>Profile Picture <small class="text-muted">(optional – .jpg, .png, .svg)</small></label>
+        <input type="file" name="avatar" accept=".jpg,.jpeg,.png,.svg" class="form-control" />
+      </div>
+    </div>
+
+    <!-- FORM - USES THYMELEAF @{} to handle context path automatically -->
+    <form th:action="${currentPath}"
+          th:object="${userForm}"
+          method="post"
+          enctype="multipart/form-data">
+
+      <!-- SUCCESS MESSAGE -->
+      <div class="message success" th:if="${param.success}" style="display:block">
+        Profile saved successfully!
       </div>
 
-      <!-- SERVER ERROR -->
+      <!-- GENERAL ERROR -->
       <div class="message error" th:if="${errorMessage}" style="display:block">
         <span th:text="${errorMessage}">Error</span>
       </div>
+
+      <!-- VALIDATION ERRORS -->
+      <div class="message error" th:if="${#fields.hasErrors('*')}" style="display:block">
+        Please fix the errors below.
+      </div>
+
       <!-- Full Name -->
       <div class="form-group">
         <label>Full Name</label>
@@ -75,8 +140,9 @@
           <i class="fas fa-user"></i>
           <input type="text" th:field="*{fullName}" placeholder="Enter your full name" />
         </div>
-        <span class="field-error" th:if="${result?.hasFieldErrors('fullName')}" th:errors="*{fullName}"></span>
+        <span class="field-error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></span>
       </div>
+
       <!-- Phone -->
       <div class="form-group">
         <label>Phone Number</label>
@@ -84,7 +150,7 @@
           <i class="fas fa-phone"></i>
           <input type="tel" th:field="*{phone}" placeholder="e.g. 0123456789" />
         </div>
-        <span class="field-error" th:if="${result?.hasFieldErrors('phone')}" th:errors="*{phone}"></span>
+        <span class="field-error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></span>
       </div>
 
       <!-- Address -->
@@ -94,10 +160,14 @@
           <i class="fas fa-map-marker-alt"></i>
           <textarea th:field="*{defaultAddress}" placeholder="Enter your address" rows="3"></textarea>
         </div>
-        <span class="field-error" th:if="${result?.hasFieldErrors('defaultAddress')}" th:errors="*{defaultAddress}"></span>
+        <span class="field-error" th:if="${#fields.hasErrors('defaultAddress')}" th:errors="*{defaultAddress}"></span>
       </div>
 
-      <button type="submit" class="btn-submit">Save & Continue</button>
+      <button type="submit" class="btn-submit">
+        <span th:text="${currentPath != null and currentPath.contains('edit') ? 'Save Changes' : 'Save & Continue'}">
+          Save Changes
+        </span>
+      </button>
     </form>
 
     <p style="text-align:center; margin-top:20px; font-size:14px; color:#6b7280;">

@@ -37,12 +37,21 @@
 
 <div class="container">
     <div class="profile-card">
-
         <div style="text-align:center; margin-bottom:30px;">
-            <img th:if="${user?.avatarUrl}" th:src="${user.avatarUrl}" alt="Avatar" class="avatar-large" />
-            <img th:unless="${user?.avatarUrl}" src="https://via.placeholder.com/100" alt="Avatar" class="avatar-large" />
-            <h2 th:text="${user?.fullName}" style="margin-top:15px; font-size:24px;">User</h2>
-            <p th:text="${user?.email}" style="color:#6b7280;">email@example.com</p>
+            <!-- Fixed: Removed the leading slash and fixed typo -->
+            <img th:if="${user?.avatarUrl != null and !#strings.isEmpty(user.avatarUrl)}"
+                 th:src="@{/{url}(url=${user.avatarUrl})}"
+                 alt="Avatar"
+                 class="avatar-large"
+                 onerror="this.src='/images/default_avatar.png'" />
+
+            <img th:unless="${user?.avatarUrl != null and !#strings.isEmpty(user.avatarUrl)}"
+                 th:src="@{/images/default_avatar.png}"
+                 alt="Default Avatar"
+                 class="avatar-large" />
+
+            <h2 th:text="${user?.fullName}">User</h2>
+            <p th:text="${user?.email}">email@example.com</p>
         </div>
 
         <div class="info-row">
