@@ -6,97 +6,97 @@
 </head>
 
 <body>
-  <header class="header">
-    <div class="icon-store">
-      <a href="/fashionshop" class="logo">
-        <img th:src="@{/images/store.png}" alt="Logo" class="logo-img" />
-        <span class="logo-text">Fashion Shop</span>
-      </a>
+<header class="header">
+  <div class="icon-store">
+    <a href="/fashionshop" class="logo">
+      <img th:src="@{/images/store.png}" alt="Logo" class="logo-img" />
+      <span class="logo-text">Fashion Shop</span>
+    </a>
+  </div>
+
+  <nav class="link-home">
+    <a href="/fashionshop" th:classappend="${currentPath == '/'} ? 'active' : ''">Home</a>
+    <a th:href="@{/shop}" th:classappend="${currentPath != null && currentPath.contains('/shop')} ? 'active' : ''">
+      Shop
+    </a>
+    <a th:href="@{/about}" th:classappend="${currentPath != null && currentPath.contains('/about')} ? 'active' : ''">About</a>
+    <a th:href="@{/careers}" th:classappend="${currentPath != null && currentPath.contains('/careers')} ? 'active' : ''">Careers</a>
+    <a th:href="@{/faqs}" th:classappend="${currentPath != null && currentPath.contains('/faqs')} ? 'active' : ''">FAQ's</a>
+    <a th:href="@{/contact}" th:classappend="${currentPath != null && currentPath.contains('/contact')} ? 'active' : ''">Contact</a>
+  </nav>
+
+  <!-- ===== USER & CART ===== -->
+  <div class="user-cart">
+
+    <!-- ===== USER DROPDOWN (ANONYMOUS) ===== -->
+    <div class="user-dropdown" sec:authorize="isAnonymous()">
+      <svg width="28" height="28" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"
+           stroke-linejoin="round" class="user-icon">
+        <circle cx="12" cy="8" r="4"></circle>
+        <path d="M4 22c0-4 4-6 8-6s8 2 8 6"></path>
+      </svg>
+
+      <div class="dropdown-menu">
+        <a th:href="@{/login}">Login</a>
+        <a th:href="@{/signup}">Register</a>
+      </div>
     </div>
 
-    <nav class="link-home">
-      <a href="/fashionshop" th:classappend="${currentPath == '/'} ? 'active' : ''">Home</a>
-      <a th:href="@{/shop}" th:classappend="${currentPath != null && currentPath.contains('/shop')} ? 'active' : ''">
-        Shop
-      </a>
-      <a th:href="@{/about}" th:classappend="${currentPath != null && currentPath.contains('/about')} ? 'active' : ''">About</a>
-      <a th:href="@{/careers}" th:classappend="${currentPath != null && currentPath.contains('/careers')} ? 'active' : ''">Careers</a>
-      <a th:href="@{/faqs}" th:classappend="${currentPath != null && currentPath.contains('/faqs')} ? 'active' : ''">FAQ's</a>
-      <a th:href="@{/contact}" th:classappend="${currentPath != null && currentPath.contains('/contact')} ? 'active' : ''">Contact</a>
-    </nav>
+    <!-- AUTHENTICATED USER DROPDOWN -->
+    <div class="user-dropdown" sec:authorize="isAuthenticated()">
+      <svg width="28" height="28" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"
+           stroke-linejoin="round" class="user-icon">
+        <circle cx="12" cy="8" r="4"></circle>
+        <path d="M4 22c0-4 4-6 8-6s8 2 8 6"></path>
+      </svg>
 
-    <!-- ===== USER & CART ===== -->
-    <div class="user-cart">
-
-      <!-- ===== USER DROPDOWN (ANONYMOUS) ===== -->
-      <div class="user-dropdown" sec:authorize="isAnonymous()">
-        <svg width="28" height="28" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"
-          stroke-linejoin="round" class="user-icon">
-          <circle cx="12" cy="8" r="4"></circle>
-          <path d="M4 22c0-4 4-6 8-6s8 2 8 6"></path>
-        </svg>
-
-        <div class="dropdown-menu">
-          <a th:href="@{/login}">Login</a>
-          <a th:href="@{/signup}">Register</a>
-        </div>
-      </div>
-
-      <!-- AUTHENTICATED USER DROPDOWN -->
-      <div class="user-dropdown" sec:authorize="isAuthenticated()">
-        <svg width="28" height="28" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"
-          stroke-linejoin="round" class="user-icon">
-          <circle cx="12" cy="8" r="4"></circle>
-          <path d="M4 22c0-4 4-6 8-6s8 2 8 6"></path>
-        </svg>
-
-        <div class="dropdown-menu">
-          <div class="user-info">
-            <th:block th:with="
+      <div class="dropdown-menu">
+        <div class="user-info">
+          <th:block th:with="
           userName=${#authentication.principal.attributes['name']},
           userEmail=${#authentication.principal.attributes['email']},
           fallback=${#authentication.name}">
-              <strong th:text="${
+            <strong th:text="${
             userName != null ? userName :
             (userEmail != null ? userEmail : fallback)
         }">User</strong>
-            </th:block>
-            <small th:text="${
+          </th:block>
+          <small th:text="${
           #authentication.principal.attributes['email'] ?: #authentication.name
       }">email</small>
-          </div>
-
-          <!-- COMPLETE PROFILE LINK -->
-          <a th:href="@{/profile/setup}" th:if="${currentUser != null && !currentUser.profileCompleted}"
-            class="dropdown-link">
-            Complete Profile
-          </a>
-
-          <!-- MY PROFILE -->
-          <a th:href="@{/profile/view}" class="dropdown-link">
-            My Profile
-          </a>
-
-          <!-- LOGOUT -->
-          <form th:action="@{/logout}" method="post" style="margin:0;">
-            <button type="submit" class="logout-btn">
-              Logout
-            </button>
-          </form>
         </div>
-      </div>
 
-      <!-- CART -->
-      <a th:href="@{/cart}" class="cart-link">
-        <svg class="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="black"
-          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 14h20l-2 12H8L6 14z"></path>
-          <path d="M10 14l4-6 4 6"></path>
-        </svg>
-        <span class="badge">0</span>
-      </a>
+        <!-- COMPLETE PROFILE LINK -->
+        <a th:href="@{/profile/setup}" th:if="${currentUser != null && !currentUser.profileCompleted}"
+           class="dropdown-link">
+          Complete Profile
+        </a>
+
+        <!-- MY PROFILE -->
+        <a th:href="@{/profile/view}" class="dropdown-link">
+          My Profile
+        </a>
+
+        <!-- LOGOUT -->
+        <form th:action="@{/logout}" method="post" style="margin:0;">
+          <button type="submit" class="logout-btn">
+            Logout
+          </button>
+        </form>
+      </div>
     </div>
-  </header>
+
+    <!-- CART -->
+    <a th:href="@{/cart}" class="cart-link">
+      <svg class="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="black"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 14h20l-2 12H8L6 14z"></path>
+        <path d="M10 14l4-6 4 6"></path>
+      </svg>
+      <span class="badge">0</span>
+    </a>
+  </div>
+</header>
 </body>
 
 <script>

@@ -1,6 +1,7 @@
 package org.fsm.controller;
 
 import jakarta.servlet.http.HttpServletRequest; // MUST IMPORT
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.fsm.dto.request.ProfileUpdateRequest;
@@ -46,7 +47,7 @@ public class ProfileController {
 
         // Pre-populate DTO with existing values
         ProfileUpdateRequest dto = new ProfileUpdateRequest();
-        dto.setFullName(user.getFullName());
+        dto.setFullName(user.getFullName());  // ← ADD
         dto.setPhone(user.getPhone());
         dto.setDefaultAddress(user.getDefaultAddress());
         model.addAttribute("userForm", dto);
@@ -55,6 +56,7 @@ public class ProfileController {
     }
 
     @PostMapping("/setup")
+    @Transactional  // ← ADD THIS
     public String saveProfile(@Valid @ModelAttribute("userForm") ProfileUpdateRequest form,
                               BindingResult result,
                               Authentication authentication,
@@ -64,7 +66,7 @@ public class ProfileController {
         model.addAttribute("currentPath", request.getRequestURI());
 
         if (result.hasErrors()) {
-            // validation failed: show same page with errors
+            System.out.println("Validation errors: " + result.getAllErrors());
             return "profile/setup";
         }
 
@@ -89,12 +91,13 @@ public class ProfileController {
         existing.setProfileCompleted(true);
 
         try {
-            userRepository.save(existing);
-        } catch (DataIntegrityViolationException dive) {
-            model.addAttribute("errorMessage", "Invalid profile data or duplicate value.");
-            return "profile/setup";
+            User saved = userRepository.save(existing);
+            System.out.println("SAVED USER ID: " + saved.getId());
+            System.out.println("PHONE: " + saved.getPhone());
+            System.out.println("ADDRESS: " + saved.getDefaultAddress());
         } catch (Exception ex) {
-            model.addAttribute("errorMessage", "Unexpected error. Please try later.");
+            ex.printStackTrace();
+            model.addAttribute("errorMessage", "Save failed: " + ex.getMessage());
             return "profile/setup";
         }
 
