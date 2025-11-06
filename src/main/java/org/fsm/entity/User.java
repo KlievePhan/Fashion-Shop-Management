@@ -10,7 +10,11 @@ import java.time.LocalDateTime;
         @UniqueConstraint(columnNames = "google_sub"),
         @UniqueConstraint(columnNames = "email")
 })
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
 
     @Id
@@ -47,7 +51,8 @@ public class User {
     @Column(name = "avatar_url", length = 512)
     private String avatarUrl;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    // ✅ Sửa tại đây: fetch = FetchType.EAGER để tránh LazyInitializationException
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
