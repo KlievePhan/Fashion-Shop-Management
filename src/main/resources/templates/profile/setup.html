@@ -38,25 +38,9 @@
     .btn-submit:hover { background:#b91c1c; transform:translateY(-1px); }
     .field-error { color:#dc2626; font-size:13px; margin-top:5px; display:block; }
     .avatar-preview { width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid #e5e7eb; }
-    .avatar-section {
-      text-align: center;
-      margin-bottom: 25px;
-    }
-
-    .avatar-large {
-      width: 22%;
-      aspect-ratio: 1 / 1; /* Keeps it a perfect square */
-      border-radius: 50%;
-      object-fit: cover;
-      border: 4px solid #e5e7eb;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s ease;
-    }
-
-    .avatar-large:hover {
-      transform: scale(1.05);
-    }
-
+    .avatar-section { text-align: center; margin-bottom: 25px; }
+    .avatar-large { width: 22%; aspect-ratio: 1 / 1; border-radius: 50%; object-fit: cover; border: 4px solid #e5e7eb; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease; }
+    .avatar-large:hover { transform: scale(1.05); }
   </style>
 </head>
 
@@ -92,55 +76,41 @@
 
     <!-- ==== AVATAR SECTION (TOP) ==== -->
     <div class="avatar-section">
-      <!-- Current avatar (large) -->
       <img th:if="${currentAvatarUrl != null && !#strings.isEmpty(currentAvatarUrl)}"
            th:src="@{/{url}(url=${currentAvatarUrl})}"
            alt="Current Avatar"
            class="avatar-large"
            onerror="this.src='@{/images/default_avatar.png}'" />
 
-      <!-- Default avatar when none -->
       <img th:unless="${currentAvatarUrl != null && !#strings.isEmpty(currentAvatarUrl)}"
            th:src="@{/images/default_avatar.png}"
            alt="Default Avatar"
            class="avatar-large" />
 
-      <!-- File input (under the picture) -->
       <div class="form-group" style="margin-top:15px;">
         <label>Profile Picture <small class="text-muted">(optional – .jpg, .png, .svg)</small></label>
         <input type="file" name="avatar" accept=".jpg,.jpeg,.png,.svg" class="form-control" />
       </div>
     </div>
 
-    <!-- FORM - USES THYMELEAF @{} to handle context path automatically -->
+    <!-- FORM -->
     <form th:action="${currentPath}"
           th:object="${userForm}"
           method="post"
-          enctype="multipart/form-data">
-
-      <!-- SUCCESS MESSAGE -->
-      <div class="message success" th:if="${param.success}" style="display:block">
-        Profile saved successfully!
-      </div>
-
-      <!-- GENERAL ERROR -->
-      <div class="message error" th:if="${errorMessage}" style="display:block">
-        <span th:text="${errorMessage}">Error</span>
-      </div>
-
-      <!-- VALIDATION ERRORS -->
-      <div class="message error" th:if="${#fields.hasErrors('*')}" style="display:block">
-        Please fix the errors below.
-      </div>
+          enctype="multipart/form-data"
+          id="profileForm"
+          novalidate>
 
       <!-- Full Name -->
       <div class="form-group">
         <label>Full Name</label>
         <div class="input-wrapper">
           <i class="fas fa-user"></i>
-          <input type="text" th:field="*{fullName}" placeholder="Enter your full name" />
+          <input type="text" th:field="*{fullName}" placeholder="Enter your full name"
+                 required pattern="^[A-Za-zÀ-ỹ\s]+$"
+                 title="Full name must contain only letters and spaces" />
         </div>
-        <span class="field-error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></span>
+        <span class="field-error" id="nameError"></span>
       </div>
 
       <!-- Phone -->
@@ -148,9 +118,11 @@
         <label>Phone Number</label>
         <div class="input-wrapper">
           <i class="fas fa-phone"></i>
-          <input type="tel" th:field="*{phone}" placeholder="e.g. 0123456789" />
+          <input type="tel" th:field="*{phone}" placeholder="e.g. 0123456789"
+                 required pattern="^[0-9]{10}$"
+                 title="Phone number must be exactly 10 digits" />
         </div>
-        <span class="field-error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></span>
+        <span class="field-error" id="phoneError"></span>
       </div>
 
       <!-- Address -->
@@ -158,16 +130,13 @@
         <label>Default Address</label>
         <div class="input-wrapper">
           <i class="fas fa-map-marker-alt"></i>
-          <textarea th:field="*{defaultAddress}" placeholder="Enter your address" rows="3"></textarea>
+          <textarea th:field="*{defaultAddress}" placeholder="Enter your address" rows="3"
+                    required></textarea>
         </div>
-        <span class="field-error" th:if="${#fields.hasErrors('defaultAddress')}" th:errors="*{defaultAddress}"></span>
+        <span class="field-error" id="addressError"></span>
       </div>
 
-      <button type="submit" class="btn-submit">
-        <span th:text="${currentPath != null and currentPath.contains('edit') ? 'Save Changes' : 'Save & Continue'}">
-          Save Changes
-        </span>
-      </button>
+      <button type="submit" class="btn-submit">Save & Continue</button>
     </form>
 
     <p style="text-align:center; margin-top:20px; font-size:14px; color:#6b7280;">
@@ -178,6 +147,41 @@
 
 <!-- FOOTER -->
 <div th:replace="~{footer :: footer}"></div>
+
+<script>
+  document.getElementById("profileForm").addEventListener("submit", function (event) {
+    let isValid = true;
+
+    const name = document.querySelector('[name="fullName"]');
+    const phone = document.querySelector('[name="phone"]');
+    const address = document.querySelector('[name="defaultAddress"]');
+
+    const nameError = document.getElementById("nameError");
+    const phoneError = document.getElementById("phoneError");
+    const addressError = document.getElementById("addressError");
+
+    nameError.textContent = "";
+    phoneError.textContent = "";
+    addressError.textContent = "";
+
+    if (!/^[A-Za-zÀ-ỹ\s]+$/.test(name.value.trim())) {
+      nameError.textContent = "Full name must not empty and not contain numbers or special characters.";
+      isValid = false;
+    }
+
+    if (!/^[0-9]{10}$/.test(phone.value.trim())) {
+      phoneError.textContent = "Phone number must contain exactly 10 digits.";
+      isValid = false;
+    }
+
+    if (address.value.trim() === "") {
+      addressError.textContent = "Address is required.";
+      isValid = false;
+    }
+
+    if (!isValid) event.preventDefault();
+  });
+</script>
 
 </body>
 </html>
