@@ -11,8 +11,6 @@ import org.fsm.repository.ContactMessageRepository;
 import org.fsm.repository.RoleRepository;
 import org.fsm.repository.UserRepository;
 import org.fsm.service.EmailService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,7 +34,7 @@ public class HomeController {
         return "home";
     }
 
-     @GetMapping("/admin")
+    @GetMapping("/admin")
     public String admin() {
         return "admin";
     }
@@ -59,13 +57,10 @@ public class HomeController {
     @GetMapping("/faqs")
     public String faqs() { return "faqs"; }
 
-//    @GetMapping("/contact")
-//    public String contact() { return "contact"; }
-
     @GetMapping("/cart")
     public String cart() { return "cart"; }
-    
- // ================== CONTACT =====================
+
+    // ================== CONTACT =====================
     @GetMapping("/contact")
     public String contact(Model model) {
         model.addAttribute("contactMessage", new ContactMessage());
@@ -82,11 +77,11 @@ public class HomeController {
             return "contact";
         }
 
-        // Lưu vào DB
+        // Save to DB
         contactMessageRepository.save(contactMessage);
 
-        // Gửi email đến admin
-        String adminEmail = "qdx2005@gmail.com";
+        // Send email to admin
+        String adminEmail = "tuanmagero@gmail.com";
         String subject = "New Contact Message from " + contactMessage.getFullName();
         String body = String.format(
                 "Name: %s%nEmail: %s%nSubject: %s%n%nMessage:%n%s",
@@ -99,42 +94,30 @@ public class HomeController {
         emailService.sendContactEmail(adminEmail, subject, body);
 
         model.addAttribute("successMessage", "Your message has been sent successfully!");
-        model.addAttribute("contactMessage", new ContactMessage()); // reset form
+        model.addAttribute("contactMessage", new ContactMessage());
         return "contact";
     }
+
     // =================================================
-    // === AUTH PAGES ===
-    @GetMapping("/login")
-    public String login(Model model, @RequestParam(required = false) String error) {
-        model.addAttribute("currentPath", "/login");
-        if (error != null) {
-            model.addAttribute("loginError", "Invalid email or password");
-        }
-        return "login_signup"; // same template
-    }
-
+    // === REGISTRATION (Keep this for backward compatibility) ===
     @GetMapping("/signup")
-    public String signup(Model model, RegisterRequest request) {
+    public String signup(Model model) {
         model.addAttribute("currentPath", "/signup");
-        model.addAttribute("registerRequest", request); // pre-fill form
-        return "login_signup";
+        return "redirect:/login"; // Redirect to AuthController
     }
 
-    // === MANUAL REGISTRATION ===
     @PostMapping("/register")
     public String doRegister(@Valid @ModelAttribute("registerRequest") RegisterRequest request,
                              BindingResult result,
                              Model model) {
 
         model.addAttribute("currentPath", "/signup");
+
         if (result.hasErrors()) {
-            model.addAttribute("hasValidationErrors", true); // ← ADD THIS
+            model.addAttribute("hasValidationErrors", true);
             return "login_signup";
         }
-        if (result.hasErrors()) {
-            return "login_signup"; // same page
-        }
-        
+
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             model.addAttribute("registerError", "Email already exists");
             return "login_signup";

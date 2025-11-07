@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <link rel="stylesheet" th:href="@{/css/header.css}">
@@ -16,9 +16,7 @@
 
   <nav class="link-home">
     <a href="/fashionshop" th:classappend="${currentPath == '/'} ? 'active' : ''">Home</a>
-    <a th:href="@{/shop}" th:classappend="${currentPath != null && currentPath.contains('/shop')} ? 'active' : ''">
-      Shop
-    </a>
+    <a th:href="@{/shop}" th:classappend="${currentPath != null && currentPath.contains('/shop')} ? 'active' : ''">Shop</a>
     <a th:href="@{/about}" th:classappend="${currentPath != null && currentPath.contains('/about')} ? 'active' : ''">About</a>
     <a th:href="@{/careers}" th:classappend="${currentPath != null && currentPath.contains('/careers')} ? 'active' : ''">Careers</a>
     <a th:href="@{/faqs}" th:classappend="${currentPath != null && currentPath.contains('/faqs')} ? 'active' : ''">FAQ's</a>
@@ -28,8 +26,8 @@
   <!-- ===== USER & CART ===== -->
   <div class="user-cart">
 
-    <!-- ===== USER DROPDOWN (ANONYMOUS) ===== -->
-    <div class="user-dropdown" sec:authorize="isAnonymous()">
+    <!-- ANONYMOUS USER -->
+    <div class="user-dropdown" th:unless="${isAuthenticated}">
       <svg width="28" height="28" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"
            stroke-linejoin="round" class="user-icon">
         <circle cx="12" cy="8" r="4"></circle>
@@ -42,8 +40,8 @@
       </div>
     </div>
 
-    <!-- AUTHENTICATED USER DROPDOWN -->
-    <div class="user-dropdown" sec:authorize="isAuthenticated()">
+    <!-- AUTHENTICATED USER -->
+    <div class="user-dropdown" th:if="${isAuthenticated}">
       <svg width="28" height="28" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"
            stroke-linejoin="round" class="user-icon">
         <circle cx="12" cy="8" r="4"></circle>
@@ -52,36 +50,23 @@
 
       <div class="dropdown-menu">
         <div class="user-info">
-          <th:block th:with="
-          userName=${#authentication.principal.attributes['name']},
-          userEmail=${#authentication.principal.attributes['email']},
-          fallback=${#authentication.name}">
-            <strong th:text="${
-            userName != null ? userName :
-            (userEmail != null ? userEmail : fallback)
-        }">User</strong>
-          </th:block>
-          <small th:text="${
-          #authentication.principal.attributes['email'] ?: #authentication.name
-      }">email</small>
+          <strong th:text="${currentUserFullName ?: currentUserEmail}">User</strong>
+          <small th:text="${currentUserEmail}">email</small>
         </div>
 
-        <!-- COMPLETE PROFILE LINK -->
-        <a th:href="@{/profile/setup}" th:if="${currentUser != null && !currentUser.profileCompleted}"
+        <!-- Complete Profile -->
+        <a th:href="@{/profile/setup}"
+           th:if="${currentUser != null && !currentUser.profileCompleted}"
            class="dropdown-link">
           Complete Profile
         </a>
 
-        <!-- MY PROFILE -->
-        <a th:href="@{/profile/view}" class="dropdown-link">
-          My Profile
-        </a>
+        <!-- My Profile -->
+        <a th:href="@{/profile/view}" class="dropdown-link">My Profile</a>
 
-        <!-- LOGOUT -->
+        <!-- Logout -->
         <form th:action="@{/logout}" method="post" style="margin:0;">
-          <button type="submit" class="logout-btn">
-            Logout
-          </button>
+          <button type="submit" class="logout-btn">Logout</button>
         </form>
       </div>
     </div>
@@ -116,25 +101,20 @@
     const hide = () => {
       hoverTimeout = setTimeout(() => {
         dropdown.classList.remove('active');
-      }, 300); // 300ms delay
+      }, 300);
     };
 
-    // Click toggle
     dropdown.addEventListener('click', (e) => {
       e.stopPropagation();
       dropdown.classList.contains('active') ? hide() : show();
     });
 
-    // Hover: instant open, delayed close
     dropdown.addEventListener('mouseenter', show);
     dropdown.addEventListener('mouseleave', hide);
   });
 
-  // Close all on outside click
   document.addEventListener('click', () => {
-    document.querySelectorAll('.user-dropdown').forEach(d => {
-      d.classList.remove('active');
-    });
+    document.querySelectorAll('.user-dropdown').forEach(d => d.classList.remove('active'));
   });
 </script>
 

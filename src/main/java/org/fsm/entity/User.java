@@ -41,7 +41,7 @@ public class User {
     @Column(name = "password", length = 255)
     private String password;
 
-    @Pattern(regexp = "^[0-9]{10,15}$", message = "Phone number must be 10–15 digits")
+    @Pattern(regexp = "^[0-9]{10,15}$", message = "Phone number must be 10-15 digits")
     @Column(length = 50)
     private String phone;
 
@@ -51,7 +51,6 @@ public class User {
     @Column(name = "avatar_url", length = 512)
     private String avatarUrl;
 
-    // ✅ Sửa tại đây: fetch = FetchType.EAGER để tránh LazyInitializationException
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
@@ -61,6 +60,13 @@ public class User {
 
     @Column(name = "profile_completed", columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean profileCompleted = false;
+
+    // Remember Me fields
+    @Column(name = "remember_me_token", length = 255)
+    private String rememberMeToken;
+
+    @Column(name = "remember_me_expiry")
+    private LocalDateTime rememberMeExpiry;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
