@@ -90,28 +90,6 @@
       Please fix the errors below.
     </div>
 
-    <!-- ==== AVATAR SECTION (TOP) ==== -->
-    <div class="avatar-section">
-      <!-- Current avatar (large) -->
-      <img th:if="${currentAvatarUrl != null && !#strings.isEmpty(currentAvatarUrl)}"
-           th:src="@{/{url}(url=${currentAvatarUrl})}"
-           alt="Current Avatar"
-           class="avatar-large"
-           onerror="this.src='@{/images/default_avatar.png}'" />
-
-      <!-- Default avatar when none -->
-      <img th:unless="${currentAvatarUrl != null && !#strings.isEmpty(currentAvatarUrl)}"
-           th:src="@{/images/default_avatar.png}"
-           alt="Default Avatar"
-           class="avatar-large" />
-
-      <!-- File input (under the picture) -->
-      <div class="form-group" style="margin-top:15px;">
-        <label>Profile Picture <small class="text-muted">(optional – .jpg, .png, .svg)</small></label>
-        <input type="file" name="avatar" accept=".jpg,.jpeg,.png,.svg" class="form-control" />
-      </div>
-    </div>
-
     <!-- FORM - USES THYMELEAF @{} to handle context path automatically -->
     <form th:action="${currentPath}"
           th:object="${userForm}"
@@ -131,6 +109,28 @@
       <!-- VALIDATION ERRORS -->
       <div class="message error" th:if="${#fields.hasErrors('*')}" style="display:block">
         Please fix the errors below.
+      </div>
+
+      <!-- ==== AVATAR SECTION (TOP) ==== -->
+      <div class="avatar-section">
+        <!-- Current avatar (large) -->
+        <img th:if="${currentAvatarUrl != null && !#strings.isEmpty(currentAvatarUrl)}"
+             th:src="@{/{url}(url=${currentAvatarUrl})}"
+             alt="Current Avatar"
+             class="avatar-large"
+             onerror="this.src='@{/images/default_avatar.png}'" />
+
+        <!-- Default avatar when none -->
+        <img th:unless="${currentAvatarUrl != null && !#strings.isEmpty(currentAvatarUrl)}"
+             th:src="@{/images/default_avatar.png}"
+             alt="Default Avatar"
+             class="avatar-large" />
+
+        <!-- File input (under the picture) -->
+        <div class="form-group" style="margin-top:15px;">
+          <label>Profile Picture <small class="text-muted">(optional – .jpg, .png, .svg)</small></label>
+          <input type="file" name="avatar" accept=".jpg,.jpeg,.png,.svg" class="form-control" />
+        </div>
       </div>
 
       <!-- Full Name -->
