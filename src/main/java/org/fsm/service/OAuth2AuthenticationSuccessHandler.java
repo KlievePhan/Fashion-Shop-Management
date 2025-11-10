@@ -39,16 +39,20 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
                             .orElse(null);
                 });
 
-        if (user == null) {
-            response.sendRedirect(request.getContextPath() + "/login?error=user_not_found");
+        String contextPath = request.getContextPath();
+        String roleCode = (user.getRole() != null) ? user.getRole().getCode() : null;
+
+        System.out.println("User role from DB: " + roleCode);
+
+        if ("ROLE_ADMIN".equals(roleCode)) {
+            response.sendRedirect(contextPath + "/admin");
             return;
         }
-        String contextPath = request.getContextPath();
-        if (user.getProfileCompleted()) {
+
+        if (Boolean.TRUE.equals(user.getProfileCompleted())) {
             response.sendRedirect(contextPath + "/");
         } else {
             response.sendRedirect(contextPath + "/profile/setup");
         }
     }
-
 }

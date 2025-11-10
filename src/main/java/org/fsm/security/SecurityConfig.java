@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.fsm.service.CustomOidcUserService;
 
 @Configuration
 @EnableWebSecurity
@@ -19,20 +20,25 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
-    private final OAuth2AuthenticationSuccessHandler oauth2SuccessHandler; // your existing handler
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2AuthenticationSuccessHandler oauth2SuccessHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/profile/**", "/cart/**").authenticated()
                         .requestMatchers("/css/**", "/images/**", "/js/**", "/login", "/forgot-password", "/reset-password").permitAll()
                         .anyRequest().permitAll()
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/login")
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
+                                .oidcUserService(customOidcUserService()) // ADD THIS
+                        )
                         .successHandler(oauth2SuccessHandler)
                 )
                 .logout(logout -> logout
@@ -45,7 +51,7 @@ public class SecurityConfig {
                         .rememberMeCookieName("remember-me")
                         .tokenValiditySeconds(30 * 24 * 60 * 60)
                         .userDetailsService(userDetailsService)
-                        .alwaysRemember(false) // only when user checks "remember me"
+                        .alwaysRemember(false)
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
@@ -53,6 +59,11 @@ public class SecurityConfig {
                 );
 
         return http.build();
+    }
+
+    @Bean
+    public CustomOidcUserService customOidcUserService() {
+        return new CustomOidcUserService(customOAuth2UserService);
     }
 
     @Bean
