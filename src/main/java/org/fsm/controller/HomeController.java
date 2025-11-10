@@ -2,12 +2,13 @@ package org.fsm.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
+import org.fsm.dto.request.RegisterRequest;
 import org.fsm.entity.ContactMessage;
+import org.fsm.entity.Product;
 import org.fsm.entity.Role;
 import org.fsm.entity.User;
-import org.fsm.dto.request.RegisterRequest;
 import org.fsm.repository.ContactMessageRepository;
+import org.fsm.repository.ProductRepository;
 import org.fsm.repository.RoleRepository;
 import org.fsm.repository.UserRepository;
 import org.fsm.service.EmailService;
@@ -15,7 +16,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Controller
@@ -25,14 +31,33 @@ public class HomeController {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final ContactMessageRepository contactMessageRepository;
+    private final ProductRepository productRepository;
     private final EmailService emailService;
 
 
     @GetMapping("/")
     public String home(Model model) {
         model.addAttribute("currentPath", "/");
+        List<Product> products = productRepository.findAll();
+        model.addAttribute("products", products);
         return "home";
     }
+
+    @GetMapping("/product/{id}")
+    public String productDetail(@PathVariable Long id, Model model) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        model.addAttribute("currentPath", "/product/" + id);
+        model.addAttribute("product", product);
+        List<Product> relatedProducts = productRepository.findAll()
+                .stream()
+                .filter(p -> !p.getId().equals(id))
+                .limit(4)
+                .toList();
+        model.addAttribute("relatedProducts", relatedProducts);
+        return "product-detail";
+    }
+
 
     @GetMapping("/admin")
     public String admin() {
@@ -52,13 +77,19 @@ public class HomeController {
     }
 
     @GetMapping("/careers")
-    public String careers() { return "careers"; }
+    public String careers() {
+        return "careers";
+    }
 
     @GetMapping("/faqs")
-    public String faqs() { return "faqs"; }
+    public String faqs() {
+        return "faqs";
+    }
 
     @GetMapping("/cart")
-    public String cart() { return "cart"; }
+    public String cart() {
+        return "cart";
+    }
 
     // ================== CONTACT =====================
     @GetMapping("/contact")
@@ -124,8 +155,9 @@ public class HomeController {
         }
 
         Role userRole = roleRepository.findByCode("ROLE_USER")
-                .orElseThrow(() -> new IllegalStateException("ROLE_USER not found"));
-
+                .orElse(
+                        roleRepository.save(new Role(null, "ROLE_USER", "USER", "USER"))
+                );
         User user = User.builder()
                 .fullName(request.getFullName())
                 .displayName(request.getFullName())
@@ -135,7 +167,6 @@ public class HomeController {
                 .active(true)
                 .profileCompleted(false)
                 .build();
-
         userRepository.save(user);
         return "redirect:/login?success=registered";
     }
