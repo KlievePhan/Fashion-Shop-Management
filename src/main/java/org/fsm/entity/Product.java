@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "products", uniqueConstraints = @UniqueConstraint(columnNames = "sku"))
@@ -43,8 +44,26 @@ public class Product {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ProductVariant> variants;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ProductImage> images;
+
     @PreUpdate
     public void preUpdate() {
         this.updatedAt = LocalDateTime.now();
+    }
+
+    @Transient
+    public String getPrimaryImageUrl() {
+        if (images != null && !images.isEmpty()) {
+            return images.stream()
+                    .filter(ProductImage::getPrimary)
+                    .map(ProductImage::getUrl)
+                    .findFirst()
+                    .orElse(images.get(0).getUrl()); // Nếu không có ảnh primary, lấy ảnh đầu tiên
+        }
+        return "/images/default.jpg"; // fallback nếu không có ảnh nào
     }
 }

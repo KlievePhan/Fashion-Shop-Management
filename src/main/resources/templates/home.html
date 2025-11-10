@@ -18,6 +18,25 @@
   <link rel="stylesheet" th:href="@{/css/promo_bar.css}">
   <link rel="stylesheet" th:href="@{/css/home.css}">
   <link rel="stylesheet" th:href="@{/css/theme-customizer.css}">
+  <style>
+    .product-image {
+      position: relative;
+    }
+
+    .product-link-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: block;
+    }
+
+    /* Đảm bảo các nút vẫn bấm được */
+    .product-actions {
+      position: relative;
+      z-index: 2;
+    }
+
+  </style>
 </head>
 
 <body>
@@ -60,47 +79,24 @@
       </div>
     </section>
     <div class="products-grid">
-      <!-- Product 1: Flowline Dresses -->
-      <div class="product-card">
+      <div class="product-card" th:each="p : ${products}">
         <div class="product-image">
-          <img src="https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=600&h=800&fit=crop"
-            alt="Flowline Dresses" />
-        </div>
-        <div class="product-info">
-          <h3 class="product-title">Flowline Dresses</h3>
-          <p class="product-category">Women</p>
-          <div class="product-price">
-            <span class="price-current">$200.00</span>
-            <span class="price-original">$250.00</span>
-          </div>
-          <div class="product-sizes">
-            <button class="size-btn active">M</button>
-            <button class="size-btn">L</button>
-            <button class="size-btn">XL</button>
-          </div>
-          <div class="product-colors">
-            <div class="color-option active" style="background: #7b68ee"></div>
-            <div class="color-option" style="background: #20b2aa"></div>
-            <div class="color-option" style="background: #9acd32"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Product 2: Essential Polos -->
-      <div class="product-card">
-        <div class="product-image">
-          <img src="https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=600&h=800&fit=crop"
-            alt="Essential Polos" />
+          <img th:src="${p.primaryImageUrl}" th:alt="${p.title}" />
+          <a class="product-link-overlay"
+             th:href="@{'/product/' + ${p.id}}"
+             title="Xem chi tiết"></a>
           <div class="product-actions">
-            <button class="action-btn" title="Add to Cart">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <button class="action-btn" title="Add to Cart" th:onclick="'addToCart(' + ${p.id} + ')'">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2">
                 <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
                 <line x1="3" y1="6" x2="21" y2="6"></line>
                 <path d="M16 10a4 4 0 0 1-8 0"></path>
               </svg>
             </button>
-            <button class="action-btn" title="Quick View">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <button class="action-btn" title="Quick View" th:onclick="'showQuickView(' + ${p.id} + ')'">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>
               </svg>
@@ -108,49 +104,31 @@
           </div>
         </div>
         <div class="product-info">
-          <h3 class="product-title">Essential Polos</h3>
-          <p class="product-category">Men</p>
-          <div class="product-price">
-            <span class="price-current">$80.00</span>
-            <span class="price-original">$90.00</span>
-          </div>
-          <div class="product-sizes">
-            <button class="size-btn active">M</button>
-            <button class="size-btn">L</button>
-            <button class="size-btn">XL</button>
-          </div>
-          <div class="product-colors">
-            <div class="color-option active" style="background: #778899"></div>
-            <div class="color-option" style="background: #696969"></div>
-            <div class="color-option" style="background: #8fbc8f"></div>
-          </div>
-        </div>
-      </div>
+          <h3 class="product-title" th:text="${p.title}">Tên sản phẩm</h3>
+          <p class="product-category" th:text="${p.category != null ? p.category.name : 'Uncategorized'}"></p>
 
-      <!-- Product 3: Cream T-Shirt -->
-      <div class="product-card">
-        <div class="product-image">
-          <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=800&fit=crop"
-            alt="Cream T-Shirt" />
-          <div class="sale-badge">Sale!</div>
-        </div>
-        <div class="product-info">
-          <h3 class="product-title">Cream T-Shirt</h3>
-          <p class="product-category">Men</p>
           <div class="product-price">
-            <span class="price-current">$60.00</span>
-            <span class="price-original">$65.00</span>
+            <span class="price-current" th:text="${#numbers.formatDecimal(p.basePrice, 0, 'COMMA', 2, 'POINT')} + ' ₫'">Giá</span>
           </div>
-          <div class="product-sizes">
-            <button class="size-btn active">M</button>
-            <button class="size-btn">L</button>
-            <button class="size-btn">XL</button>
+          <div class="product-sizes" th:if="${p.variants != null}">
+            <button class="size-btn"
+                    th:each="v, iter : ${p.variants}"
+                    th:text="'Size'"
+            th:data-attributes="${v.attributeJson}"
+            th:classappend="${iter.index == 0} ? ' active' : ''">
+            </button>
           </div>
-          <div class="product-colors">
-            <div class="color-option active" style="background: #dda0dd"></div>
-            <div class="color-option" style="background: #4682b4"></div>
-            <div class="color-option" style="background: #8fbc8f"></div>
+
+          <div class="product-colors" th:if="${p.variants != null}">
+            <div class="color-option"
+                 th:each="v, iter : ${p.variants}"
+                 th:data-attributes="${v.attributeJson}"
+                 th:classappend="${iter.index == 0} ? ' active' : ''">
+            </div>
           </div>
+
+
+
         </div>
       </div>
     </div>
@@ -172,6 +150,22 @@
     <i class="bi bi-sliders"></i>
     <span>Customize</span>
   </a>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Sizes
+      document.querySelectorAll(".size-btn").forEach(btn => {
+        const attrs = JSON.parse(btn.dataset.attributes);
+        btn.textContent = attrs.size;          // hiển thị size
+        btn.style.background = attrs.color;    // optional: màu nền theo color
+      });
+
+      // Colors
+      document.querySelectorAll(".color-option").forEach(div => {
+        const attrs = JSON.parse(div.dataset.attributes);
+        div.style.background = attrs.color;
+      });
+    });
+  </script>
   <!-- JS links using Thymeleaf -->
   <script th:src="@{/js/index.js}"></script>
   <script th:src="@{/js/header.js}"></script>

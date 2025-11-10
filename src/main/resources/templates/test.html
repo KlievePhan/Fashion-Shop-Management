@@ -1,0 +1,90 @@
+<!-- Cart Content -->
+<main class="container cart-container">
+    <div class="cart-header">
+        <h1>Shopping Cart</h1>
+    </div>
+
+    <!-- Empty Cart -->
+    <div th:if="${cartItems == null || cartItems.isEmpty()}" class="cart-items-section empty-cart">
+        <i class="bi bi-bag-x"></i>
+        <p>Your cart is empty</p>
+        <a th:href="@{/}" class="btn btn-dark">Continue Shopping</a>
+    </div>
+
+    <!-- Cart Items -->
+    <div th:if="${cartItems != null && !cartItems.isEmpty()}" class="row">
+        <div class="col-lg-8">
+            <div class="cart-items-section">
+                <div th:each="item : ${cartItems}" class="cart-item">
+                    <!-- Item Image -->
+                    <img th:src="${item.productVariant.product.images[0].imageUrl}"
+                         alt="Product"
+                         class="item-image">
+
+                    <!-- Item Info -->
+                    <div class="item-details">
+                        <h4 class="item-title" th:text="${item.productVariant.product.title}"></h4>
+
+                        <div class="item-variant">
+                            <!-- Parse attributeJson from productVariant instead of accessing separate color/size fields -->
+                            <span class="variant-attributes" th:data-attributes="${item.productVariant.attributeJson}"></span>
+                        </div>
+
+                        <div class="item-price">
+                            <span th:text="'$' + ${#numbers.formatDecimal(item.productVariant.price, 1, 2)}"></span>
+                        </div>
+
+                        <!-- Quantity Control -->
+                        <div class="quantity-control">
+                            <button class="quantity-btn" onclick="updateQuantity(this, -1)">−</button>
+                            <input type="number" class="quantity-input" th:value="${item.quantity}" min="1" readonly>
+                            <button class="quantity-btn" onclick="updateQuantity(this, 1)">+</button>
+                        </div>
+
+                        <!-- Remove Button -->
+                        <button class="remove-btn" th:onclick="'removeFromCart(' + ${item.id} + ')'">
+                            <i class="bi bi-trash"></i> Remove
+                        </button>
+                    </div>
+
+                    <!-- Line Total -->
+                    <div style="text-align: right; min-width: 120px;">
+                        <div style="font-weight: 600; font-size: 16px;"
+                             th:text="'$' + ${#numbers.formatDecimal(item.productVariant.price * item.quantity, 1, 2)}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart Summary -->
+        <div class="col-lg-4">
+            <div class="cart-summary">
+                <h5 style="font-weight: 600; margin-bottom: 20px;">Order Summary</h5>
+
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span th:text="'$' + ${#numbers.formatDecimal(subtotal, 1, 2)}"></span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Shipping:</span>
+                    <span th:text="'$' + ${#numbers.formatDecimal(shipping, 1, 2)}"></span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Tax:</span>
+                    <span th:text="'$' + ${#numbers.formatDecimal(tax, 1, 2)}"></span>
+                </div>
+
+                <div class="summary-row total">
+                    <span>Total:</span>
+                    <span th:text="'$' + ${#numbers.formatDecimal(total, 1, 2)}"></span>
+                </div>
+
+                <button class="checkout-btn">Proceed to Checkout</button>
+                <button class="continue-shopping" onclick="window.location.href='/'">Continue Shopping</button>
+            </div>
+        </div>
+    </div>
+</main>
