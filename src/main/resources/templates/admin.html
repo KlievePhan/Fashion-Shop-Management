@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fashion Shop Management</title>
     <link rel="stylesheet" th:href="@{/css/admin.css}">
-
 </head>
 
 <body>
@@ -54,6 +53,12 @@
                 <div class="user-profile">
                     <span>Admin</span>
                     <div class="avatar">A</div>
+
+                    <!-- NÚT LOGOUT TĨNH (KHÔNG JS) -->
+                    <form th:action="@{/logout}" method="post" style="margin:0;">
+                        <button type="submit" class="logout-btn">Logout</button>
+                    </form>
+                    <!-- Nếu muốn về trang khác, đổi href ở đây -->
                 </div>
             </div>
         </header>
@@ -337,7 +342,7 @@
         </div>
     </div>
 
-  <script th:src="@{/js/admin.js}"></script>
+    <script th:src="@{/js/admin.js}"></script>
 </body>
 
 </html>
