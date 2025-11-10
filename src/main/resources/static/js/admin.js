@@ -43,18 +43,18 @@ navItems.forEach(item => {
     item.addEventListener('click', (e) => {
         e.preventDefault();
         const targetSection = item.dataset.section;
-        
+
         // Update active nav item
         navItems.forEach(nav => nav.classList.remove('active'));
         item.classList.add('active');
-        
+
         // Show target section
         sections.forEach(section => section.classList.remove('active'));
         document.getElementById(targetSection).classList.add('active');
-        
+
         // Update page title
         pageTitle.textContent = item.textContent.trim();
-        
+
         // Close sidebar on mobile
         if (window.innerWidth <= 768) {
             sidebar.classList.remove('active');
@@ -69,8 +69,8 @@ menuToggle.addEventListener('click', () => {
 
 // Close sidebar when clicking outside
 document.addEventListener('click', (e) => {
-    if (window.innerWidth <= 768 && 
-        !sidebar.contains(e.target) && 
+    if (window.innerWidth <= 768 &&
+        !sidebar.contains(e.target) &&
         !menuToggle.contains(e.target)) {
         sidebar.classList.remove('active');
     }
@@ -105,12 +105,12 @@ productModal.addEventListener('click', (e) => {
 // Product Form Submit
 productForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    
+
     const name = document.getElementById('productName').value;
     const category = document.getElementById('productCategory').value;
     const price = parseFloat(document.getElementById('productPrice').value);
     const stock = parseInt(document.getElementById('productStock').value);
-    
+
     if (editingProductId) {
         // Update existing product
         const product = products.find(p => p.id === editingProductId);
@@ -129,7 +129,7 @@ productForm.addEventListener('submit', (e) => {
         };
         products.push(newProduct);
     }
-    
+
     renderProducts();
     closeModal();
     showNotification(editingProductId ? 'Product updated successfully!' : 'Product added successfully!');
@@ -138,11 +138,11 @@ productForm.addEventListener('submit', (e) => {
 // Render Products
 function renderProducts(filter = '') {
     const tbody = document.getElementById('productsTable');
-    const filteredProducts = products.filter(p => 
+    const filteredProducts = products.filter(p =>
         p.name.toLowerCase().includes(filter.toLowerCase()) ||
         p.category.toLowerCase().includes(filter.toLowerCase())
     );
-    
+
     tbody.innerHTML = filteredProducts.map(product => `
         <tr>
             <td>${product.id}</td>
@@ -186,10 +186,10 @@ function deleteProduct(id) {
 // Render Orders
 function renderOrders(statusFilter = 'all') {
     const tbody = document.getElementById('ordersTable');
-    const filteredOrders = statusFilter === 'all' 
-        ? orders 
+    const filteredOrders = statusFilter === 'all'
+        ? orders
         : orders.filter(o => o.status === statusFilter);
-    
+
     tbody.innerHTML = filteredOrders.map(order => `
         <tr>
             <td>#${order.id}</td>
@@ -284,9 +284,9 @@ function showNotification(message) {
         z-index: 3000;
         animation: slideIn 0.3s ease;
     `;
-    
+
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
         notification.style.animation = 'slideOut 0.3s ease';
         setTimeout(() => notification.remove(), 300);
@@ -297,7 +297,7 @@ function showNotification(message) {
 searchInput.addEventListener('input', (e) => {
     const query = e.target.value;
     const activeSection = document.querySelector('.content-section.active').id;
-    
+
     if (activeSection === 'products') {
         renderProducts(query);
     }
@@ -348,3 +348,104 @@ window.deleteProduct = deleteProduct;
 window.viewOrder = viewOrder;
 window.updateOrderStatus = updateOrderStatus;
 window.viewCustomer = viewCustomer;
+
+/* =====================
+   HEADER UPDATE FUNCTIONS
+===================== */
+
+// Update header subtitle based on active section
+function updateHeaderSubtitle(section) {
+    const subtitles = {
+        'dashboard': 'Welcome back, Admin',
+        'products': 'Manage your product inventory',
+        'orders': 'View and manage customer orders',
+        'customers': 'Customer information and analytics',
+        'analytics': 'Business insights and reports'
+    };
+
+    const headerSubtitle = document.getElementById('headerSubtitle');
+    if (headerSubtitle) {
+        headerSubtitle.textContent = subtitles[section] || 'Welcome back, Admin';
+    }
+}
+
+// Update dashboard stats in header
+function updateHeaderStats() {
+    const ordersToday = Math.floor(Math.random() * 20) + 5; // Random 5-25
+    const revenueToday = (Math.random() * 5000 + 1000).toFixed(0); // Random $1000-6000
+
+    const ordersTodayEl = document.getElementById('ordersToday');
+    const revenueTodayEl = document.getElementById('revenueToday');
+
+    if (ordersTodayEl) ordersTodayEl.textContent = ordersToday;
+    if (revenueTodayEl) revenueTodayEl.textContent = '$' + revenueToday;
+}
+
+// Notification click handler
+document.addEventListener('DOMContentLoaded', () => {
+    const notificationBtn = document.getElementById('notificationBtn');
+    if (notificationBtn) {
+        notificationBtn.addEventListener('click', () => {
+            showNotificationPanel();
+        });
+    }
+
+    // Update stats on load
+    updateHeaderStats();
+});
+
+// Show notification panel
+function showNotificationPanel() {
+    const notifications = [
+        '📦 New order #ORD-006 received',
+        '✅ 5 products are low on stock',
+        '💬 You have 2 new customer messages'
+    ];
+
+    let message = 'Notifications:\n\n';
+    notifications.forEach((notif, index) => {
+        message += `${index + 1}. ${notif}\n`;
+    });
+
+    alert(message);
+}
+
+// Update header when navigation changes (modify existing nav click handler)
+const originalNavClickHandler = document.querySelectorAll('.nav-item')[0]?.onclick;
+
+document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function (e) {
+        const section = this.dataset.section;
+        updateHeaderSubtitle(section);
+
+        // Remove old onclick and add new one if needed
+        e.preventDefault();
+
+        // Update active nav item
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        this.classList.add('active');
+
+        // Show target section
+        document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+        document.getElementById(section).classList.add('active');
+
+        // Update page title
+        document.getElementById('pageTitle').textContent = this.textContent.trim();
+
+        // Update header subtitle
+        updateHeaderSubtitle(section);
+
+        // Close sidebar on mobile
+        if (window.innerWidth <= 768) {
+            document.querySelector('.sidebar').classList.remove('active');
+        }
+    });
+});
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+    const profileDropdown = document.querySelector('.profile-dropdown');
+    if (profileDropdown && !profileDropdown.contains(e.target)) {
+        // Dropdown closes automatically with CSS hover
+    }
+});
