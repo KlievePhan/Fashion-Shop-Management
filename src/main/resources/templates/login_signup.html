@@ -32,7 +32,7 @@
     .input-wrapper { position:relative; }
     .input-wrapper i { position:absolute; left:15px; top:50%; transform:translateY(-50%); color:#9ca3af; }
     input[type="text"], input[type="email"], input[type="password"] {
-      width:100%; padding:14px 15px 14px 45px; border:2px solid #e5e7eb; border-radius:12px; font-size:15px;
+      width:100%; padding:14px 45px 14px 45px; border:2px solid #e5e7eb; border-radius:12px; font-size:15px;
     }
     input:focus { outline:none; border-color:#dc2626; }
     .btn-submit { width:100%; padding:15px; background:#dc2626; color:white; border:none; border-radius:12px; font-weight:600; cursor:pointer; transition:background 0.3s; }
@@ -54,6 +54,26 @@
     .forgot-link { color:#dc2626; text-decoration:none; font-weight:600; }
     .forgot-link:hover { text-decoration:underline; }
     label { display:block; margin-bottom:8px; color:#374151; font-weight:600; font-size:14px; }
+    .toggle-password {
+      position: absolute;
+      right: 15px;
+      left: auto;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px;
+      color: #6b7280;
+      cursor: pointer;
+    }
+    .toggle-password:hover {
+      color: #dc2626;
+    }
+    .password-strength {
+      font-size: 13px;
+      margin-top: 6px;
+      display: block;
+    }
+    .password-valid { color: #065f46; }
+    .password-invalid { color: #991b1b; }
   </style>
 </head>
 
@@ -97,8 +117,8 @@
         <div class="form-group">
           <label>Password</label>
           <div class="input-wrapper">
-            <i class="fas fa-lock"></i>
-            <input type="password" th:field="*{password}" placeholder="Enter your password" required />
+            <input type="password" id="loginPassword" th:field="*{password}" placeholder="Enter your password" required />
+            <i class="fas fa-eye toggle-password" onclick="togglePassword('loginPassword')"></i>
           </div>
           <span class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
         </div>
@@ -133,11 +153,12 @@
       </div>
 
       <div class="message error" th:if="${registerError}" style="display:block" th:text="${registerError}"></div>
-      <div class="message success" th:if="${param.success == 'registered'}" style="display:block">
-        Registered! Please login.
+      <div class="message success" id="registerSuccess" style="display:none;">
+        Registration successful! Redirecting to login...
       </div>
 
-      <form th:action="@{/register}" method="post">
+      <form id="registerFormElement" th:action="@{/register}" method="post" onsubmit="return validatePassword()">
+        <!-- Full Name -->
         <div class="form-group">
           <label>Full Name</label>
           <div class="input-wrapper">
@@ -146,6 +167,7 @@
           </div>
         </div>
 
+        <!-- Email -->
         <div class="form-group">
           <label>Email</label>
           <div class="input-wrapper">
@@ -154,12 +176,34 @@
           </div>
         </div>
 
+        <!-- Password -->
         <div class="form-group">
           <label>Password</label>
           <div class="input-wrapper">
-            <i class="fas fa-lock"></i>
-            <input type="password" name="password" placeholder="Create a password (min 6 characters)" required minlength="6" />
+            <input type="password" id="password" name="password"
+                   placeholder="Min 8 chars: 1 uppercase, 1 digit, 1 special (!@#$%^&*)"
+                   required minlength="8"
+                   oninput="checkPasswordStrength()" />
+            <i class="fas fa-eye toggle-password" onclick="togglePassword('password')"></i>
           </div>
+          <span id="passwordStrength" class="password-strength password-invalid">
+        Must be 8+ chars: 1 uppercase, 1 digit, 1 special (!@#$%^&*)
+      </span>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <div class="input-wrapper">
+            <input type="password" id="confirmPassword"
+                   placeholder="Re-enter your password"
+                   required
+                   oninput="checkPasswordMatch()" />
+            <i class="fas fa-eye toggle-password" onclick="togglePassword('confirmPassword')"></i>
+          </div>
+          <span id="passwordMatch" class="password-strength password-invalid">
+        Passwords must match
+      </span>
         </div>
 
         <button type="submit" class="btn-submit">Sign Up</button>
@@ -194,6 +238,112 @@
     const url = new URL(window.location);
     if (url.pathname.includes('signup') || url.searchParams.get('success') === 'registered') {
       switchForm('register');
+    }
+  });
+
+  // Toggle password visibility - FIXED
+  function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const wrapper = field.parentElement;
+    const icon = wrapper.querySelector('.toggle-password');
+
+    if (field.type === 'password') {
+      field.type = 'text';
+      icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+      field.type = 'password';
+      icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+  }
+
+  // Password strength - FIXED
+  function checkPasswordStrength() {
+    const password = document.getElementById('password').value;
+    const strengthEl = document.getElementById('passwordStrength');
+    const input = document.getElementById('password');
+
+    const hasUpper = /[A-Z]/.test(password);
+    const hasDigit = /\d/.test(password);
+    const hasSpecial = /[!@#$%^&*]/.test(password);
+    const hasMinLength = password.length >= 8;
+
+    if (hasUpper && hasDigit && hasSpecial && hasMinLength) {
+      strengthEl.textContent = 'Strong password!';
+      strengthEl.className = 'password-strength password-valid';
+      input.style.borderColor = '#6ee7b7';
+      return true;
+    } else {
+      strengthEl.textContent = 'Must be 8+ chars: 1 uppercase, 1 digit, 1 special (!@#$%^&*)';
+      strengthEl.className = 'password-strength password-invalid';
+      input.style.borderColor = '#fca5a5';
+      return false;
+    }
+  }
+
+  // Password match - FIXED
+  function checkPasswordMatch() {
+    const password = document.getElementById('password').value;
+    const confirm = document.getElementById('confirmPassword').value;
+    const matchEl = document.getElementById('passwordMatch');
+    const confirmInput = document.getElementById('confirmPassword');
+
+    // Don't validate if confirm is empty
+    if (confirm.length === 0) {
+      matchEl.textContent = 'Passwords must match';
+      matchEl.className = 'password-strength password-invalid';
+      confirmInput.style.borderColor = '#e5e7eb';
+      return false;
+    }
+
+    if (password === confirm) {
+      matchEl.textContent = 'Passwords match';
+      matchEl.className = 'password-strength password-valid';
+      confirmInput.style.borderColor = '#6ee7b7';
+      return true;
+    } else {
+      matchEl.textContent = 'Passwords do not match';
+      matchEl.className = 'password-strength password-invalid';
+      confirmInput.style.borderColor = '#fca5a5';
+      return false;
+    }
+  }
+
+  // Validation on submit - FIXED
+  function validatePassword() {
+    const password = document.getElementById('password').value;
+    const confirm = document.getElementById('confirmPassword').value;
+
+    const hasUpper = /[A-Z]/.test(password);
+    const hasDigit = /\d/.test(password);
+    const hasSpecial = /[!@#$%^&*]/.test(password);
+    const hasMinLength = password.length >= 8;
+
+    const isStrong = hasUpper && hasDigit && hasSpecial && hasMinLength;
+    const isMatch = password === confirm && confirm.length > 0;
+
+    if (!isStrong) {
+      alert('Password must be at least 8 characters and contain:\n- 1 uppercase letter\n- 1 digit\n- 1 special character (!@#$%^&*)');
+      return false;
+    }
+
+    if (!isMatch) {
+      alert('Passwords do not match. Please check and try again.');
+      return false;
+    }
+
+    return true;
+  }
+
+  // Success alert
+  document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success') === 'registered') {
+      const successDiv = document.getElementById('registerSuccess');
+      if (successDiv) successDiv.style.display = 'block';
+      setTimeout(() => {
+        alert('Account created successfully!\nYou can now log in.');
+        switchForm('login');
+      }, 300);
     }
   });
 </script>

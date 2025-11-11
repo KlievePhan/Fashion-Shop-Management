@@ -168,4 +168,31 @@ CREATE INDEX idx_products_category ON products(category_id);
 CREATE INDEX idx_products_brand ON products(brand_id);
 CREATE INDEX idx_orders_user ON orders(user_id);
 CREATE INDEX idx_payments_order ON payments(order_id);
-select * from users
+select * from users;
+select * from roles;
+INSERT INTO roles (code, name, description) VALUES ('ROLE_USER', 'User', 'Basic permission to view products, add to cart and payment.');
+INSERT INTO roles (code, name, description) VALUES ('ROLE_STAFF', 'Staff', 'Basic permissions and Limited management permission.');
+INSERT INTO roles (code, name, description) VALUES ('ROLE_ADMIN', 'Admin', 'All permissions are allowed.');
+SELECT u.email, u.password, u.active, r.code 
+FROM users u 
+JOIN roles r ON u.role_id = r.id;
+SELECT * FROM roles WHERE code = 'ROLE_USER';
+delete from users where id between 1 and 5;
+delete from roles where id = 1;
+
+-- Add Remember Me fields to users table
+ALTER TABLE users 
+ADD COLUMN remember_me_token VARCHAR(255),
+ADD COLUMN remember_me_expiry TIMESTAMP;
+
+-- Create password reset tokens table
+CREATE TABLE password_reset_tokens (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    user_id BIGINT NOT NULL,
+    expiry_date TIMESTAMP NOT NULL,
+    used BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
