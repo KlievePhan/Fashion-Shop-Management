@@ -155,9 +155,8 @@ public class HomeController {
         }
 
         Role userRole = roleRepository.findByCode("ROLE_USER")
-                .orElse(
-                        roleRepository.save(new Role(null, "ROLE_USER", "USER", "USER"))
-                );
+                .orElseThrow(() -> new IllegalStateException("ROLE_USER not found in database! Run migration!"));
+
         User user = User.builder()
                 .fullName(request.getFullName())
                 .displayName(request.getFullName())
