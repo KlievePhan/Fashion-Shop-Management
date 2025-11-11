@@ -28,10 +28,10 @@
                 <span class="icon">📦</span>
                 Orders
             </a>
-            <a href="#" class="nav-item" data-section="customers">
-                <span class="icon">👥</span>
-                Users
-            </a>
+			<a href="#" class="nav-item" data-section="users">
+			    <span class="icon">👥</span>
+			    Users
+			</a>
             <a href="#" class="nav-item" data-section="analytics">
                 <span class="icon">📈</span>
                 Analytics
@@ -271,31 +271,50 @@
         </section>
 
         <!-- Customers Section -->
-        <section id="customers" class="content-section">
-            <div class="section-header">
-                <h2>Customers Management</h2>
-            </div>
+		<section id="users" class="content-section">
+		    <div class="section-header">
+		        <h2>Users Management</h2>
+		    </div>
 
-            <div class="card">
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Orders</th>
-                                <th>Total Spent</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="customersTable">
-                            <!-- Customers will be populated by JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
+		    <div class="card">
+		        <div class="table-container">
+		            <table class="data-table">
+		                <thead>
+		                    <tr>
+		                        <th>ID</th>
+		                        <th>Name</th>
+		                        <th>Email</th>
+		                        <th>Role</th>
+		                        <th>Active</th>
+		                        <th>Actions</th>
+		                    </tr>
+		                </thead>
+		                <tbody>
+		                    <tr th:each="user : ${users}">
+		                        <td th:text="${user.id}"></td>
+		                        <td th:text="${user.fullName}"></td>
+		                        <td th:text="${user.email}"></td>
+		                        <td th:text="${user.role.code}"></td>
+		                        <td th:text="${user.active} ? 'Yes' : 'No'"></td>
+		                        <td>
+		                            <div class="action-btns">
+		                                <button class="btn btn-sm btn-secondary" th:onclick="'viewUser(' + ${user.id} + ')'">View</button>
+		                                <form th:action="@{/admin/users/${user.id}/edit-role}" method="post">
+		                                    <select name="roleCode">
+		                                        <option value="ROLE_USER">User</option>
+		                                        <option value="ROLE_ADMIN">Admin</option>
+		                                        <!-- Add more roles -->
+		                                    </select>
+		                                    <button type="submit" class="btn btn-sm btn-primary">Update Role</button>
+		                                </form>
+		                            </div>
+		                        </td>
+		                    </tr>
+		                </tbody>
+		            </table>
+		        </div>
+		    </div>
+		</section>
 
         <!-- Analytics Section -->
         <section id="analytics" class="content-section">

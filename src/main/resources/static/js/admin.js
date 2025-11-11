@@ -449,3 +449,9 @@ document.addEventListener('click', (e) => {
         // Dropdown closes automatically with CSS hover
     }
 });
+
+// In admin.js, add viewUser function
+function viewUser(id) {
+    // Implement view logic, e.g., alert or modal
+    alert('Viewing user ID: ' + id);
+}
