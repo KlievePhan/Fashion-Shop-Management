@@ -57,10 +57,10 @@ public class HomeController {
         return "product-detail";
     }
 
-    @GetMapping("/admin")
-    public String admin() {
-        return "admin";
-    }
+//    @GetMapping("/admin")
+//    public String admin() {
+//        return "admin";
+//    }
 
     @GetMapping("/shop")
     public String shop(Model model) {
