@@ -1,142 +1,125 @@
-const sortSelect = document.getElementById('sortSelect');
-const productsGrid = document.querySelector('.products-grid');
+document.addEventListener('DOMContentLoaded', () => {
+  const productsGrid = document.querySelector('.products-grid');
+  const sortSelect = document.getElementById('sortSelect');
 
-sortSelect.addEventListener('change', function () {
-  const sortValue = this.value;
-  const products = Array.from(document.querySelectorAll('.product-card'));
+  // SORT
+  if (sortSelect && productsGrid) {
+    sortSelect.addEventListener('change', function () {
+      const sortValue = this.value;
+      const cards = Array.from(productsGrid.querySelectorAll('.product-card'));
+      const getPrice = el => parseFloat(el.dataset.price || '0') || 0;
+      const getDate  = el => new Date(el.dataset.date || '1970-01-01').getTime();
 
-  products.sort((a, b) => {
-    switch (sortValue) {
-      case 'latest':
-        return new Date(b.dataset.date) - new Date(a.dataset.date);
-      case 'price-low':
-        return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
-      case 'price-high':
-        return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
-      default:
-        return 0;
-    }
-  });
-
-  products.forEach(product => productsGrid.appendChild(product));
-});
-
-// Add click functionality to product cards
-document.querySelectorAll('.product-card').forEach(card => {
-  card.style.cursor = 'pointer';
-  card.addEventListener('click', function () {
-    const title = this.querySelector('.product-title').textContent;
-    console.log('Clicked on:', title);
-    // Navigate to product detail page
-  });
-});
-
-// Xử lý chọn size
-document.querySelectorAll('.size-btn').forEach(btn => {
-  btn.addEventListener('click', function (event) {
-    event.stopPropagation(); // Ngăn click lan ra card
-
-    const parent = this.closest('.product-sizes');
-    parent.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
-    this.classList.add('active');
-  });
-});
-
-// Xử lý chọn màu
-document.querySelectorAll('.color-option').forEach(option => {
-  option.addEventListener('click', function (event) {
-    event.stopPropagation(); // Ngăn click lan ra card
-
-    const parent = this.closest('.product-colors');
-    parent.querySelectorAll('.color-option').forEach(c => c.classList.remove('active'));
-    this.classList.add('active');
-  });
-});
-
-
-const cartModal = document.getElementById('cartModal');
-const cartClose = document.querySelector('.cart-close');
-const body = document.body;
-
-// Fade + Scale Animation
-function openModal() {
-  cartModal.classList.add('active');
-  body.style.overflow = 'hidden';
-}
-
-function closeModal() {
-  cartModal.classList.remove('active');
-  body.style.overflow = '';
-}
-
-// Click handlers
-cartClose.addEventListener('click', closeModal);
-cartModal.addEventListener('click', e => {
-  if (e.target === cartModal) closeModal();
-});
-
-// Open modal when clicking product image
-document.querySelectorAll('.product-image img').forEach(img => {
-  img.addEventListener('click', e => {
-    const card = e.target.closest('.product-card');
-    if (!card) return;
-
-    // Populate modal
-    document.getElementById('modalProductImg').src = card.querySelector('img').src;
-    document.getElementById('modalProductTitle').textContent = card.querySelector('.product-title').textContent;
-    document.getElementById('modalProductCategory').textContent = card.querySelector('.product-category').textContent;
-    document.getElementById('modalPrice').textContent = card.querySelector('.price-current').textContent;
-    document.getElementById('modalOriginalPrice').textContent = card.querySelector('.price-original').textContent;
-
-    // Clone sizes
-    const modalSizes = document.getElementById('modalSizes');
-    modalSizes.innerHTML = '';
-    card.querySelectorAll('.size-btn').forEach(btn => {
-      const newBtn = btn.cloneNode(true);
-      newBtn.classList.remove('active');
-      newBtn.addEventListener('click', () => {
-        modalSizes.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
-        newBtn.classList.add('active');
+      cards.sort((a, b) => {
+        switch (sortValue) {
+          case 'latest':     return getDate(b) - getDate(a);
+          case 'price-low':  return getPrice(a) - getPrice(b);
+          case 'price-high': return getPrice(b) - getPrice(a);
+          default:           return 0;
+        }
       });
-      modalSizes.appendChild(newBtn);
+      cards.forEach(c => productsGrid.appendChild(c));
     });
+  }
 
-    // Clone colors
-    const modalColors = document.getElementById('modalColors');
-    modalColors.innerHTML = '';
-    card.querySelectorAll('.color-option').forEach(option => {
-      const newOption = option.cloneNode(true);
-      newOption.classList.remove('active');
-      newOption.addEventListener('click', () => {
-        modalColors.querySelectorAll('.color-option').forEach(c => c.classList.remove('active'));
-        newOption.classList.add('active');
-      });
-      modalColors.appendChild(newOption);
-    });
+  // MODAL
+  const cartModal = document.getElementById('cartModal');
+  const cartClose = cartModal ? cartModal.querySelector('.cart-close') : null;
+  const body = document.body;
 
-    // Reset qty
-    const productQty = document.getElementById('productQty');
-    productQty.value = 1;
+  const openModal  = () => { if(cartModal){ cartModal.classList.add('active'); body.style.overflow='hidden'; } };
+  const closeModal = () => { if(cartModal){ cartModal.classList.remove('active'); body.style.overflow=''; } };
 
-    // Show modal
-    openModal();
-    // Show modal
-    openModal();
+  cartClose && cartClose.addEventListener('click', closeModal);
+  cartModal && cartModal.addEventListener('click', e => { if (e.target === cartModal) closeModal(); });
 
-    // Re-attach quantity listeners (đặt sau openModal)
-    const decreaseBtn = document.getElementById('decreaseQty');
-    const increaseBtn = document.getElementById('increaseQty');
-    const qtyInput = document.getElementById('productQty');
+  // QUICK VIEW / ADD
+  productsGrid?.querySelectorAll('.product-card').forEach(card => {
+    const imgEl = card.querySelector('.product-image img');
+    const titleEl = card.querySelector('.product-title');
+    const catEl = card.querySelector('.product-category');
+    const priceCurrentEl = card.querySelector('.price-current');
+    const priceOriginalEl = card.querySelector('.price-original'); // có thể vắng
 
-    increaseBtn.onclick = () => {
-      qtyInput.value = parseInt(qtyInput.value) + 1;
-    };
+    card.querySelectorAll('.product-actions .action-btn').forEach(btn => {
+      const action = btn.dataset.action;
 
-    decreaseBtn.onclick = () => {
-      if (parseInt(qtyInput.value) > parseInt(qtyInput.min)) {
-        qtyInput.value = parseInt(qtyInput.value) - 1;
+      if (action === 'quick') {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault(); e.stopPropagation();
+
+          if (imgEl)   document.getElementById('modalProductImg').src = imgEl.src;
+          if (titleEl) document.getElementById('modalProductTitle').textContent = titleEl.textContent;
+          if (catEl)   document.getElementById('modalProductCategory').textContent = catEl.textContent;
+          if (priceCurrentEl) document.getElementById('modalPrice').textContent = priceCurrentEl.textContent;
+          document.getElementById('modalOriginalPrice').textContent = priceOriginalEl ? priceOriginalEl.textContent : '';
+
+          const modalSizes = document.getElementById('modalSizes');
+          modalSizes.innerHTML = '';
+          card.querySelectorAll('.size-btn').forEach(btn => {
+            const clone = btn.cloneNode(true);
+            clone.classList.remove('active');
+            clone.addEventListener('click', () => {
+              modalSizes.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+              clone.classList.add('active');
+            });
+            modalSizes.appendChild(clone);
+          });
+
+          const modalColors = document.getElementById('modalColors');
+          modalColors.innerHTML = '';
+          card.querySelectorAll('.color-option').forEach(dot => {
+            const clone = dot.cloneNode(true);
+            clone.classList.remove('active');
+            clone.addEventListener('click', () => {
+              modalColors.querySelectorAll('.color-option').forEach(c => c.classList.remove('active'));
+              clone.classList.add('active');
+            });
+            modalColors.appendChild(clone);
+          });
+
+          const qtyInput = document.getElementById('productQty');
+          const dec = document.getElementById('decreaseQty');
+          const inc = document.getElementById('increaseQty');
+          if (qtyInput) qtyInput.value = 1;
+          if (inc) inc.onclick = () => qtyInput.value = parseInt(qtyInput.value || '1') + 1;
+          if (dec) dec.onclick = () => {
+            const cur = parseInt(qtyInput.value || '1');
+            const min = parseInt(qtyInput.min || '1');
+            if (cur > min) qtyInput.value = cur - 1;
+          };
+
+          openModal();
+        });
       }
-    };
 
+      if (action === 'add') {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault(); e.stopPropagation();
+          const productId = btn.dataset.id;
+          console.log('Add to cart:', productId);
+          // TODO: gọi API add-to-cart nếu có
+        });
+      }
+    });
+  });
+
+  // chọn size/màu trên card
+  document.querySelectorAll('.product-sizes').forEach(group => {
+    group.addEventListener('click', (e) => {
+      const btn = e.target.closest('.size-btn'); if (!btn) return;
+      e.stopPropagation();
+      group.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('.product-colors').forEach(group => {
+    group.addEventListener('click', (e) => {
+      const dot = e.target.closest('.color-option'); if (!dot) return;
+      e.stopPropagation();
+      group.querySelectorAll('.color-option').forEach(c => c.classList.remove('active'));
+      dot.classList.add('active');
+    });
   });
 });

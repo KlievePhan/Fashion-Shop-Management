@@ -34,7 +34,6 @@ public class HomeController {
     private final ProductRepository productRepository;
     private final EmailService emailService;
 
-
     @GetMapping("/")
     public String home(Model model) {
         model.addAttribute("currentPath", "/");
@@ -58,7 +57,6 @@ public class HomeController {
         return "product-detail";
     }
 
-
     @GetMapping("/admin")
     public String admin() {
         return "admin";
@@ -67,6 +65,8 @@ public class HomeController {
     @GetMapping("/shop")
     public String shop(Model model) {
         model.addAttribute("currentPath", "/shop");
+        List<Product> products = productRepository.findAll();
+        model.addAttribute("products", products);
         return "shop";
     }
 
@@ -102,8 +102,7 @@ public class HomeController {
     public String handleContact(
             @Valid @ModelAttribute("contactMessage") ContactMessage contactMessage,
             BindingResult result,
-            Model model
-    ) {
+            Model model) {
         if (result.hasErrors()) {
             return "contact";
         }
@@ -119,8 +118,7 @@ public class HomeController {
                 contactMessage.getFullName(),
                 contactMessage.getEmail(),
                 contactMessage.getSubject(),
-                contactMessage.getMessage()
-        );
+                contactMessage.getMessage());
 
         emailService.sendContactEmail(adminEmail, subject, body);
 
@@ -139,8 +137,8 @@ public class HomeController {
 
     @PostMapping("/register")
     public String doRegister(@Valid @ModelAttribute("registerRequest") RegisterRequest request,
-                             BindingResult result,
-                             Model model) {
+            BindingResult result,
+            Model model) {
 
         model.addAttribute("currentPath", "/signup");
 
