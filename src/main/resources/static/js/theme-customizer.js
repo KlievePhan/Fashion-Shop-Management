@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Create customizer HTML
   createCustomizer();
 
-  // Load saved theme
+  // Load saved theme (silent)
   loadSavedTheme();
 
   // Event listeners
@@ -61,21 +61,19 @@ function createCustomizer() {
             </div>
           </div>
         </div>
+
         <!-- Currency Converter Section -->
         <div class="customizer-section">
-        <h4>
-        <i class="bi bi-currency-exchange"></i>
-          Currency Converter
-        </h4>
-    <p>Convert USD amount to VND</p>
-        <input type="number" id="usdAmount" placeholder="Enter USD" style="width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #ccc;">
-    <button class="convert-btn" id="convertBtn">
-      Convert to VND
-    </button>
-      <p id="vndResult" style="margin-top: 10px; font-weight: bold;"></p>
-  </div>
+          <h4>
+            <i class="bi bi-currency-exchange"></i>
+            Currency Converter
+          </h4>
+          <p>Convert USD amount to VND</p>
+          <input type="number" id="usdAmount" placeholder="Enter USD" style="width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #ccc;">
+          <button class="convert-btn" id="convertBtn">Convert to VND</button>
+          <p id="vndResult" style="margin-top: 10px; font-weight: bold;"></p>
+        </div>
 
-        <!-- Divider -->
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
         
         <!-- Additional Info -->
@@ -124,11 +122,13 @@ function initEventListeners() {
   closeBtn.addEventListener("click", closeCustomizer);
   overlay.addEventListener("click", closeCustomizer);
 
-  // Theme selection
+  // Theme selection (show toast ONLY on click)
   themeOptions.forEach((option) => {
     option.addEventListener("click", function () {
       const theme = this.getAttribute("data-theme");
-      applyTheme(theme);
+
+      // apply with notification because this is a user action
+      applyTheme(theme, { notify: true });
 
       // Update active state
       themeOptions.forEach((opt) => opt.classList.remove("active"));
@@ -136,14 +136,11 @@ function initEventListeners() {
     });
   });
 
-  // Reset theme
+  // Reset theme (also show toast)
   resetBtn.addEventListener("click", function () {
-    applyTheme("light");
+    applyTheme("light", { notify: true });
     themeOptions.forEach((opt) => opt.classList.remove("active"));
     document.querySelector('[data-theme="light"]').classList.add("active");
-
-    // Show notification
-    showNotification("Theme reset to default!");
   });
 
   // Keyboard shortcut: ESC to close
@@ -164,8 +161,8 @@ function initEventListeners() {
       if (isNaN(usd)) {
         vndResult.textContent = "Please enter a valid USD amount!";
         return;
-      }
-      const rate = 24000; // tỉ giá USD -> VND, bạn có thể update theo thực tế
+        }
+      const rate = 24000; // tỉ giá ví dụ
       const vnd = usd * rate;
       vndResult.textContent = `${usd} USD = ${vnd.toLocaleString()} VND`;
     });
@@ -192,8 +189,8 @@ function closeCustomizer() {
   document.body.style.overflow = ""; // Restore body scroll
 }
 
-// Apply Theme
-function applyTheme(theme) {
+// Apply Theme — silent by default; notify only when requested
+function applyTheme(theme, opts = { notify: false }) {
   if (theme === "dark") {
     document.body.classList.add("dark-mode");
   } else {
@@ -203,17 +200,18 @@ function applyTheme(theme) {
   // Save to localStorage
   localStorage.setItem("selectedTheme", theme);
 
-  // Show notification
-  showNotification(
-    `${theme.charAt(0).toUpperCase() + theme.slice(1)} mode activated!`
-  );
+  // Only show toast if explicitly requested (user action)
+  if (opts.notify) {
+    showNotification(`${theme.charAt(0).toUpperCase() + theme.slice(1)} mode activated!`);
+  }
 }
 
-// Load Saved Theme
+// Load Saved Theme (no toast here)
 function loadSavedTheme() {
   const savedTheme = localStorage.getItem("selectedTheme") || "light";
 
-  applyTheme(savedTheme);
+  // Apply silently on page load
+  applyTheme(savedTheme, { notify: false });
 
   // Update active option
   const themeOptions = document.querySelectorAll(".theme-option");
