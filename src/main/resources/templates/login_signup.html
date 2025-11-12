@@ -18,334 +18,566 @@
   <link rel="stylesheet" th:href="@{/css/promo_bar.css}">
 
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:'Lato',sans-serif; background:linear-gradient(135deg,#f5f7fa 0%,#e8eaf0 100%); min-height:100vh; }
-    .container { max-width:550px; margin:40px auto; }
-    .form-container { background:white; border-radius:20px; box-shadow:0 20px 60px rgba(0,0,0,.1); padding:50px 40px; position:relative; }
-    .form-container::before { content:''; position:absolute; top:0; left:0; right:0; height:5px; background:linear-gradient(90deg,#dc2626 0%,#991b1b 100%); }
-    .form-header h2 { font-size:32px; font-weight:700; color:#1a1a1a; text-align:center; margin-bottom:10px; }
-    .form-header p { color:#6b7280; text-align:center; }
-    .message { padding:12px 20px; border-radius:10px; margin-bottom:25px; font-size:14px; text-align:center; }
-    .message.success { background:#d1fae5; color:#065f46; border:1px solid #6ee7b7; }
-    .message.error { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; }
-    .form-group { margin-bottom:20px; }
-    .input-wrapper { position:relative; }
-    .input-wrapper i { position:absolute; left:15px; top:50%; transform:translateY(-50%); color:#9ca3af; }
-    input[type="text"], input[type="email"], input[type="password"] {
-      width:100%; padding:14px 45px 14px 45px; border:2px solid #e5e7eb; border-radius:12px; font-size:15px;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    input:focus { outline:none; border-color:#dc2626; }
-    .btn-submit { width:100%; padding:15px; background:#dc2626; color:white; border:none; border-radius:12px; font-weight:600; cursor:pointer; transition:background 0.3s; }
-    .btn-submit:hover { background:#991b1b; }
-    .form-tabs { display:flex; gap:10px; margin-bottom:30px; }
-    .form-tab { flex:1; padding:12px; background:#f3f4f6; border:none; border-radius:10px; font-weight:600; color:#6b7280; cursor:pointer; transition:all 0.3s; }
-    .form-tab.active { background:#dc2626; color:white; }
-    .toggle-form { display:none; }
-    .toggle-form.active { display:block; }
-    .divider { display:flex; align-items:center; margin:30px 0; color:#9ca3af; }
-    .divider::before, .divider::after { content:''; flex:1; height:1px; background:#e5e7eb; }
-    .divider span { padding:0 15px; }
-    .social-btn { display:flex; align-items:center; justify-content:center; gap:10px; padding:12px; border:2px solid #e5e7eb; border-radius:12px; text-decoration:none; color:#1a1a1a; font-weight:600; transition:all 0.3s; }
-    .social-btn.google { color:#ea4335; border-color:#ea4335; }
-    .social-btn.google:hover { background:#ea4335; color:white; }
-    .form-footer { display:flex; justify-content:space-between; align-items:center; margin-top:15px; font-size:14px; }
-    .checkbox-wrapper { display:flex; align-items:center; gap:8px; }
-    .checkbox-wrapper input[type="checkbox"] { width:18px; height:18px; cursor:pointer; }
-    .forgot-link { color:#dc2626; text-decoration:none; font-weight:600; }
-    .forgot-link:hover { text-decoration:underline; }
-    label { display:block; margin-bottom:8px; color:#374151; font-weight:600; font-size:14px; }
-    .toggle-password {
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e8eaf0 100%);
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 550px;
+      margin: 40px auto;
+    }
+
+    .form-container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .1);
+      padding: 50px 40px;
+      position: relative;
+    }
+
+    .form-container::before {
+      content: '';
       position: absolute;
-      right: 15px;
-      left: auto;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #dc2626 0%, #991b1b 100%);
+      border-radius: 20px 20px 0 0;
+    }
+
+    .form-header h2 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1a1a1a;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .form-header p {
+      color: #6b7280;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .message {
+      padding: 12px 20px;
+      border-radius: 10px;
+      margin-bottom: 25px;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .message.success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #6ee7b7;
+    }
+
+    .message.error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: block;
+    }
+
+    /* Icons trái */
+    .input-wrapper .fa-envelope,
+    .input-wrapper .fa-user-circle {
+      position: absolute;
+      left: 15px;
       top: 50%;
       transform: translateY(-50%);
-      font-size: 16px;
+      color: #9ca3af;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* Inputs */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 14px 45px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: 15px;
+      background: white;
+      transition: border-color 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #dc2626;
+    }
+
+    /* Icon toggle password (con mắt) */
+    .toggle-password {
+      position: absolute;
+      right: 90%;
+      top: 50%;
+      transform: translateY(-50%);
       color: #6b7280;
       cursor: pointer;
+      font-size: 18px;
+      padding: 8px;
+      z-index: 5;
+      user-select: none;
+      line-height: 1;
     }
+
     .toggle-password:hover {
       color: #dc2626;
     }
+
+    .btn-submit {
+      width: 100%;
+      padding: 15px;
+      background: #dc2626;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 16px;
+    }
+
+    .btn-submit:hover {
+      background: #991b1b;
+      transform: translateY(-2px);
+    }
+
+    .form-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    .form-tab {
+      flex: 1;
+      padding: 12px;
+      background: #f3f4f6;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      color: #6b7280;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .form-tab.active {
+      background: #dc2626;
+      color: white;
+    }
+
+    .toggle-form {
+      display: none;
+    }
+
+    .toggle-form.active {
+      display: block;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 30px 0;
+      color: #9ca3af;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #e5e7eb;
+    }
+
+    .divider span {
+      padding: 0 15px;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      text-decoration: none;
+      color: #1a1a1a;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .social-btn.google {
+      color: #ea4335;
+      border-color: #ea4335;
+    }
+
+    .social-btn.google:hover {
+      background: #ea4335;
+      color: white;
+    }
+
+    .form-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 15px;
+      margin-bottom: 25px;
+      font-size: 14px;
+    }
+
+    .checkbox-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .checkbox-wrapper input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #dc2626;
+    }
+
+    .checkbox-wrapper label {
+      margin: 0 !important;
+      font-weight: normal !important;
+    }
+
+    .forgot-link {
+      color: #dc2626;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .forgot-link:hover {
+      text-decoration: underline;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #374151;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
     .password-strength {
       font-size: 13px;
       margin-top: 6px;
       display: block;
     }
-    .password-valid { color: #065f46; }
-    .password-invalid { color: #991b1b; }
+
+    .password-valid {
+      color: #065f46;
+    }
+
+    .password-invalid {
+      color: #991b1b;
+    }
+
+    .text-danger {
+      color: #dc2626;
+      font-size: 13px;
+      margin-top: 6px;
+      display: block;
+    }
   </style>
 </head>
 
 <body>
-<!-- HEADER -->
-<div th:replace="~{header :: header}" th:with="currentPath=${currentPath}"></div>
+  <!-- HEADER -->
+  <div th:replace="~{header :: header}" th:with="currentPath=${currentPath}"></div>
 
-<div class="promo-bar">Get 15% off on your first order</div>
+  <div class="promo-bar">Get 15% off on your first order</div>
 
-<div class="container">
-  <div class="form-container">
+  <div class="container">
+    <div class="form-container">
 
-    <!-- TABS -->
-    <div class="form-tabs">
-      <button class="form-tab active" onclick="switchForm('login')">Login</button>
-      <button class="form-tab" onclick="switchForm('register')">Register</button>
-    </div>
-
-    <!-- LOGIN FORM -->
-    <div id="loginForm" class="toggle-form active">
-      <div class="form-header">
-        <h2>Welcome Back</h2>
-        <p>Sign in to continue</p>
+      <!-- TABS -->
+      <div class="form-tabs">
+        <button class="form-tab active" onclick="switchForm('login')">Login</button>
+        <button class="form-tab" onclick="switchForm('register')">Register</button>
       </div>
 
-      <div class="message error" th:if="${loginError}" style="display:block" th:text="${loginError}"></div>
-      <div class="message success" th:if="${param.logout}" style="display:block">Logged out successfully</div>
-      <div class="message success" th:if="${param.resetSuccess}" style="display:block">Password reset successfully. Please login.</div>
-      <div class="message success" th:if="${param.success == 'registered'}" style="display:block">Registration successful! Please login.</div>
-
-      <form th:action="@{/login}" method="post" th:object="${loginRequest}">
-        <div class="form-group">
-          <label>Email</label>
-          <div class="input-wrapper">
-            <i class="fas fa-envelope"></i>
-            <input type="email" th:field="*{email}" placeholder="Enter your email" required />
-          </div>
-          <span class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+      <!-- LOGIN FORM -->
+      <div id="loginForm" class="toggle-form active">
+        <div class="form-header">
+          <h2>Welcome Back</h2>
+          <p>Sign in to continue</p>
         </div>
 
-        <div class="form-group">
-          <label>Password</label>
-          <div class="input-wrapper">
-            <input type="password" id="loginPassword" th:field="*{password}" placeholder="Enter your password" required />
-            <i class="fas fa-eye toggle-password" onclick="togglePassword('loginPassword')"></i>
+        <div class="message error" th:if="${loginError}" style="display:block" th:text="${loginError}"></div>
+        <div class="message success" th:if="${param.logout}" style="display:block">Logged out successfully</div>
+        <div class="message success" th:if="${param.resetSuccess}" style="display:block">Password reset successfully.
+          Please login.</div>
+        <div class="message success" th:if="${param.success == 'registered'}" style="display:block">Registration
+          successful! Please login.</div>
+
+        <form th:action="@{/login}" method="post" th:object="${loginRequest}">
+          <div class="form-group">
+            <label>Email</label>
+            <div class="input-wrapper">
+              <i class="fas fa-envelope"></i>
+              <input type="email" th:field="*{email}" placeholder="Enter your email" required />
+            </div>
+            <span class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
           </div>
-          <span class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
-        </div>
 
-        <div class="form-footer">
-          <div class="checkbox-wrapper">
-            <input type="checkbox" name="rememberMe" id="rememberMe">
-            <label for="rememberMe" style="margin:0; font-weight:normal;">Remember Me</label>
+          <div class="form-group">
+            <label>Password</label>
+            <div class="input-wrapper">
+              <input type="password" id="loginPassword" th:field="*{password}" placeholder="Enter your password"
+                required />
+              <i class="fas fa-eye toggle-password" onclick="togglePassword('loginPassword')"></i>
+            </div>
+            <span class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
           </div>
-          <a th:href="@{/forgot-password}" class="forgot-link">Forgot Password?</a>
+
+          <div class="form-footer">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" name="rememberMe" id="rememberMe">
+              <label for="rememberMe" style="margin:0; font-weight:normal;">Remember Me</label>
+            </div>
+            <a th:href="@{/forgot-password}" class="forgot-link">Forgot Password?</a>
+          </div>
+
+          <button type="submit" class="btn-submit" style="margin-top:25px;">Sign In</button>
+        </form>
+
+        <div class="divider"><span>Or sign in with</span></div>
+        <div style="text-align:center;">
+          <a th:href="@{/oauth2/authorization/google}" class="social-btn google">
+            <i class="fab fa-google"></i> <span>Continue with Google</span>
+          </a>
         </div>
-
-        <button type="submit" class="btn-submit" style="margin-top:25px;">Sign In</button>
-      </form>
-
-      <div class="divider"><span>Or sign in with</span></div>
-      <div style="text-align:center;">
-        <a th:href="@{/oauth2/authorization/google}" class="social-btn google">
-          <i class="fab fa-google"></i> <span>Continue with Google</span>
-        </a>
+        <p style="text-align:center; margin-top:20px; color:#6b7280;">
+          Don't have an account? <a th:href="@{/signup}"
+            style="color:#dc2626; font-weight:600; text-decoration:none;">Register</a>
+        </p>
       </div>
-      <p style="text-align:center; margin-top:20px; color:#6b7280;">
-        Don't have an account? <a th:href="@{/signup}" style="color:#dc2626; font-weight:600; text-decoration:none;">Register</a>
-      </p>
-    </div>
 
-    <!-- REGISTER FORM -->
-    <div id="registerForm" class="toggle-form">
-      <div class="form-header">
-        <h2>Create Account</h2>
-        <p>Sign up to get started</p>
+      <!-- REGISTER FORM -->
+      <div id="registerForm" class="toggle-form">
+        <div class="form-header">
+          <h2>Create Account</h2>
+          <p>Sign up to get started</p>
+        </div>
+
+        <div class="message error" th:if="${registerError}" style="display:block" th:text="${registerError}"></div>
+        <div class="message success" id="registerSuccess" style="display:none;">
+          Registration successful! Redirecting to login...
+        </div>
+
+        <form id="registerFormElement" th:action="@{/register}" method="post" onsubmit="return validatePassword()">
+          <!-- Full Name -->
+          <div class="form-group">
+            <label>Full Name</label>
+            <div class="input-wrapper">
+              <i class="fas fa-user-circle"></i>
+              <input type="text" name="fullName" placeholder="Enter your full name" required />
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label>Email</label>
+            <div class="input-wrapper">
+              <i class="fas fa-envelope"></i>
+              <input type="email" name="email" placeholder="Enter your email" required />
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="form-group">
+            <label>Password</label>
+            <div class="input-wrapper">
+              <input type="password" id="password" name="password"
+                placeholder="Min 8 chars: 1 uppercase, 1 digit, 1 special (!@#$%^&*)" required minlength="8"
+                oninput="checkPasswordStrength()" />
+              <i class="fas fa-eye toggle-password" onclick="togglePassword('password')"></i>
+            </div>
+            <span id="passwordStrength" class="password-strength password-invalid">
+              Must be 8+ chars: 1 uppercase, 1 digit, 1 special (!@#$%^&*)
+            </span>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="form-group">
+            <label>Confirm Password</label>
+            <div class="input-wrapper">
+              <input type="password" id="confirmPassword" placeholder="Re-enter your password" required
+                oninput="checkPasswordMatch()" />
+              <i class="fas fa-eye toggle-password" onclick="togglePassword('confirmPassword')"></i>
+            </div>
+            <span id="passwordMatch" class="password-strength password-invalid">
+              Passwords must match
+            </span>
+          </div>
+
+          <button type="submit" class="btn-submit">Sign Up</button>
+        </form>
+
+        <div class="divider"><span>Or sign up with</span></div>
+        <div style="text-align:center;">
+          <a th:href="@{/oauth2/authorization/google}" class="social-btn google">
+            <i class="fab fa-google"></i> <span>Continue with Google</span>
+          </a>
+        </div>
+        <p style="text-align:center; margin-top:20px; color:#6b7280;">
+          Already have an account? <a th:href="@{/login}"
+            style="color:#dc2626; font-weight:600; text-decoration:none;">Login</a>
+        </p>
       </div>
-
-      <div class="message error" th:if="${registerError}" style="display:block" th:text="${registerError}"></div>
-      <div class="message success" id="registerSuccess" style="display:none;">
-        Registration successful! Redirecting to login...
-      </div>
-
-      <form id="registerFormElement" th:action="@{/register}" method="post" onsubmit="return validatePassword()">
-        <!-- Full Name -->
-        <div class="form-group">
-          <label>Full Name</label>
-          <div class="input-wrapper">
-            <i class="fas fa-user-circle"></i>
-            <input type="text" name="fullName" placeholder="Enter your full name" required />
-          </div>
-        </div>
-
-        <!-- Email -->
-        <div class="form-group">
-          <label>Email</label>
-          <div class="input-wrapper">
-            <i class="fas fa-envelope"></i>
-            <input type="email" name="email" placeholder="Enter your email" required />
-          </div>
-        </div>
-
-        <!-- Password -->
-        <div class="form-group">
-          <label>Password</label>
-          <div class="input-wrapper">
-            <input type="password" id="password" name="password"
-                   placeholder="Min 8 chars: 1 uppercase, 1 digit, 1 special (!@#$%^&*)"
-                   required minlength="8"
-                   oninput="checkPasswordStrength()" />
-            <i class="fas fa-eye toggle-password" onclick="togglePassword('password')"></i>
-          </div>
-          <span id="passwordStrength" class="password-strength password-invalid">
-        Must be 8+ chars: 1 uppercase, 1 digit, 1 special (!@#$%^&*)
-      </span>
-        </div>
-
-        <!-- Confirm Password -->
-        <div class="form-group">
-          <label>Confirm Password</label>
-          <div class="input-wrapper">
-            <input type="password" id="confirmPassword"
-                   placeholder="Re-enter your password"
-                   required
-                   oninput="checkPasswordMatch()" />
-            <i class="fas fa-eye toggle-password" onclick="togglePassword('confirmPassword')"></i>
-          </div>
-          <span id="passwordMatch" class="password-strength password-invalid">
-        Passwords must match
-      </span>
-        </div>
-
-        <button type="submit" class="btn-submit">Sign Up</button>
-      </form>
-
-      <div class="divider"><span>Or sign up with</span></div>
-      <div style="text-align:center;">
-        <a th:href="@{/oauth2/authorization/google}" class="social-btn google">
-          <i class="fab fa-google"></i> <span>Continue with Google</span>
-        </a>
-      </div>
-      <p style="text-align:center; margin-top:20px; color:#6b7280;">
-        Already have an account? <a th:href="@{/login}" style="color:#dc2626; font-weight:600; text-decoration:none;">Login</a>
-      </p>
     </div>
   </div>
-</div>
 
-<!-- FOOTER -->
-<div th:replace="~{footer :: footer}"></div>
+  <!-- FOOTER -->
+  <div th:replace="~{footer :: footer}"></div>
 
-<script>
-  function switchForm(form) {
-    document.querySelectorAll('.toggle-form').forEach(f => f.classList.remove('active'));
-    document.querySelectorAll('.form-tab').forEach(t => t.classList.remove('active'));
-    document.getElementById(form + 'Form').classList.add('active');
-    document.querySelector(`.form-tab[onclick*="${form}"]`).classList.add('active');
-  }
-
-  // Auto-switch on URL params
-  document.addEventListener('DOMContentLoaded', () => {
-    const url = new URL(window.location);
-    if (url.pathname.includes('signup') || url.searchParams.get('success') === 'registered') {
-      switchForm('register');
+  <script>
+    function switchForm(form) {
+      document.querySelectorAll('.toggle-form').forEach(f => f.classList.remove('active'));
+      document.querySelectorAll('.form-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById(form + 'Form').classList.add('active');
+      document.querySelector(`.form-tab[onclick*="${form}"]`).classList.add('active');
     }
-  });
 
-  // Toggle password visibility - FIXED
-  function togglePassword(fieldId) {
-    const field = document.getElementById(fieldId);
-    const wrapper = field.parentElement;
-    const icon = wrapper.querySelector('.toggle-password');
+    // Auto-switch on URL params
+    document.addEventListener('DOMContentLoaded', () => {
+      const url = new URL(window.location);
+      if (url.pathname.includes('signup') || url.searchParams.get('success') === 'registered') {
+        switchForm('register');
+      }
+    });
 
-    if (field.type === 'password') {
-      field.type = 'text';
-      icon.classList.replace('fa-eye', 'fa-eye-slash');
-    } else {
-      field.type = 'password';
-      icon.classList.replace('fa-eye-slash', 'fa-eye');
+    // Toggle password visibility - FIXED
+    function togglePassword(fieldId) {
+      const field = document.getElementById(fieldId);
+      const wrapper = field.parentElement;
+      const icon = wrapper.querySelector('.toggle-password');
+
+      if (field.type === 'password') {
+        field.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        field.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+      }
     }
-  }
 
-  // Password strength - FIXED
-  function checkPasswordStrength() {
-    const password = document.getElementById('password').value;
-    const strengthEl = document.getElementById('passwordStrength');
-    const input = document.getElementById('password');
+    // Password strength - FIXED
+    function checkPasswordStrength() {
+      const password = document.getElementById('password').value;
+      const strengthEl = document.getElementById('passwordStrength');
+      const input = document.getElementById('password');
 
-    const hasUpper = /[A-Z]/.test(password);
-    const hasDigit = /\d/.test(password);
-    const hasSpecial = /[!@#$%^&*]/.test(password);
-    const hasMinLength = password.length >= 8;
+      const hasUpper = /[A-Z]/.test(password);
+      const hasDigit = /\d/.test(password);
+      const hasSpecial = /[!@#$%^&*]/.test(password);
+      const hasMinLength = password.length >= 8;
 
-    if (hasUpper && hasDigit && hasSpecial && hasMinLength) {
-      strengthEl.textContent = 'Strong password!';
-      strengthEl.className = 'password-strength password-valid';
-      input.style.borderColor = '#6ee7b7';
+      if (hasUpper && hasDigit && hasSpecial && hasMinLength) {
+        strengthEl.textContent = 'Strong password!';
+        strengthEl.className = 'password-strength password-valid';
+        input.style.borderColor = '#6ee7b7';
+        return true;
+      } else {
+        strengthEl.textContent = 'Must be 8+ chars: 1 uppercase, 1 digit, 1 special (!@#$%^&*)';
+        strengthEl.className = 'password-strength password-invalid';
+        input.style.borderColor = '#fca5a5';
+        return false;
+      }
+    }
+
+    // Password match - FIXED
+    function checkPasswordMatch() {
+      const password = document.getElementById('password').value;
+      const confirm = document.getElementById('confirmPassword').value;
+      const matchEl = document.getElementById('passwordMatch');
+      const confirmInput = document.getElementById('confirmPassword');
+
+      // Don't validate if confirm is empty
+      if (confirm.length === 0) {
+        matchEl.textContent = 'Passwords must match';
+        matchEl.className = 'password-strength password-invalid';
+        confirmInput.style.borderColor = '#e5e7eb';
+        return false;
+      }
+
+      if (password === confirm) {
+        matchEl.textContent = 'Passwords match';
+        matchEl.className = 'password-strength password-valid';
+        confirmInput.style.borderColor = '#6ee7b7';
+        return true;
+      } else {
+        matchEl.textContent = 'Passwords do not match';
+        matchEl.className = 'password-strength password-invalid';
+        confirmInput.style.borderColor = '#fca5a5';
+        return false;
+      }
+    }
+
+    // Validation on submit - FIXED
+    function validatePassword() {
+      const password = document.getElementById('password').value;
+      const confirm = document.getElementById('confirmPassword').value;
+
+      const hasUpper = /[A-Z]/.test(password);
+      const hasDigit = /\d/.test(password);
+      const hasSpecial = /[!@#$%^&*]/.test(password);
+      const hasMinLength = password.length >= 8;
+
+      const isStrong = hasUpper && hasDigit && hasSpecial && hasMinLength;
+      const isMatch = password === confirm && confirm.length > 0;
+
+      if (!isStrong) {
+        alert('Password must be at least 8 characters and contain:\n- 1 uppercase letter\n- 1 digit\n- 1 special character (!@#$%^&*)');
+        return false;
+      }
+
+      if (!isMatch) {
+        alert('Passwords do not match. Please check and try again.');
+        return false;
+      }
+
       return true;
-    } else {
-      strengthEl.textContent = 'Must be 8+ chars: 1 uppercase, 1 digit, 1 special (!@#$%^&*)';
-      strengthEl.className = 'password-strength password-invalid';
-      input.style.borderColor = '#fca5a5';
-      return false;
-    }
-  }
-
-  // Password match - FIXED
-  function checkPasswordMatch() {
-    const password = document.getElementById('password').value;
-    const confirm = document.getElementById('confirmPassword').value;
-    const matchEl = document.getElementById('passwordMatch');
-    const confirmInput = document.getElementById('confirmPassword');
-
-    // Don't validate if confirm is empty
-    if (confirm.length === 0) {
-      matchEl.textContent = 'Passwords must match';
-      matchEl.className = 'password-strength password-invalid';
-      confirmInput.style.borderColor = '#e5e7eb';
-      return false;
     }
 
-    if (password === confirm) {
-      matchEl.textContent = 'Passwords match';
-      matchEl.className = 'password-strength password-valid';
-      confirmInput.style.borderColor = '#6ee7b7';
-      return true;
-    } else {
-      matchEl.textContent = 'Passwords do not match';
-      matchEl.className = 'password-strength password-invalid';
-      confirmInput.style.borderColor = '#fca5a5';
-      return false;
-    }
-  }
-
-  // Validation on submit - FIXED
-  function validatePassword() {
-    const password = document.getElementById('password').value;
-    const confirm = document.getElementById('confirmPassword').value;
-
-    const hasUpper = /[A-Z]/.test(password);
-    const hasDigit = /\d/.test(password);
-    const hasSpecial = /[!@#$%^&*]/.test(password);
-    const hasMinLength = password.length >= 8;
-
-    const isStrong = hasUpper && hasDigit && hasSpecial && hasMinLength;
-    const isMatch = password === confirm && confirm.length > 0;
-
-    if (!isStrong) {
-      alert('Password must be at least 8 characters and contain:\n- 1 uppercase letter\n- 1 digit\n- 1 special character (!@#$%^&*)');
-      return false;
-    }
-
-    if (!isMatch) {
-      alert('Passwords do not match. Please check and try again.');
-      return false;
-    }
-
-    return true;
-  }
-
-  // Success alert
-  document.addEventListener('DOMContentLoaded', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('success') === 'registered') {
-      const successDiv = document.getElementById('registerSuccess');
-      if (successDiv) successDiv.style.display = 'block';
-      setTimeout(() => {
-        alert('Account created successfully!\nYou can now log in.');
-        switchForm('login');
-      }, 300);
-    }
-  });
-</script>
+    // Success alert
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('success') === 'registered') {
+        const successDiv = document.getElementById('registerSuccess');
+        if (successDiv) successDiv.style.display = 'block';
+        setTimeout(() => {
+          alert('Account created successfully!\nYou can now log in.');
+          switchForm('login');
+        }, 300);
+      }
+    });
+  </script>
 </body>
+
 </html>
