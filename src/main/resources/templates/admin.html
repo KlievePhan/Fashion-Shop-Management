@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
- 
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,31 +19,31 @@
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
- 
+
     .badge.success {
         background-color: #d1fae5;
         color: #065f46;
         border: 1px solid #6ee7b7;
     }
- 
+
     .badge.danger {
         background-color: #fee2e2;
         color: #991b1b;
         border: 1px solid #fca5a5;
     }
- 
+
     .badge.warning {
         background-color: #fef3c7;
         color: #92400e;
         border: 1px solid #fcd34d;
     }
- 
+
     .badge.info {
         background-color: #dbeafe;
         color: #1e40af;
         border: 1px solid #93c5fd;
     }
- 
+
     .changes-preview {
         display: inline-block;
         max-width: 200px;
@@ -54,17 +54,17 @@
         color: #6b7280;
         font-size: 13px;
     }
- 
+
     .changes-preview:hover {
         color: #111827;
     }
- 
+
     .filter-group {
         display: flex;
         gap: 10px;
         align-items: center;
     }
- 
+
     .filter-select {
         padding: 8px 12px;
         border: 2px solid #e5e7eb;
@@ -74,28 +74,28 @@
         cursor: pointer;
         transition: border-color 0.3s;
     }
- 
+
     .filter-select:hover {
         border-color: #9ca3af;
     }
- 
+
     .filter-select:focus {
         outline: none;
         border-color: #dc2626;
     }
- 
+
     .action-btns {
         display: flex;
         gap: 8px;
         align-items: center;
         flex-wrap: wrap;
     }
- 
+
     .action-btns form {
         margin: 0;
         display: inline-block;
     }
- 
+
     .btn-sm {
         padding: 6px 12px;
         font-size: 13px;
@@ -105,30 +105,30 @@
         font-weight: 500;
         transition: all 0.3s;
     }
- 
+
     .btn-secondary {
         background-color: #6b7280;
         color: white;
     }
- 
+
     .btn-secondary:hover {
         background-color: #4b5563;
     }
- 
+
     .btn-danger {
         background-color: #dc2626;
         color: white;
     }
- 
+
     .btn-danger:hover {
         background-color: #991b1b;
     }
- 
+
     .btn-primary {
         background-color: #dc2626;
         color: white;
     }
- 
+
     .btn-primary:hover {
         background-color: #991b1b;
     }
@@ -150,12 +150,12 @@
         background-color: white;
         cursor: pointer;
     }
- 
+
     @media (max-width: 1200px) {
         .table-container {
             overflow-x: auto;
         }
- 
+
         .data-table {
             min-width: 1000px;
         }
@@ -271,7 +271,7 @@
         </a>
     </nav>
 </aside>
- 
+
 <!-- Main Content -->
 <main class="main-content">
     <!-- Header -->
@@ -295,7 +295,7 @@
                     <span class="status-value" id="revenueToday">$2,450</span>
                 </div>
             </div>
-			
+
             <div class="search-bar">
                 <input type="text" placeholder="Search products, orders..." id="searchInput">
                 <i class="search-icon">🔍</i>
@@ -307,14 +307,14 @@
                     <span class="notification-badge">3</span>
                 </button>
             </div>
- 
+
             <div class="user-profile">
                 <div class="avatar">A</div>
                 <div class="user-info">
                     <span class="user-name">Admin</span>
                     <span class="user-role">Administrator</span>
                 </div>
- 
+
                 <div class="profile-dropdown">
                     <button class="dropdown-toggle">⋮</button>
                     <div class="dropdown-menu">
@@ -335,7 +335,7 @@
             </div>
         </div>
     </header>
- 
+
     <!-- Dashboard Section -->
     <section id="dashboard" class="content-section active">
         <div class="stats-grid">
@@ -372,7 +372,7 @@
                 </div>
             </div>
         </div>
- 
+
         <div class="dashboard-grid">
             <div class="card">
                 <h3>Recent Orders</h3>
@@ -409,7 +409,7 @@
                     </table>
                 </div>
             </div>
- 
+
             <div class="card">
                 <h3>Top Products</h3>
                 <div class="product-list">
@@ -433,14 +433,14 @@
             </div>
         </div>
     </section>
- 
+
     <!-- Products Section -->
     <section id="products" class="content-section">
         <div class="section-header">
             <h2>Products Management</h2>
             <button class="btn btn-primary" id="addProductBtn">+ Add Product</button>
         </div>
- 
+
         <div class="card">
             <div class="table-container">
                 <table class="data-table">
@@ -460,14 +460,14 @@
             </div>
         </div>
     </section>
- 
+
     <!-- Brands Section -->
     <section id="brands" class="content-section">
         <div class="section-header">
             <h2>Brand Management</h2>
             <button class="btn btn-primary" id="addBrandBtn">+ Add Brand</button>
         </div>
- 
+
         <div class="card">
             <div class="table-container">
                 <table class="data-table">
@@ -489,7 +489,7 @@
                         <td>
                             <div class="action-btns">
                                 <button class="btn btn-sm btn-secondary" th:onclick="'editBrand(' + ${brand.id} + ')'">Edit</button>
-                                <form th:action="@{/admin/brands/{id}/delete(id=${brand.id})}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this brand?')">
+                                <form th:action="@{/admin/brand/{id}/delete(id=${brand.id})}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this brand?')">
                                     <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                                 </form>
                             </div>
@@ -500,7 +500,7 @@
             </div>
         </div>
     </section>
- 
+
     <!-- Orders Section -->
     <section id="orders" class="content-section">
         <div class="section-header">
@@ -514,7 +514,7 @@
                 </select>
             </div>
         </div>
- 
+
         <div class="card">
             <div class="table-container">
                 <table class="data-table">
@@ -534,14 +534,14 @@
             </div>
         </div>
     </section>
- 
+
     <!-- Users Section -->
     <section id="users" class="content-section">
         <div class="section-header">
             <h2>Users Management</h2>
             <button class="btn btn-primary" id="addUserBtn">+ Add User</button>
         </div>
- 
+
         <div class="card">
             <div class="table-container">
                 <table class="data-table">
@@ -563,14 +563,14 @@
                         <td>
                             <form th:action="@{/admin/users/{id}/edit-role(id=${user.id})}" method="post" style="display:inline;">
                                 <select name="roleCode" class="role-select" th:disabled="${user.id == currentUserId}">
-                                    <option th:each="role : ${roles}" 
-                                            th:value="${role.code}" 
+                                    <option th:each="role : ${roles}"
+                                            th:value="${role.code}"
                                             th:text="${role.name}"
                                             th:selected="${user.role.code == role.code}">
                                     </option>
                                 </select>
-                                <button type="submit" 
-                                        class="btn btn-sm btn-primary" 
+                                <button type="submit"
+                                        class="btn btn-sm btn-primary"
                                         th:disabled="${user.id == currentUserId}"
                                         style="margin-left: 5px;">
                                     Update
@@ -578,29 +578,29 @@
                             </form>
                         </td>
                         <td>
-                            <span class="badge" th:classappend="${user.active ? 'success' : 'danger'}" 
+                            <span class="badge" th:classappend="${user.active ? 'success' : 'danger'}"
                                   th:text="${user.active ? 'Active' : 'Inactive'}"></span>
                         </td>
                         <td>
                             <div class="action-btns">
                                 <button class="btn btn-sm btn-secondary" th:onclick="'viewUser(' + ${user.id} + ')'">View</button>
-                                <button class="btn btn-sm btn-secondary" 
+                                <button class="btn btn-sm btn-secondary"
                                         th:onclick="'editUser(' + ${user.id} + ')'"
                                         th:disabled="${user.id == currentUserId}">
                                     Edit
                                 </button>
                                 <form th:action="@{/admin/users/{id}/toggle-active(id=${user.id})}" method="post" style="display:inline;">
-                                    <button type="submit" 
-                                            class="btn btn-sm" 
+                                    <button type="submit"
+                                            class="btn btn-sm"
                                             th:classappend="${user.active ? 'btn-danger' : 'btn-success'}"
                                             th:disabled="${user.id == currentUserId}">
                                         <span th:text="${user.active ? 'Deactivate' : 'Activate'}"></span>
                                     </button>
                                 </form>
-                                <form th:if="${!user.active}" 
-                                      th:action="@{/admin/users/{id}/delete(id=${user.id})}" 
-                                      method="post" 
-                                      style="display:inline;" 
+                                <form th:if="${!user.active}"
+                                      th:action="@{/admin/users/{id}/delete(id=${user.id})}"
+                                      method="post"
+                                      style="display:inline;"
                                       onsubmit="return confirm('Are you sure you want to permanently delete this user? This action cannot be undone.');">
                                     <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                                 </form>
@@ -612,13 +612,13 @@
             </div>
         </div>
     </section>
- 
+
     <!-- Analytics Section -->
     <section id="analytics" class="content-section">
         <div class="section-header">
             <h2>Analytics</h2>
         </div>
- 
+
         <div class="analytics-grid">
             <div class="card">
                 <h3>Sales Overview</h3>
@@ -662,7 +662,7 @@
             </div>
         </div>
     </section>
- 
+
     <!-- Audit Log Section -->
     <section id="auditlog" class="content-section">
         <div class="section-header">
@@ -685,7 +685,7 @@
                 <input type="date" class="filter-select" id="auditDate">
             </div>
         </div>
- 
+
         <div class="card">
             <div class="table-container">
                 <table class="data-table">
@@ -722,7 +722,7 @@
         </div>
     </section>
 </main>
- 
+
 <!-- Modal for Add/Edit Product -->
 <div id="productModal" class="modal">
     <div class="modal-content">
@@ -762,7 +762,7 @@
         </form>
     </div>
 </div>
- 
+
 <!-- Modal for Add/Edit Brand -->
 <div id="brandModal" class="modal">
     <div class="modal-content">
@@ -770,7 +770,7 @@
             <h2 id="brandModalTitle">Add New Brand</h2>
             <button class="close-modal" onclick="closeBrandModal()">&times;</button>
         </div>
-        <form th:action="@{/admin/brands/save}" method="post" id="brandForm">
+        <form th:action="@{/admin/brand/save}" method="post" id="brandForm">
             <input type="hidden" id="brandId" name="id">
             <div class="form-group">
                 <label>Brand Name</label>
@@ -813,8 +813,8 @@
             <div class="form-group">
                 <label>Role</label>
                 <select id="roleCode" name="roleCode" required>
-                    <option th:each="role : ${roles}" 
-                            th:value="${role.code}" 
+                    <option th:each="role : ${roles}"
+                            th:value="${role.code}"
                             th:text="${role.name}">
                     </option>
                 </select>
@@ -858,7 +858,40 @@
         </div>
     </div>
 </div>
- 
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const contextPath = /*[[@{/}]]*/ '/';
+
+    function editBrand(id) {
+        fetch(contextPath + 'admin/brand/' + id, {
+            headers: {
+                'Accept': 'application/json'   // <-- THIS IS THE KEY
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    // 404 → brand not found
+                    throw new Error('Brand not found (HTTP ' + response.status + ')');
+                }
+                return response.json();
+            })
+            .then(brand => {
+                // ---- Fill the modal ----
+                document.getElementById('brandModalTitle').textContent = 'Edit Brand';
+                document.getElementById('brandId').value      = brand.id;
+                document.getElementById('brandName').value    = brand.name;
+                document.getElementById('brandSlug').value    = brand.slug;
+
+                // ---- Show the modal ----
+                document.getElementById('brandModal').style.display = 'flex';
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Failed to load brand: ' + err.message);
+            });
+    }
+    /*]]>*/
+</script>
 <script th:src="@{/js/admin.js}"></script>
 <script>
     // Brand Management Functions
@@ -868,27 +901,11 @@
         document.getElementById('brandId').value = '';
         document.getElementById('brandModal').style.display = 'flex';
     });
- 
-    function editBrand(id) {
-        fetch(`/admin/brands/${id}`)
-            .then(response => response.json())
-            .then(brand => {
-                document.getElementById('brandModalTitle').textContent = 'Edit Brand';
-                document.getElementById('brandId').value = brand.id;
-                document.getElementById('brandName').value = brand.name;
-                document.getElementById('brandSlug').value = brand.slug;
-                document.getElementById('brandModal').style.display = 'flex';
-            })
-            .catch(error => {
-                alert('Error loading brand data');
-                console.error(error);
-            });
-    }
- 
+
     function closeBrandModal() {
         document.getElementById('brandModal').style.display = 'none';
     }
- 
+
     document.getElementById('brandName')?.addEventListener('input', function(e) {
         const slug = e.target.value
             .toLowerCase()
@@ -896,7 +913,7 @@
             .replace(/^-+|-+$/g, '');
         document.getElementById('brandSlug').value = slug;
     });
- 
+
     window.addEventListener('click', function(e) {
         const brandModal = document.getElementById('brandModal');
         if (e.target === brandModal) {
@@ -942,13 +959,13 @@
                 document.getElementById('detailFullName').textContent = user.fullName;
                 document.getElementById('detailEmail').textContent = user.email;
                 document.getElementById('detailRole').textContent = user.role.name + ' (' + user.role.code + ')';
-                
+
                 const activeSpan = document.createElement('span');
                 activeSpan.className = 'badge ' + (user.active ? 'success' : 'danger');
                 activeSpan.textContent = user.active ? 'Active' : 'Inactive';
                 document.getElementById('detailActive').innerHTML = '';
                 document.getElementById('detailActive').appendChild(activeSpan);
-                
+
                 document.getElementById('userDetailModal').style.display = 'flex';
             })
             .catch(error => {
@@ -968,7 +985,7 @@
     window.addEventListener('click', function(e) {
         const userModal = document.getElementById('userModal');
         const userDetailModal = document.getElementById('userDetailModal');
-        
+
         if (e.target === userModal) {
             closeUserModal();
         }
@@ -982,7 +999,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const success = urlParams.get('success');
         const error = urlParams.get('error');
-        
+
         if (success) {
             showNotification(success, 'success');
         }
@@ -1007,9 +1024,9 @@
             animation: slideIn 0.3s ease;
             max-width: 400px;
         `;
-        
+
         document.body.appendChild(notification);
-        
+
         setTimeout(() => {
             notification.style.animation = 'slideOut 0.3s ease';
             setTimeout(() => notification.remove(), 300);
@@ -1017,5 +1034,5 @@
     }
 </script>
 </body>
- 
+
 </html>

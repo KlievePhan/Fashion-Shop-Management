@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.fsm.entity.Product;
 import org.fsm.entity.Role;
 import org.fsm.entity.User;
-import org.fsm.repository.BrandRepository;
-import org.fsm.repository.ProductRepository;
-import org.fsm.repository.RoleRepository;
-import org.fsm.repository.UserRepository;
+import org.fsm.repository.*;
 import org.fsm.service.AuditLogService;
 import org.fsm.service.SessionService;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +32,7 @@ public class AdminController {
     private final RoleRepository roleRepository;
     private final ProductRepository productRepository;
     private final BrandRepository brandRepository;
+    private final CategoryRepository categoryRepository;
     private final AuditLogService auditLogService;
     private final PasswordEncoder passwordEncoder;
     private final SessionService sessionService;
@@ -60,6 +58,7 @@ public class AdminController {
         
         // Load brands
         model.addAttribute("brands", brandRepository.findAll());
+        model.addAttribute("categories", categoryRepository.findAll());
         
         // Load recent audit logs with pagination
         var pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
