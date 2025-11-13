@@ -329,6 +329,7 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
+        // Parse and display variant attributes
         document.querySelectorAll(".variant-attributes").forEach(el => {
             try {
                 const attrs = JSON.parse(el.dataset.attributes);
@@ -350,17 +351,193 @@
     });
 
     function updateQuantity(button, change) {
+        const cartItem = button.closest('.cart-item');
         const input = button.parentElement.querySelector('.quantity-input');
+        const removeBtn = cartItem.querySelector('.remove-btn');
+        const onclickAttr = removeBtn.getAttribute('onclick');
+        const itemId = onclickAttr.match(/\d+/)[0];
+
         let newQty = parseInt(input.value) + change;
         if (newQty < 1) newQty = 1;
-        input.value = newQty;
-        // TODO: Send update to server
+
+        // Disable buttons during update
+        const buttons = button.parentElement.querySelectorAll('.quantity-btn');
+        buttons.forEach(btn => btn.disabled = true);
+
+        // Send update to server
+        fetch('/fashionshop/cart/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `itemId=${itemId}&qty=${newQty}`
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update quantity input
+                    input.value = newQty;
+
+                    // Update line total
+                    const lineTotalDiv = cartItem.querySelector('[style*="text-align: right"]');
+                    if (lineTotalDiv) {
+                        const priceDiv = lineTotalDiv.querySelector('div');
+                        priceDiv.textContent = ''
+
+                        function removeFromCart(itemId) {
+                            if (!confirm('Are you sure you want to remove this item?')) {
+                                return;
+                            }
+
+                            // Show loading state
+                            const cartItem = document.querySelector(`[onclick*="removeFromCart(${itemId})"]`).closest('.cart-item');
+                            cartItem.style.opacity = '0.5';
+                            cartItem.style.pointerEvents = 'none';
+
+                            fetch(`/fashionshop/cart/delete/${itemId}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                }
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        // Remove item from DOM with animation
+                                        cartItem.style.transition = 'all 0.3s ease';
+                                        cartItem.style.transform = 'translateX(-100%)';
+                                        cartItem.style.opacity = '0';
+
+                                        setTimeout(() => {
+                                            cartItem.remove();
+
+                                            // Check if cart is empty
+                                            if (data.isEmpty) {
+                                                location.reload();
+                                            } else {
+                                                // Update cart summary
+                                                updateCartSummary(data);
+                                            }
+                                        }, 300);
+                                    } else {
+                                        alert(data.message || 'Failed to remove item');
+                                        cartItem.style.opacity = '1';
+                                        cartItem.style.pointerEvents = 'auto';
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    alert('An error occurred while removing the item');
+                                    cartItem.style.opacity = '1';
+                                    cartItem.style.pointerEvents = 'auto';
+                                });
+                        }
+
+                        function updateCartSummary(data) {
+                            // Update all summary values
+                            const summaryRows = document.querySelectorAll('.summary-row');
+
+                            summaryRows.forEach(row => {
+                                const label = row.querySelector('span:first-child').textContent.toLowerCase();
+                                const valueSpan = row.querySelector('span:last-child');
+
+                                if (label.includes('subtotal')) {
+                                    valueSpan.textContent = '$' + data.subtotal.toFixed(2);
+                                } else if (label.includes('shipping')) {
+                                    valueSpan.textContent = '$' + data.shipping.toFixed(2);
+                                } else if (label.includes('tax')) {
+                                    valueSpan.textContent = '$' + data.tax.toFixed(2);
+                                } else if (label.includes('total')) {
+                                    valueSpan.textContent = '$' + data.total.toFixed(2);
+                                }
+                            });
+                        } + data.itemTotal.toFixed(2);
+                    }
+
+                    // Update cart summary
+                    updateCartSummary(data);
+                } else {
+                    alert(data.message || 'Failed to update quantity');
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating the cart');
+                location.reload();
+            })
+            .finally(() => {
+                buttons.forEach(btn => btn.disabled = false);
+            });
     }
 
     function removeFromCart(itemId) {
-        if (confirm('Are you sure you want to remove this item?')) {
-            // TODO: Send delete request to server
+        if (!confirm('Are you sure you want to remove this item?')) {
+            return;
         }
+
+        // Show loading state
+        const cartItem = document.querySelector(`[onclick*="removeFromCart(${itemId})"]`).closest('.cart-item');
+        cartItem.style.opacity = '0.5';
+        cartItem.style.pointerEvents = 'none';
+
+        fetch(`/fashionshop/cart/delete/${itemId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove item from DOM with animation
+                    cartItem.style.transition = 'all 0.3s ease';
+                    cartItem.style.transform = 'translateX(-100%)';
+                    cartItem.style.opacity = '0';
+
+                    setTimeout(() => {
+                        cartItem.remove();
+
+                        // Check if cart is empty
+                        if (data.isEmpty) {
+                            location.reload();
+                        } else {
+                            // Update cart summary
+                            updateCartSummary(data);
+                        }
+                    }, 300);
+                } else {
+                    alert(data.message || 'Failed to remove item');
+                    cartItem.style.opacity = '1';
+                    cartItem.style.pointerEvents = 'auto';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while removing the item');
+                cartItem.style.opacity = '1';
+                cartItem.style.pointerEvents = 'auto';
+            });
+    }
+
+    function updateCartSummary(data) {
+        // Update all summary values
+        const summaryRows = document.querySelectorAll('.summary-row');
+
+        summaryRows.forEach(row => {
+            const label = row.querySelector('span:first-child').textContent.toLowerCase();
+            const valueSpan = row.querySelector('span:last-child');
+
+            if (label.includes('subtotal')) {
+                valueSpan.textContent = '$' + data.subtotal.toFixed(2);
+            } else if (label.includes('shipping')) {
+                valueSpan.textContent = '$' + data.shipping.toFixed(2);
+            } else if (label.includes('tax')) {
+                valueSpan.textContent = '$' + data.tax.toFixed(2);
+            } else if (label.includes('total')) {
+                valueSpan.textContent = '$' + data.total.toFixed(2);
+            }
+        });
     }
 </script>
 </body>
