@@ -65,6 +65,10 @@
   gap: 18px;
 }
 
+/* =====================
+   CART BADGE - UPDATED
+===================== */
+
 .cart-link {
   position: relative;
   display: inline-block;
@@ -78,18 +82,52 @@
   display: block;
 }
 
+/* Badge styling - Always visible, animated */
 .cart-link .badge {
   position: absolute;
-  top: -6px;
-  right: -10px;
-  background: red;
+  top: -8px;
+  right: -8px;
+  background-color: #e74c3c;
   color: white;
   border-radius: 50%;
+  min-width: 20px;
+  height: 20px;
+  display: flex; /* Always use flex */
+  align-items: center;
+  justify-content: center;
   font-size: 11px;
-  padding: 2px 5px;
-  font-weight: 600;
-  line-height: 1;
+  font-weight: bold;
+  padding: 0 6px;
   z-index: 999;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+/* Optional: Different color when empty */
+.cart-link .badge[data-count="0"],
+.cart-link .badge:empty {
+  background-color: #95a5a6; /* Gray when empty */
+}
+
+/* Hover effect */
+.cart-link:hover .badge {
+  transform: scale(1.1);
+}
+
+/* Animation when count changes */
+@keyframes badgePop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.cart-link .badge.updated {
+  animation: badgePop 0.3s ease;
 }
 
 /* =====================
@@ -202,10 +240,42 @@
   display: block !important; /* Force show */
 }
 
+.cart-link {
+  position: relative;
+  display: inline-block;
+}
+
+.cart-link .badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #e74c3c;
+  color: white;
+  border-radius: 50%;
+  min-width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 0 6px;
+}
+
+.cart-link .badge:empty,
+.cart-link .badge[data-count="0"] {
+  display: none;
+}
 /* Keep your fade-in animation */
 @keyframes dropdownFade {
-  from { opacity: 0; transform: translateY(-10px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Responsive */

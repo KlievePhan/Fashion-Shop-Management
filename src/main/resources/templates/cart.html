@@ -7,18 +7,57 @@
     <title>Shopping Cart - Fashion Shop</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600&display.swap" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="icon" th:href="@{/images/store.png}" type="image/x-icon">
-
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/theme-customizer.css}">
+    <link rel="stylesheet" th:href="@{/css/fixed_button.css}">
+    <link rel="stylesheet" th:href="@{/css/cart-notification.css}" />
 
     <style>
+        :root {
+            /* Light Mode Defaults */
+            --body-bg: #fafafa;
+            --container-bg: white;
+            --text-color: #333;
+            --text-secondary: #666;
+            --border-color: #eee;
+            --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            --price-color: #000;
+            --highlight-color: #e74c3c;
+            --primary-button-bg: #000;
+            --primary-button-text: white;
+            --primary-button-hover: #333;
+            --secondary-button-bg: white;
+            --secondary-button-border: #ddd;
+            --secondary-button-hover: #f5f5f5;
+        }
+
+        .dark-mode {
+            --body-bg: #121212;
+            --container-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --text-secondary: #aaaaaa;
+            --border-color: #333333;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --price-color: #ffffff;
+            --highlight-color: #ff6b6b;
+            --primary-button-bg: #bb86fc;
+            --primary-button-text: #121212;
+            --primary-button-hover: #9f6ee6;
+            --secondary-button-bg: #2d2d2d;
+            --secondary-button-border: #444444;
+            --secondary-button-hover: #3a3a3a;
+        }
+
+        /* ... (Toàn bộ các style CSS khác của bạn giữ nguyên) ... */
         body {
             font-family: 'Lato', sans-serif;
-            background-color: #fafafa;
+            background-color: var(--body-bg);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .cart-container {
@@ -33,23 +72,30 @@
         .cart-header h1 {
             font-size: 32px;
             font-weight: 600;
-            color: #333;
+            color: var(--text-color);
         }
 
-        .cart-items-section {
-            background: white;
+        .cart-items-section,
+        .cart-summary {
+            background: var(--container-bg);
             border-radius: 8px;
             padding: 30px;
             margin-bottom: 30px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            box-shadow: var(--box-shadow);
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        .cart-summary {
+            margin-bottom: 0;
         }
 
         .cart-item {
             display: flex;
             gap: 20px;
             padding: 20px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--border-color);
             align-items: flex-start;
+            transition: border-color 0.3s;
         }
 
         .cart-item:last-child {
@@ -61,31 +107,31 @@
             height: 120px;
             object-fit: cover;
             border-radius: 8px;
-            background-color: #f5f5f5;
+            background-color: var(--secondary-button-hover);
             flex-shrink: 0;
-        }
-
-        .item-details {
-            flex: 1;
         }
 
         .item-title {
             font-size: 16px;
             font-weight: 600;
-            color: #333;
+            color: var(--text-color);
             margin-bottom: 8px;
         }
 
         .item-variant {
             font-size: 14px;
-            color: #666;
+            color: var(--text-secondary);
             margin-bottom: 10px;
+        }
+
+        .item-variant strong {
+            color: var(--text-color);
         }
 
         .item-price {
             font-size: 16px;
             font-weight: 600;
-            color: #000;
+            color: var(--price-color);
             margin-bottom: 15px;
         }
 
@@ -100,47 +146,53 @@
         .quantity-btn {
             width: 30px;
             height: 30px;
-            border: 1px solid #ddd;
-            background: white;
+            border: 1px solid var(--secondary-button-border);
+            background: var(--secondary-button-bg);
+            color: var(--text-color);
             cursor: pointer;
             border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 14px;
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
         }
 
-        .quantity-btn:hover {
-            background-color: #f5f5f5;
+        .quantity-btn:hover:not(:disabled) {
+            background-color: var(--secondary-button-hover);
+        }
+
+        .quantity-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .quantity-input {
             width: 50px;
             text-align: center;
-            border: 1px solid #ddd;
+            border: 1px solid var(--secondary-button-border);
+            background: var(--container-bg);
+            color: var(--text-color);
             border-radius: 4px;
             padding: 5px;
         }
 
         .remove-btn {
-            color: #e74c3c;
+            color: var(--highlight-color);
             cursor: pointer;
             font-size: 14px;
             border: none;
             background: none;
             text-decoration: none;
+            transition: color 0.3s;
         }
 
         .remove-btn:hover {
             text-decoration: underline;
         }
 
-        .cart-summary {
-            background: white;
-            border-radius: 8px;
-            padding: 30px;
-            width: 100%;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        .cart-summary h5 {
+            color: var(--text-color);
         }
 
         .summary-row {
@@ -150,19 +202,30 @@
             font-size: 15px;
         }
 
+        .summary-row span:first-child {
+            color: var(--text-secondary);
+        }
+
+        .summary-row span:last-child {
+            color: var(--price-color);
+        }
+
         .summary-row.total {
-            border-top: 2px solid #eee;
+            border-top: 2px solid var(--border-color);
             padding-top: 15px;
             font-size: 18px;
             font-weight: 600;
-            color: #000;
+        }
+
+        .summary-row.total span {
+            color: var(--price-color) !important;
         }
 
         .checkout-btn {
             width: 100%;
             padding: 15px;
-            background-color: #000;
-            color: white;
+            background-color: var(--primary-button-bg);
+            color: var(--primary-button-text);
             border: none;
             border-radius: 4px;
             font-size: 16px;
@@ -173,23 +236,30 @@
         }
 
         .checkout-btn:hover {
-            background-color: #333;
+            background-color: var(--primary-button-hover);
         }
 
-        .continue-shopping {
+        .continue-shopping,
+        .empty-cart .btn-dark {
             width: 100%;
             padding: 12px;
-            background-color: white;
-            color: #000;
-            border: 1px solid #ddd;
+            background-color: var(--secondary-button-bg);
+            color: var(--text-color);
+            border: 1px solid var(--secondary-button-border);
             border-radius: 4px;
             font-size: 15px;
             cursor: pointer;
             margin-top: 10px;
+            text-align: center;
+            display: block;
+            text-decoration: none;
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
         }
 
-        .continue-shopping:hover {
-            background-color: #f5f5f5;
+        .continue-shopping:hover,
+        .empty-cart .btn-dark:hover {
+            background-color: var(--secondary-button-hover);
+            color: var(--text-color);
         }
 
         .empty-cart {
@@ -199,14 +269,34 @@
 
         .empty-cart i {
             font-size: 60px;
-            color: #ddd;
+            color: var(--border-color);
             margin-bottom: 20px;
         }
 
         .empty-cart p {
             font-size: 18px;
-            color: #666;
+            color: var(--text-secondary);
             margin-bottom: 30px;
+        }
+
+        .empty-cart .btn-dark {
+            width: 250px;
+            margin: 0 auto;
+            background-color: var(--primary-button-bg);
+            color: var(--primary-button-text);
+            border: none;
+        }
+
+        .empty-cart .btn-dark:hover {
+            background-color: var(--primary-button-hover);
+        }
+
+        .item-line-total {
+            text-align: right;
+            min-width: 120px;
+            color: var(--price-color);
+            font-weight: 600;
+            font-size: 16px;
         }
 
         @media (max-width: 768px) {
@@ -224,322 +314,127 @@
             }
         }
     </style>
+
 </head>
 
 <body>
-<!-- Header -->
-<!-- HEADER using Thymeleaf fragment -->
-<div th:insert="~{header}"></div>
+    <div th:insert="~{header}"></div>
 
-<!-- Cart Content -->
-<main class="container cart-container">
-    <div class="cart-header">
-        <h1>Shopping Cart</h1>
-    </div>
+    <main class="container cart-container">
+        <div class="cart-header">
+            <h1>Shopping Cart</h1>
+        </div>
 
-    <!-- Empty Cart -->
-    <div th:if="${cartItems == null || cartItems.isEmpty()}" class="cart-items-section empty-cart">
-        <i class="bi bi-bag-x"></i>
-        <p>Your cart is empty</p>
-        <a th:href="@{/}" class="btn btn-dark">Continue Shopping</a>
-    </div>
+        <div th:if="${cartItems == null || cartItems.isEmpty()}" class="cart-items-section empty-cart">
+            <i class="bi bi-bag-x"></i>
+            <p>Your cart is empty</p>
+            <a th:href="@{/shop}" class="btn btn-dark">Continue Shopping</a>
+        </div>
 
-    <!-- Cart Items -->
-    <div th:if="${cartItems != null && !cartItems.isEmpty()}" class="row">
-        <div class="col-lg-8">
-            <div class="cart-items-section">
-                <div th:each="item : ${cartItems}" class="cart-item">
-                    <!-- Item Image -->
-                    <img th:src="${item.productVariant.product.images[0].url}"
-                         alt="Product"
-                         class="item-image">
+        <div th:if="${cartItems != null && !cartItems.isEmpty()}" class="row">
+            <div class="col-lg-8">
+                <div class="cart-items-section">
+                    <div th:each="item : ${cartItems}" class="cart-item">
+                        <img th:src="${item.productVariant.product.images[0].url}" alt="Product" class="item-image">
 
-                    <!-- Item Info -->
-                    <div class="item-details">
-                        <h4 class="item-title" th:text="${item.productVariant.product.title}"></h4>
+                        <div class="item-details">
+                            <h4 class="item-title" th:text="${item.productVariant.product.title}"></h4>
+                            <div class="item-variant">
+                                <span class="variant-attributes"
+                                    th:data-attributes="${item.productVariant.attributeJson}"></span>
+                            </div>
+                            <div class="item-price">
+                                <span th:text="'$' + ${#numbers.formatDecimal(item.productVariant.price, 1, 2)}"></span>
+                            </div>
 
-                        <div class="item-variant">
-                            <!-- Parse attributeJson from productVariant instead of accessing separate color/size fields -->
-                            <span class="variant-attributes" th:data-attributes="${item.productVariant.attributeJson}"></span>
+                            <div class="quantity-control">
+                                <button class="quantity-btn" onclick="updateQuantityOnServer(this, -1)">−</button>
+                                <input type="number" class="quantity-input" th:value="${item.qty}" min="1" readonly>
+                                <button class="quantity-btn" onclick="updateQuantityOnServer(this, 1)">+</button>
+                            </div>
+
+                            <button class="remove-btn" th:onclick="'removeFromCartOnServer(' + ${item.id} + ')'">
+                                <i class="bi bi-trash"></i> Remove
+                            </button>
                         </div>
 
-                        <div class="item-price">
-                            <span th:text="'$' + ${#numbers.formatDecimal(item.productVariant.price, 1, 2)}"></span>
-                        </div>
-
-                        <!-- Quantity Control -->
-                        <div class="quantity-control">
-                            <button class="quantity-btn" onclick="updateQuantity(this, -1)">−</button>
-                            <input type="number" class="quantity-input" th:value="${item.qty}" min="1" readonly>
-                            <button class="quantity-btn" onclick="updateQuantity(this, 1)">+</button>
-                        </div>
-
-                        <!-- Remove Button -->
-                        <button class="remove-btn" th:onclick="'removeFromCart(' + ${item.id} + ')'">
-                            <i class="bi bi-trash"></i> Remove
-                        </button>
-                    </div>
-
-                    <!-- Line Total -->
-                    <div style="text-align: right; min-width: 120px;">
-                        <div style="font-weight: 600; font-size: 16px;"
-                             th:text="'$' + ${#numbers.formatDecimal(item.productVariant.price * item.qty, 1, 2)}">
+                        <div class="item-line-total">
+                            <span
+                                th:text="'$' + ${#numbers.formatDecimal(item.productVariant.price * item.qty, 1, 2)}"></span>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Cart Summary -->
-        <div class="col-lg-4">
-            <div class="cart-summary">
-                <h5 style="font-weight: 600; margin-bottom: 20px;">Order Summary</h5>
-
-                <div class="summary-row">
-                    <span>Subtotal:</span>
-                    <span th:text="'$' + ${#numbers.formatDecimal(subtotal, 1, 2)}"></span>
+            <div class="col-lg-4">
+                <div class="cart-summary">
+                    <h5 style="font-weight: 600; margin-bottom: 20px;">Order Summary</h5>
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span th:text="'$' + ${#numbers.formatDecimal(subtotal, 1, 2)}"></span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Shipping:</span>
+                        <span th:text="'$' + ${#numbers.formatDecimal(shipping, 1, 2)}"></span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Tax:</span>
+                        <span th:text="'$' + ${#numbers.formatDecimal(tax, 1, 2)}"></span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total:</span>
+                        <span th:text="'$' + ${#numbers.formatDecimal(total, 1, 2)}"></span>
+                    </div>
+                    <button class="checkout-btn">Proceed to Checkout</button>
+                    <a th:href="@{/shop}" class="continue-shopping">Continue Shopping</a>
                 </div>
-
-                <div class="summary-row">
-                    <span>Shipping:</span>
-                    <span th:text="'$' + ${#numbers.formatDecimal(shipping, 1, 2)}"></span>
-                </div>
-
-                <div class="summary-row">
-                    <span>Tax:</span>
-                    <span th:text="'$' + ${#numbers.formatDecimal(tax, 1, 2)}"></span>
-                </div>
-
-                <div class="summary-row total">
-                    <span>Total:</span>
-                    <span th:text="'$' + ${#numbers.formatDecimal(total, 1, 2)}"></span>
-                </div>
-
-                <button class="checkout-btn">Proceed to Checkout</button>
-                <button class="continue-shopping" onclick="window.location.href='/fashionshop/shop'">Continue Shopping</button>
             </div>
         </div>
-    </div>
-</main>
+    </main>
 
-<!-- FOOTER using Thymeleaf fragment -->
-<div th:replace="~{footer :: footer}"></div>
+    <div th:replace="~{footer :: footer}"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <a href="#" class="customize-btn">
+        <i class="bi bi-sliders"></i> Customize
+    </a>
 
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        // Parse and display variant attributes
-        document.querySelectorAll(".variant-attributes").forEach(el => {
-            try {
-                const attrs = JSON.parse(el.dataset.attributes);
-                let html = '';
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
-                if (attrs.size) {
-                    html += `Size: <strong>${attrs.size}</strong>`;
-                }
-                if (attrs.color) {
-                    if (html) html += '<span class="ms-3"></span>';
-                    html += `Color: <strong>${attrs.color}</strong>`;
-                }
+    <script th:src="@{/js/header.js}"></script>
 
-                el.innerHTML = html;
-            } catch (e) {
-                console.warn("Failed to parse variant attributes:", e);
-            }
-        });
-    });
+    <script th:src="@{/js/cart-update.js}"></script>
 
-    function updateQuantity(button, change) {
-        const cartItem = button.closest('.cart-item');
-        const input = button.parentElement.querySelector('.quantity-input');
-        const removeBtn = cartItem.querySelector('.remove-btn');
-        const onclickAttr = removeBtn.getAttribute('onclick');
-        const itemId = onclickAttr.match(/\d+/)[0];
+    <script th:src="@{/js/theme-customizer.js}"></script>
 
-        let newQty = parseInt(input.value) + change;
-        if (newQty < 1) newQty = 1;
+    <script>
+        // --- CHỈ GIỮ LẠI LOGIC NÀY ---
+        // (Nó chỉ chịu trách nhiệm hiển thị "Size: M", "Color: Red")
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll(".variant-attributes").forEach(el => {
+                try {
+                    const attrs = JSON.parse(el.dataset.attributes);
+                    let html = '';
 
-        // Disable buttons during update
-        const buttons = button.parentElement.querySelectorAll('.quantity-btn');
-        buttons.forEach(btn => btn.disabled = true);
-
-        // Send update to server
-        fetch('/fashionshop/cart/update', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `itemId=${itemId}&qty=${newQty}`
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update quantity input
-                    input.value = newQty;
-
-                    // Update line total
-                    const lineTotalDiv = cartItem.querySelector('[style*="text-align: right"]');
-                    if (lineTotalDiv) {
-                        const priceDiv = lineTotalDiv.querySelector('div');
-                        priceDiv.textContent = ''
-
-                        function removeFromCart(itemId) {
-                            if (!confirm('Are you sure you want to remove this item?')) {
-                                return;
-                            }
-
-                            // Show loading state
-                            const cartItem = document.querySelector(`[onclick*="removeFromCart(${itemId})"]`).closest('.cart-item');
-                            cartItem.style.opacity = '0.5';
-                            cartItem.style.pointerEvents = 'none';
-
-                            fetch(`/fashionshop/cart/delete/${itemId}`, {
-                                method: 'DELETE',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                }
-                            })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.success) {
-                                        // Remove item from DOM with animation
-                                        cartItem.style.transition = 'all 0.3s ease';
-                                        cartItem.style.transform = 'translateX(-100%)';
-                                        cartItem.style.opacity = '0';
-
-                                        setTimeout(() => {
-                                            cartItem.remove();
-
-                                            // Check if cart is empty
-                                            if (data.isEmpty) {
-                                                location.reload();
-                                            } else {
-                                                // Update cart summary
-                                                updateCartSummary(data);
-                                            }
-                                        }, 300);
-                                    } else {
-                                        alert(data.message || 'Failed to remove item');
-                                        cartItem.style.opacity = '1';
-                                        cartItem.style.pointerEvents = 'auto';
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Error:', error);
-                                    alert('An error occurred while removing the item');
-                                    cartItem.style.opacity = '1';
-                                    cartItem.style.pointerEvents = 'auto';
-                                });
-                        }
-
-                        function updateCartSummary(data) {
-                            // Update all summary values
-                            const summaryRows = document.querySelectorAll('.summary-row');
-
-                            summaryRows.forEach(row => {
-                                const label = row.querySelector('span:first-child').textContent.toLowerCase();
-                                const valueSpan = row.querySelector('span:last-child');
-
-                                if (label.includes('subtotal')) {
-                                    valueSpan.textContent = '$' + data.subtotal.toFixed(2);
-                                } else if (label.includes('shipping')) {
-                                    valueSpan.textContent = '$' + data.shipping.toFixed(2);
-                                } else if (label.includes('tax')) {
-                                    valueSpan.textContent = '$' + data.tax.toFixed(2);
-                                } else if (label.includes('total')) {
-                                    valueSpan.textContent = '$' + data.total.toFixed(2);
-                                }
-                            });
-                        } + data.itemTotal.toFixed(2);
+                    if (attrs.size) {
+                        html += `Size: <strong>${attrs.size}</strong>`;
+                    }
+                    if (attrs.color) {
+                        if (html) html += '<span class="ms-3"></span>';
+                        html += `Color: <strong>${attrs.color}</strong>`;
                     }
 
-                    // Update cart summary
-                    updateCartSummary(data);
-                } else {
-                    alert(data.message || 'Failed to update quantity');
-                    location.reload();
+                    el.innerHTML = html;
+                } catch (e) {
+                    console.warn("Failed to parse variant attributes:", e);
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while updating the cart');
-                location.reload();
-            })
-            .finally(() => {
-                buttons.forEach(btn => btn.disabled = false);
             });
-    }
-
-    function removeFromCart(itemId) {
-        if (!confirm('Are you sure you want to remove this item?')) {
-            return;
-        }
-
-        // Show loading state
-        const cartItem = document.querySelector(`[onclick*="removeFromCart(${itemId})"]`).closest('.cart-item');
-        cartItem.style.opacity = '0.5';
-        cartItem.style.pointerEvents = 'none';
-
-        fetch(`/fashionshop/cart/delete/${itemId}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Remove item from DOM with animation
-                    cartItem.style.transition = 'all 0.3s ease';
-                    cartItem.style.transform = 'translateX(-100%)';
-                    cartItem.style.opacity = '0';
-
-                    setTimeout(() => {
-                        cartItem.remove();
-
-                        // Check if cart is empty
-                        if (data.isEmpty) {
-                            location.reload();
-                        } else {
-                            // Update cart summary
-                            updateCartSummary(data);
-                        }
-                    }, 300);
-                } else {
-                    alert(data.message || 'Failed to remove item');
-                    cartItem.style.opacity = '1';
-                    cartItem.style.pointerEvents = 'auto';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while removing the item');
-                cartItem.style.opacity = '1';
-                cartItem.style.pointerEvents = 'auto';
-            });
-    }
-
-    function updateCartSummary(data) {
-        // Update all summary values
-        const summaryRows = document.querySelectorAll('.summary-row');
-
-        summaryRows.forEach(row => {
-            const label = row.querySelector('span:first-child').textContent.toLowerCase();
-            const valueSpan = row.querySelector('span:last-child');
-
-            if (label.includes('subtotal')) {
-                valueSpan.textContent = '$' + data.subtotal.toFixed(2);
-            } else if (label.includes('shipping')) {
-                valueSpan.textContent = '$' + data.shipping.toFixed(2);
-            } else if (label.includes('tax')) {
-                valueSpan.textContent = '$' + data.tax.toFixed(2);
-            } else if (label.includes('total')) {
-                valueSpan.textContent = '$' + data.total.toFixed(2);
-            }
         });
-    }
-</script>
+
+        // <-- XÓA TOÀN BỘ function updateQuantity(...) TỪ ĐÂY -->
+        // <-- XÓA TOÀN BỘ function removeFromCart(...) TỪ ĐÂY -->
+        // <-- XÓA TOÀN BỘ function updateCartSummary(...) TỪ ĐÂY -->
+    </script>
+
 </body>
 
 </html>

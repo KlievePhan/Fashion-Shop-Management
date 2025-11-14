@@ -1,5 +1,6 @@
 package org.fsm.controller;
 
+import org.springframework.security.core.Authentication;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.fsm.dto.request.RegisterRequest;
@@ -11,7 +12,9 @@ import org.fsm.repository.ContactMessageRepository;
 import org.fsm.repository.ProductRepository;
 import org.fsm.repository.RoleRepository;
 import org.fsm.repository.UserRepository;
+import org.fsm.service.CartService;
 import org.fsm.service.EmailService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,13 +23,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Controller
 public class HomeController {
-
+    private final CartService cartService;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -57,10 +62,10 @@ public class HomeController {
         return "product-detail";
     }
 
-//    @GetMapping("/admin")
-//    public String admin() {
-//        return "admin";
-//    }
+    // @GetMapping("/admin")
+    // public String admin() {
+    // return "admin";
+    // }
 
     @GetMapping("/shop")
     public String shop(Model model) {
@@ -167,4 +172,5 @@ public class HomeController {
         userRepository.save(user);
         return "redirect:/login?success=registered";
     }
+
 }

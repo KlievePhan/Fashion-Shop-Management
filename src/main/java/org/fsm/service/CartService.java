@@ -34,5 +34,13 @@ public class CartService {
         }
         cartItemRepository.save(cartItem);
     }
-}
 
+    public int getCartItemCount(User user) {
+        return cartRepository.findByUser(user)
+                .map(cart -> cartItemRepository.findByCart(cart).stream()
+                        .mapToInt(CartItem::getQty)
+                        .sum())
+                .orElse(0);
+    }
+
+}

@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.fsm.entity.User;
 import org.fsm.repository.UserRepository;
+import org.fsm.service.CartService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 public class GlobalControllerAdvice {
 
     private final UserRepository userRepository;
+    private final CartService cartService;  // ← THÊM DÒNG NÀY
 
     @ModelAttribute("isAuthenticated")
     public boolean isAuthenticated(HttpSession session) {
@@ -81,4 +83,27 @@ public class GlobalControllerAdvice {
 
         return null;
     }
+
+    // ============ THÊM PHẦN NÀY ĐỂ HIỂN THỊ SỐ LƯỢNG CART ============
+    /**
+     * Số lượng sản phẩm trong giỏ hàng - hiển thị ở header badge
+     */
+    @ModelAttribute("cartItemCount")
+    public Integer cartItemCount(HttpSession session) {
+        // Lấy user hiện tại
+        User user = currentUser(session);
+        
+        if (user == null) {
+            return 0;
+        }
+
+        try {
+            return cartService.getCartItemCount(user);
+        } catch (Exception e) {
+            // Log error nếu cần
+            System.err.println("Error getting cart item count: " + e.getMessage());
+            return 0;
+        }
+    }
+    // ============ KẾT THÚC PHẦN THÊM ============
 }
