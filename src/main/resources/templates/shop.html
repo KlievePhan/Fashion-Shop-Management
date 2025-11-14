@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,17 +17,50 @@
   <link rel="stylesheet" th:href="@{/css/promo_bar.css}" />
   <link rel="stylesheet" th:href="@{/css/theme-customizer.css}" />
   <link rel="stylesheet" th:href="@{/css/shop.css}" />
+  <link rel="stylesheet" th:href="@{/css/cart-notification.css}" />
 
   <style>
-    .product-image{position:relative}
-    .product-link-overlay{position:absolute;inset:0;z-index:1;display:block}
-    .product-actions{position:relative;z-index:2;display:flex;gap:8px}
-    .action-btn{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid #ddd;background:#fff;cursor:pointer}
-    .action-btn:hover{border-color:#3498db;color:#3498db}
+    .product-image {
+      position: relative
+    }
+
+    .product-link-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: block
+    }
+
+    .product-actions {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      gap: 8px
+    }
+
+    .action-btn {
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      background: #fff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+      border-color: #3498db;
+      color: #3498db;
+      transform: scale(1.1);
+    }
   </style>
 </head>
+
 <body>
-  <!-- Header (giống home.html dùng insert) -->
+  <!-- Header -->
   <div th:insert="~{header}"></div>
 
   <div class="promo-bar">Get 15% off on your first order</div>
@@ -51,14 +85,12 @@
     </div>
 
     <div class="products-grid">
-      <div class="product-card"
-           th:each="p : ${products}"
-           th:attr="data-price=${p.basePrice != null ? p.basePrice : 0},
-                    data-date=${p.createdAt}">
+      <div class="product-card" th:each="p : ${products}"
+        th:attr="data-price=${p.basePrice != null ? p.basePrice : 0}, data-date=${p.createdAt}">
 
         <div class="product-image">
           <img th:src="${p.primaryImageUrl != null ? p.primaryImageUrl : '/images/placeholder.jpg'}"
-               th:alt="${p.title != null ? p.title : 'Product'}" />
+            th:alt="${p.title != null ? p.title : 'Product'}" />
           <a class="product-link-overlay" th:href="@{'/product/' + ${p.id}}" title="View detail"></a>
 
           <div class="product-actions">
@@ -77,25 +109,20 @@
 
           <div class="product-price">
             <span class="price-current"
-                  th:text="${p.basePrice != null ? #numbers.formatDecimal(p.basePrice,0,'COMMA',2,'POINT') : '0,00'} + ' ₫'">0 ₫</span>
+              th:text="${p.basePrice != null ? #numbers.formatDecimal(p.basePrice,0,'COMMA',2,'POINT') : '0,00'} + ' $'">0
+              $</span>
           </div>
 
           <!-- Sizes -->
-          <div class="product-sizes"
-               th:if="${p.variants != null and #lists.size(p.variants) > 0}">
-            <button class="size-btn"
-                    th:each="v, i : ${p.variants}"
-                    th:data-attributes="${v.attributeJson}"
-                    th:classappend="${i.index == 0} ? ' active' : ''">Size</button>
+          <div class="product-sizes" th:if="${p.variants != null and #lists.size(p.variants) > 0}">
+            <button class="size-btn" th:each="v, i : ${p.variants}" th:data-attributes="${v.attributeJson}"
+              th:classappend="${i.index == 0} ? ' active' : ''">Size</button>
           </div>
 
           <!-- Colors -->
-          <div class="product-colors"
-               th:if="${p.variants != null and #lists.size(p.variants) > 0}">
-            <div class="color-option"
-                 th:each="v, i : ${p.variants}"
-                 th:data-attributes="${v.attributeJson}"
-                 th:classappend="${i.index == 0} ? ' active' : ''"></div>
+          <div class="product-colors" th:if="${p.variants != null and #lists.size(p.variants) > 0}">
+            <div class="color-option" th:each="v, i : ${p.variants}" th:data-attributes="${v.attributeJson}"
+              th:classappend="${i.index == 0} ? ' active' : ''"></div>
           </div>
         </div>
       </div>
@@ -105,8 +132,12 @@
   <!-- Footer -->
   <div th:replace="~{footer :: footer}"></div>
 
-  <a th:href="@{/shop}" class="buy-now-fab"><i class="bi bi-cart-fill"></i> Buy Now</a>
-  <a href="#" class="customize-btn"><i class="bi bi-sliders"></i> Customize</a>
+  <a th:href="@{/shop}" class="buy-now-fab text-decoration-none">
+    <i class="bi bi-cart-fill"></i> Buy Now
+  </a>
+  <a href="#" class="customize-btn">
+    <i class="bi bi-sliders"></i> Customize
+  </a>
 
   <!-- Modal -->
   <div id="cartModal" class="cart-modal">
@@ -134,24 +165,37 @@
     </div>
   </div>
 
+  <!-- ⭐ QUAN TRỌNG: Load cart-update.js TRƯỚC shop.js -->
+  <script th:src="@{/js/cart-update.js}"></script>
   <script th:src="@{/js/shop.js}"></script>
   <script th:src="@{/js/header.js}"></script>
   <script th:src="@{/js/theme-customizer.js}"></script>
 
-  <!-- Map size/color từ attributeJson (an toàn) -->
+  <!-- Map size/color từ attributeJson -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const safe = (raw)=>{try{return raw?JSON.parse(raw):null}catch{return null}};
-      document.querySelectorAll(".size-btn").forEach(b=>{
-        const a=safe(b.dataset.attributes);
-        if(a?.size) b.textContent=a.size;
-        if(a?.color) b.style.background=a.color;
+      const safe = (raw) => {
+        try {
+          return raw ? JSON.parse(raw) : null;
+        } catch {
+          return null;
+        }
+      };
+
+      document.querySelectorAll(".size-btn").forEach(b => {
+        const a = safe(b.dataset.attributes);
+        if (a?.size) b.textContent = a.size;
+        // ✅ Bỏ dòng b.style.background = a.color;
       });
-      document.querySelectorAll(".color-option").forEach(d=>{
-        const a=safe(d.dataset.attributes);
-        if(a?.color) d.style.background=a.color;
+
+      document.querySelectorAll(".color-option").forEach(d => {
+        const a = safe(d.dataset.attributes);
+        if (a?.color) d.style.background = a.color; // OK, vì color-option cho phép màu tùy chỉnh
       });
     });
+
   </script>
+
 </body>
+
 </html>
