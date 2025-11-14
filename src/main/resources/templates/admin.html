@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 
 <head>
     <meta charset="UTF-8">
@@ -240,7 +240,7 @@
     <div class="logo">
         <h2>Fashion Shop</h2>
     </div>
-	<nav class="nav-menu">
+    <nav class="nav-menu">
         <a href="#" class="nav-item active" data-section="dashboard">
             <span class="icon">📊</span>
             Dashboard
@@ -438,6 +438,14 @@
     <section id="products" class="content-section">
         <div class="section-header">
             <h2>Products Management</h2>
+            <div class="filter-group">
+                <select class="filter-select" id="productCategoryFilter">
+                    <option value="all">All Categories</option>
+                    <option value="man">Man</option>
+                    <option value="woman">Woman</option>
+                    <option value="unisex">Unisex</option>
+                </select>
+            </div>
             <button class="btn btn-primary" id="addProductBtn">+ Add Product</button>
         </div>
 
@@ -447,14 +455,59 @@
                     <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Name</th>
+                        <th>SKU</th>
+                        <th>Image</th>
+                        <th>Title</th>
                         <th>Category</th>
+                        <th>Brand</th>
                         <th>Price</th>
-                        <th>Stock</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                     </thead>
-                    <tbody id="productsTable">
+                    <tbody id="productsTableBody">
+                    <tr th:each="product : ${products}">
+                        <td th:text="${product.id}"></td>
+                        <td th:text="${product.sku}"></td>
+                        <td>
+                            <img th:src="${product.primaryImageUrl}"
+                                 alt="Product"
+                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                        </td>
+                        <td th:text="${product.title}"></td>
+                        <td th:text="${product.category != null ? product.category.name : 'N/A'}"></td>
+                        <td th:text="${product.brand != null ? product.brand.name : 'N/A'}"></td>
+                        <td th:text="'$' + ${product.basePrice}"></td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${product.active ? 'success' : 'danger'}"
+                                  th:text="${product.active ? 'Active' : 'Inactive'}"></span>
+                        </td>
+                        <td>
+                            <div class="action-btns">
+                                <button type="button"
+                                        class="btn btn-sm btn-secondary"
+                                        th:onclick="'editProduct(' + ${product.id} + ')'">
+                                    Edit
+                                </button>
+                                <form th:action="@{/admin/products/{id}/toggle-active(id=${product.id})}"
+                                      method="post"
+                                      style="display:inline;">
+                                    <button type="submit"
+                                            class="btn btn-sm"
+                                            th:classappend="${product.active ? 'btn-warning' : 'btn-success'}">
+                                        <span th:text="${product.active ? 'Deactivate' : 'Activate'}"></span>
+                                    </button>
+                                </form>
+                                <form th:action="@{/admin/products/{id}/delete(id=${product.id})}"
+                                      method="post"
+                                      style="display:inline;"
+                                      onsubmit="return confirm('Delete this product?')">
+                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
@@ -723,46 +776,6 @@
     </section>
 </main>
 
-<!-- Modal for Add/Edit Product -->
-<div id="productModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 id="modalTitle">Add New Product</h2>
-            <button class="close-modal">&times;</button>
-        </div>
-        <form id="productForm">
-            <div class="form-group">
-                <label>Product Name</label>
-                <input type="text" id="productName" required>
-            </div>
-            <div class="form-group">
-                <label>Category</label>
-                <select id="productCategory" required>
-                    <option value="">Select Category</option>
-                    <option value="T-Shirts">T-Shirts</option>
-                    <option value="Jeans">Jeans</option>
-                    <option value="Jackets">Jackets</option>
-                    <option value="Accessories">Accessories</option>
-                </select>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Price ($)</label>
-                    <input type="number" id="productPrice" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label>Stock</label>
-                    <input type="number" id="productStock" required>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary close-modal">Cancel</button>
-                <button type="submit" class="btn btn-primary">Save Product</button>
-            </div>
-        </form>
-    </div>
-</div>
-
 <!-- Modal for Add/Edit Brand -->
 <div id="brandModal" class="modal">
     <div class="modal-content">
@@ -858,9 +871,110 @@
         </div>
     </div>
 </div>
+
+<!-- Product Modal -->
+<div id="productModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="productModalTitle">Add New Product</h2>
+            <button class="close-modal" onclick="closeProductModal()">&times;</button>
+        </div>
+        <form th:action="@{/admin/products/save}" method="post" id="productForm">
+            <input type="hidden" id="productId" name="id">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>SKU *</label>
+                    <input type="text" id="productSku" name="sku" required placeholder="e.g., TS-001">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="productActive" name="active">
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Product Title *</label>
+                <input type="text" id="productTitle" name="title" required placeholder="e.g., Classic T-Shirt">
+            </div>
+
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="productDescription" name="description" rows="3"
+                          placeholder="Product description..."></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Category *</label>
+                    <select id="productCategoryId" name="categoryId" required>
+                        <option value="">Select Category</option>
+                        <option th:each="cat : ${categories}"
+                                th:value="${cat.id}"
+                                th:text="${cat.name}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Brand</label>
+                    <select id="productBrandId" name="brandId">
+                        <option value="">Optional</option>
+                        <option th:each="brand : ${brands}"
+                                th:value="${brand.id}"
+                                th:text="${brand.name}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Base Price ($) *</label>
+                <input type="number" id="productPrice" name="basePrice" step="0.01" min="0" required placeholder="0.00">
+            </div>
+
+            <div class="form-group">
+                <label>Image URLs (comma-separated)</label>
+                <textarea id="productImageUrls" name="imageUrls" rows="2"
+                          placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"></textarea>
+                <small style="color: #6b7280;">First image will be primary</small>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeProductModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Product</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script th:inline="javascript">
-    /*<![CDATA[*/
     const contextPath = /*[[@{/}]]*/ '/';
+
+    // ============= Navigation =============
+    document.addEventListener('DOMContentLoaded', function() {
+        const navItems = document.querySelectorAll('.nav-item');
+        const sections = document.querySelectorAll('.content-section');
+        const pageTitle = document.getElementById('pageTitle');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetSection = this.dataset.section;
+
+                // Update active states
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+
+                // Show target section
+                sections.forEach(section => section.classList.remove('active'));
+                document.getElementById(targetSection).classList.add('active');
+
+                // Update title
+                pageTitle.textContent = this.textContent.trim();
+            });
+        });
+    });
 
     function editBrand(id) {
         fetch(contextPath + 'admin/brand/' + id, {
@@ -890,7 +1004,84 @@
                 alert('Failed to load brand: ' + err.message);
             });
     }
-    /*]]>*/
+
+    // ============= Product Management =============
+    document.getElementById('addProductBtn')?.addEventListener('click', function() {
+        document.getElementById('productModalTitle').textContent = 'Add New Product';
+        document.getElementById('productForm').reset();
+        document.getElementById('productId').value = '';
+        document.getElementById('productModal').classList.add('active');
+    });
+
+    function editProduct(id) {
+        fetch(contextPath + 'admin/products/' + id, {
+            headers: { 'Accept': 'application/json' }
+        })
+            .then(response => response.json())
+            .then(product => {
+                document.getElementById('productModalTitle').textContent = 'Edit Product';
+                document.getElementById('productId').value = product.id;
+                document.getElementById('productSku').value = product.sku;
+                document.getElementById('productTitle').value = product.title;
+                document.getElementById('productDescription').value = product.description || '';
+                document.getElementById('productCategoryId').value = product.category ? product.category.id : '';
+                document.getElementById('productBrandId').value = product.brand ? product.brand.id : '';
+                document.getElementById('productPrice').value = product.basePrice;
+                document.getElementById('productActive').value = product.active ? 'true' : 'false';
+
+                if (product.images && product.images.length > 0) {
+                    document.getElementById('productImageUrls').value = product.images.map(img => img.url).join(', ');
+                }
+
+                document.getElementById('productModal').classList.add('active');
+            })
+            .catch(error => alert('Error: ' + error.message));
+    }
+
+    function closeProductModal() {
+        document.getElementById('productModal').classList.remove('active');
+    }
+
+    // Category Filter
+    document.getElementById('productCategoryFilter')?.addEventListener('change', function(e) {
+        const category = e.target.value;
+        if (category === 'all') {
+            window.location.href = contextPath + 'admin#products';
+        } else {
+            fetch(contextPath + 'admin/products/filter?category=' + category, {
+                headers: { 'Accept': 'application/json' }
+            })
+                .then(response => response.json())
+                .then(products => {
+                    const tbody = document.getElementById('productsTableBody');
+                    tbody.innerHTML = products.map(product => `
+                    <tr>
+                        <td>${product.id}</td>
+                        <td>${product.sku || 'N/A'}</td>
+                        <td><img src="${product.primaryImageUrl || '/images/default.jpg'}"
+                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"></td>
+                        <td>${product.title}</td>
+                        <td>${product.category ? product.category.name : 'N/A'}</td>
+                        <td>${product.brand ? product.brand.name : 'N/A'}</td>
+                        <td>$${product.basePrice}</td>
+                        <td><span class="badge ${product.active ? 'success' : 'danger'}">${product.active ? 'Active' : 'Inactive'}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-secondary" onclick="editProduct(${product.id})">Edit</button>
+                            <form action="${contextPath}admin/products/${product.id}/toggle-active" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-sm ${product.active ? 'btn-warning' : 'btn-success'}">
+                                    ${product.active ? 'Deactivate' : 'Activate'}
+                                </button>
+                            </form>
+                            <form action="${contextPath}admin/products/${product.id}/delete" method="post" style="display:inline;"
+                                  onsubmit="return confirm('Delete?')">
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                `).join('');
+                });
+        }
+    });
 </script>
 <script th:src="@{/js/admin.js}"></script>
 <script>

@@ -28,6 +28,8 @@
   }
   
   body {
+    width: 70%;
+    height: 70%;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--bg-light);
     color: var(--dark-text);
@@ -50,7 +52,7 @@
     z-index: 1000;
     box-shadow: var(--shadow-md);
   }
-  
+
   .logo {
     padding: 2rem 1.5rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
@@ -1283,13 +1285,13 @@
     display: flex;
     gap: 0.5rem;
   }
-  
+
   /* Responsive Design */
   @media (max-width: 768px) {
     .sidebar {
       transform: translateX(-100%);
     }
-  
+
     .sidebar.active {
       transform: translateX(0);
     }
