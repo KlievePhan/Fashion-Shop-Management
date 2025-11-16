@@ -16,18 +16,13 @@ let customers = [
     { id: 5, name: 'Tom Brown', email: 'tom@example.com', orders: 6, spent: 599.99 }
 ];
 
-let editingProductId = null;
-
 // DOM Elements
 const navItems = document.querySelectorAll('.nav-item');
 const sections = document.querySelectorAll('.content-section');
 const pageTitle = document.getElementById('pageTitle');
 const menuToggle = document.getElementById('menuToggle');
 const sidebar = document.querySelector('.sidebar');
-const productModal = document.getElementById('productModal');
-const addProductBtn = document.getElementById('addProductBtn');
 const closeModalBtns = document.querySelectorAll('.close-modal');
-const productForm = document.getElementById('productForm');
 const searchInput = document.getElementById('searchInput');
 const orderStatusFilter = document.getElementById('orderStatus');
 
@@ -67,65 +62,6 @@ document.addEventListener('click', (e) => {
         !menuToggle.contains(e.target)) {
         sidebar.classList.remove('active');
     }
-});
-
-// Modal functions
-function openModal() {
-    productModal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeModal() {
-    productModal.classList.remove('active');
-    document.body.style.overflow = 'auto';
-    productForm.reset();
-    editingProductId = null;
-    document.getElementById('modalTitle').textContent = 'Add New Product';
-}
-
-addProductBtn.addEventListener('click', openModal);
-
-closeModalBtns.forEach(btn => {
-    btn.addEventListener('click', closeModal);
-});
-
-productModal.addEventListener('click', (e) => {
-    if (e.target === productModal) {
-        closeModal();
-    }
-});
-
-// Product Form Submit
-productForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    const name = document.getElementById('productName').value;
-    const category = document.getElementById('productCategory').value;
-    const price = parseFloat(document.getElementById('productPrice').value);
-    const stock = parseInt(document.getElementById('productStock').value);
-
-    if (editingProductId) {
-        // Update existing product
-        const product = products.find(p => p.id === editingProductId);
-        product.name = name;
-        product.category = category;
-        product.price = price;
-        product.stock = stock;
-    } else {
-        // Add new product
-        const newProduct = {
-            id: products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1,
-            name,
-            category,
-            price,
-            stock
-        };
-        products.push(newProduct);
-    }
-
-    renderProducts();
-    closeModal();
-    showNotification(editingProductId ? 'Product updated successfully!' : 'Product added successfully!');
 });
 
 
@@ -240,16 +176,6 @@ function showNotification(message) {
     }, 3000);
 }
 
-// Search functionality
-searchInput.addEventListener('input', (e) => {
-    const query = e.target.value;
-    const activeSection = document.querySelector('.content-section.active').id;
-
-    if (activeSection === 'products') {
-        renderProducts(query);
-    }
-});
-
 // Order status filter
 orderStatusFilter.addEventListener('change', (e) => {
     renderOrders(e.target.value);
@@ -288,42 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCustomers();
 });
 
-// === Edit Product (GLOBAL) ===
-window.editProduct = function(id) {
-    fetch(`${contextPath}admin/products/${id}`, {
-        headers: { 'Accept': 'application/json' }
-    })
-        .then(response => {
-            if (!response.ok) throw new Error('Product not found');
-            return response.json();
-        })
-        .then(product => {
-            // These elements MUST exist
-            productModal.textContent = 'Edit Product';
-            document.getElementById('productId').value = product.id;
-            document.getElementById('productSku').value = product.sku || '';
-            document.getElementById('productTitle').value = product.title || '';
-            document.getElementById('productDescription').value = product.description || '';
-            document.getElementById('productCategoryId').value = product.category?.id || '';
-            document.getElementById('productBrandId').value = product.brand?.id || '';
-            document.getElementById('productPrice').value = product.basePrice || '';
-            document.getElementById('productActive').value = product.active ? 'true' : 'false';
-
-            // Images
-            const imageUrls = product.images ? product.images.map(img => img.url).join(', ') : '';
-            document.getElementById('productImageUrls').value = imageUrls;
-
-            productModal.classList.add('active');
-        })
-        .catch(err => {
-            console.error(err);
-            alert('Failed to load product: ' + err.message);
-        });
-};
-
 // Make functions globally accessible
-window.editProduct = editProduct;
-window.deleteProduct = deleteProduct;
 window.viewOrder = viewOrder;
 window.updateOrderStatus = updateOrderStatus;
 window.viewCustomer = viewCustomer;

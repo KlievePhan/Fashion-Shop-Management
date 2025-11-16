@@ -7,6 +7,7 @@ import org.fsm.entity.*;
 import org.fsm.repository.UserRepository;
 import org.fsm.service.AuditLogService;
 import org.fsm.service.ProductService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,7 +36,7 @@ public class ProductController {
     /**
      * Get single product by ID (for AJAX edit)
      */
-    @GetMapping("/{id}")
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<Product> getProductById(@PathVariable Long id) {
         return productService.getProductById(id)

@@ -454,7 +454,7 @@
                 <table class="data-table">
                     <thead>
                     <tr>
-                        <th>ID</th>
+                        <th style="display: none;">ID</th>
                         <th>SKU</th>
                         <th>Image</th>
                         <th>Title</th>
@@ -467,7 +467,7 @@
                     </thead>
                     <tbody id="productsTableBody">
                     <tr th:each="product : ${products}">
-                        <td th:text="${product.id}"></td>
+                        <td style="display: none;" th:text="${product.id}"></td>
                         <td th:text="${product.sku}"></td>
                         <td>
                             <img th:src="${product.primaryImageUrl}"
@@ -487,7 +487,7 @@
                             <div class="action-btns">
                                 <button type="button"
                                         class="btn btn-sm btn-secondary"
-                                        th:onclick="'editProduct(' + ${product.id} + ')'">
+                                        th:onclick="'editProduct(\'' + ${product.id} + '\')'">
                                     Edit
                                 </button>
                                 <form th:action="@{/admin/products/{id}/toggle-active(id=${product.id})}"
@@ -1005,82 +1005,115 @@
             });
     }
 
-    // ============= Product Management =============
-    document.getElementById('addProductBtn')?.addEventListener('click', function() {
+    /* ---------- 1. OPEN ADD PRODUCT MODAL ---------- */
+    document.getElementById('addProductBtn')?.addEventListener('click', function () {
         document.getElementById('productModalTitle').textContent = 'Add New Product';
         document.getElementById('productForm').reset();
         document.getElementById('productId').value = '';
         document.getElementById('productModal').classList.add('active');
     });
 
+    /* ---------- 2. EDIT PRODUCT (AJAX → JSON) ---------- */
     function editProduct(id) {
         fetch(contextPath + 'admin/products/' + id, {
             headers: { 'Accept': 'application/json' }
         })
-            .then(response => response.json())
-            .then(product => {
+            .then(r => {
+                if (!r.ok) throw new Error('Product not found – HTTP ' + r.status);
+                return r.json();
+            })
+            .then(p => {
+                // Title
                 document.getElementById('productModalTitle').textContent = 'Edit Product';
-                document.getElementById('productId').value = product.id;
-                document.getElementById('productSku').value = product.sku;
-                document.getElementById('productTitle').value = product.title;
-                document.getElementById('productDescription').value = product.description || '';
-                document.getElementById('productCategoryId').value = product.category ? product.category.id : '';
-                document.getElementById('productBrandId').value = product.brand ? product.brand.id : '';
-                document.getElementById('productPrice').value = product.basePrice;
-                document.getElementById('productActive').value = product.active ? 'true' : 'false';
 
-                if (product.images && product.images.length > 0) {
-                    document.getElementById('productImageUrls').value = product.images.map(img => img.url).join(', ');
-                }
+                // Basic fields
+                document.getElementById('productId').value          = p.id;
+                document.getElementById('productSku').value         = p.sku || '';
+                document.getElementById('productTitle').value       = p.title || '';
+                document.getElementById('productDescription').value = p.description || '';
+                document.getElementById('productCategoryId').value  = p.category?.id || '';
+                document.getElementById('productBrandId').value     = p.brand?.id || '';
+                document.getElementById('productPrice').value       = p.basePrice || '';
+                document.getElementById('productActive').value      = p.active ? 'true' : 'false';
 
+                // Images – comma separated
+                const imgs = p.images ? p.images.map(i => i.url).join(', ') : '';
+                document.getElementById('productImageUrls').value = imgs;
+
+                // Show modal (same CSS class used everywhere)
                 document.getElementById('productModal').classList.add('active');
             })
-            .catch(error => alert('Error: ' + error.message));
+            .catch(err => {
+                console.error(err);
+                alert('Failed to load product: ' + err.message);
+            });
     }
 
+    /* ---------- 3. CLOSE MODAL ---------- */
     function closeProductModal() {
         document.getElementById('productModal').classList.remove('active');
     }
 
-    // Category Filter
-    document.getElementById('productCategoryFilter')?.addEventListener('change', function(e) {
-        const category = e.target.value;
-        if (category === 'all') {
-            window.location.href = contextPath + 'admin#products';
-        } else {
-            fetch(contextPath + 'admin/products/filter?category=' + category, {
-                headers: { 'Accept': 'application/json' }
-            })
-                .then(response => response.json())
-                .then(products => {
-                    const tbody = document.getElementById('productsTableBody');
-                    tbody.innerHTML = products.map(product => `
-                    <tr>
-                        <td>${product.id}</td>
-                        <td>${product.sku || 'N/A'}</td>
-                        <td><img src="${product.primaryImageUrl || '/images/default.jpg'}"
-                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"></td>
-                        <td>${product.title}</td>
-                        <td>${product.category ? product.category.name : 'N/A'}</td>
-                        <td>${product.brand ? product.brand.name : 'N/A'}</td>
-                        <td>$${product.basePrice}</td>
-                        <td><span class="badge ${product.active ? 'success' : 'danger'}">${product.active ? 'Active' : 'Inactive'}</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-secondary" onclick="editProduct(${product.id})">Edit</button>
-                            <form action="${contextPath}admin/products/${product.id}/toggle-active" method="post" style="display:inline;">
-                                <button type="submit" class="btn btn-sm ${product.active ? 'btn-warning' : 'btn-success'}">
-                                    ${product.active ? 'Deactivate' : 'Activate'}
+    /* ---------- 4. GLOBAL EXPORTS (used by th:onclick) ---------- */
+    window.editProduct      = editProduct;
+    window.closeProductModal = closeProductModal;
+
+    /* ---------- 5. CATEGORY FILTER (tiny improvement) ---------- */
+    document.getElementById('productCategoryFilter')?.addEventListener('change', function (e) {
+        const cat = e.target.value;
+
+        if (cat === 'all') {
+            location.href = contextPath + 'admin#products';
+            return;
+        }
+
+        fetch(contextPath + 'admin/products/filter?category=' + cat, {
+            headers: { 'Accept': 'application/json' }
+        })
+            .then(r => r.json())
+            .then(list => {
+                const tbody = document.getElementById('productsTableBody');
+                tbody.innerHTML = list.map(p => `
+                <tr>
+                    <td style="display: none;">${p.id}</td>
+                    <td>${p.sku || 'N/A'}</td>
+                    <td>
+                        <img src="${p.primaryImageUrl || '/images/default.jpg'}"
+                             style="width:50px;height:50px;object-fit:cover;border-radius:4px;">
+                    </td>
+                    <td>${p.title}</td>
+                    <td>${p.category ? p.category.name : 'N/A'}</td>
+                    <td>${p.brand ? p.brand.name : 'N/A'}</td>
+                    <td>$${p.basePrice}</td>
+                    <td>
+                        <span class="badge ${p.active ? 'success' : 'danger'}">
+                            ${p.active ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-btns">
+                            <button type="button" class="btn btn-sm btn-secondary"
+                                   onclick="editProduct('${p.id}')">Edit</button>
+
+                            <form action="${contextPath}admin/products/${p.id}/toggle-active"
+                                  method="post" style="display:inline;">
+                                <button type="submit"
+                                        class="btn btn-sm ${p.active ? 'btn-warning' : 'btn-success'}">
+                                    ${p.active ? 'Deactivate' : 'Activate'}
                                 </button>
                             </form>
-                            <form action="${contextPath}admin/products/${product.id}/delete" method="post" style="display:inline;"
-                                  onsubmit="return confirm('Delete?')">
+
+                            <form action="${contextPath}admin/products/${p.id}/delete"
+                                  method="post" style="display:inline;"
+                                  onsubmit="return confirm('Delete this product?')">
                                 <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                             </form>
-                        </td>
-                    </tr>
-                `).join('');
-                });
-        }
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+            })
+            .catch(err => console.error(err));
     });
 </script>
 <script th:src="@{/js/admin.js}"></script>
