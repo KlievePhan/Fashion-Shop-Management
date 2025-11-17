@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html">
-
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -151,7 +150,7 @@
         cursor: pointer;
     }
 
-    /* -------------------  MODAL LAYOUT  ------------------- */
+    /* ------------------- MODAL LAYOUT ------------------- */
     .modal-content {
         max-width: 1100px;
         width: 92%;
@@ -162,9 +161,7 @@
         background: #fff;
     }
 
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
+    .form-group input, .form-group select, .form-group textarea {
         width: 100%;
         padding: 13px 16px;
         font-size: 15px;
@@ -256,639 +253,674 @@
         color: #dc2626;
     }
 </style>
-
 <body>
-<!-- Sidebar Navigation -->
-<aside class="sidebar">
-    <div class="logo">
-        <h2>Fashion Shop</h2>
-    </div>
-    <nav class="nav-menu">
-        <a href="#" class="nav-item active" data-section="dashboard">
-            <span class="icon">📊</span>
-            Dashboard
-        </a>
-        <a href="#" class="nav-item" data-section="users">
-            <span class="icon">👥</span>
-            Users
-        </a>
-        <a href="#" class="nav-item" data-section="analytics">
-            <span class="icon">📈</span>
-            Analytics
-        </a>
-        <a href="#" class="nav-item" data-section="auditlog">
-            <span class="icon">📋</span>
-            Audit Log
-        </a>
-    </nav>
-</aside>
-
-<!-- Main Content -->
-<main class="main-content">
-    <!-- Header -->
-    <header class="header">
-        <div class="header-left">
-            <button class="menu-toggle" id="menuToggle">☰</button>
-            <div class="header-title-section">
-                <h1 id="pageTitle">Dashboard</h1>
-                <p class="header-subtitle" id="headerSubtitle">Welcome back, Admin</p>
-            </div>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="logo">
+            <h2>Fashion Shop</h2>
         </div>
-        <div class="header-right">
-            <div class="status-info">
-                <div class="status-item">
-                    <span class="status-label">Active Users</span>
-                    <span class="status-value" id="headerActiveUsers">0</span>
-                </div>
-                <div class="status-divider"></div>
-                <div class="status-item">
-                    <span class="status-label">Total Users</span>
-                    <span class="status-value" id="headerTotalUsers">0</span>
+        <nav class="nav-menu">
+            <a href="#" class="nav-item active" data-section="dashboard">
+                <span class="icon">📊</span> Dashboard
+            </a>
+            <a href="#" class="nav-item" data-section="users">
+                <span class="icon">👥</span> Users
+            </a>
+            <a href="#" class="nav-item" data-section="analytics">
+                <span class="icon">📈</span> Analytics
+            </a>
+            <a href="#" class="nav-item" data-section="auditlog">
+                <span class="icon">📋</span> Audit Log
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">☰</button>
+                <div class="header-title-section">
+                    <h1 id="pageTitle">Dashboard</h1>
+                    <p class="header-subtitle" id="headerSubtitle">Welcome back, Admin</p>
                 </div>
             </div>
-
-            <div class="search-bar">
-                <input type="text" placeholder="Search users, logs..." id="searchInput">
-                <i class="search-icon">🔍</i>
-            </div>
-
-            <div class="notifications">
-                <button class="notification-btn" id="notificationBtn">
-                    <i class="bell-icon">🔔</i>
-                    <span class="notification-badge">3</span>
-                </button>
-            </div>
-
-            <div class="user-profile">
-                <div class="avatar">A</div>
-                <div class="user-info">
-                    <span class="user-name">Admin</span>
-                    <span class="user-role">Administrator</span>
+            <div class="header-right">
+                <div class="status-info">
+                    <div class="status-item">
+                        <span class="status-label">Active Users</span>
+                        <span class="status-value" id="headerActiveUsers">0</span>
+                    </div>
+                    <div class="status-divider"></div>
+                    <div class="status-item">
+                        <span class="status-label">Total Users</span>
+                        <span class="status-value" id="headerTotalUsers">0</span>
+                    </div>
                 </div>
-
-                <div class="profile-dropdown">
-                    <button class="dropdown-toggle">⋮</button>
-                    <div class="dropdown-menu">
-                        <a href="#" class="dropdown-item">
-                            <i>👤</i> Profile
-                        </a>
-                        <a href="#" class="dropdown-item">
-                            <i>⚙️</i> Settings
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <form th:action="@{/logout}" method="post" style="margin:0;">
-                            <button type="submit" class="dropdown-item logout-item">
-                                <i class="bi bi-box-arrow-right"></i> Logout
-                            </button>
-                        </form>
+                <div class="search-bar">
+                    <input type="text" placeholder="Search users, logs..." id="searchInput">
+                    <i class="search-icon">🔍</i>
+                </div>
+                <div class="notifications">
+                    <button class="notification-btn" id="notificationBtn">
+                        <i class="bell-icon">🔔</i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                </div>
+                <div class="user-profile">
+                    <div class="avatar">A</div>
+                    <div class="user-info">
+                        <span class="user-name">Admin</span>
+                        <span class="user-role">Administrator</span>
+                    </div>
+                    <div class="profile-dropdown">
+                        <button class="dropdown-toggle">⋮</button>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">
+                                <i>👤</i> Profile
+                            </a>
+                            <a href="#" class="dropdown-item">
+                                <i>⚙️</i> Settings
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <form th:action="@{/logout}" method="post" style="margin:0;">
+                                <button type="submit" class="dropdown-item logout-item">
+                                    <i class="bi bi-box-arrow-right"></i> Logout
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </header>
+        </header>
 
-    <!-- Dashboard Section -->
-    <section id="dashboard" class="content-section active">
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon red">👥</div>
-                <div class="stat-info">
-                    <h3>Total Users</h3>
-                    <p class="stat-value" id="totalUsersStat">0</p>
-                    <span class="stat-change">All registered accounts</span>
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="content-section active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon red">👥</div>
+                    <div class="stat-info">
+                        <h3>Total Users</h3>
+                        <p class="stat-value" id="totalUsersStat">0</p>
+                        <span class="stat-change">All registered accounts</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-info">
+                        <h3>Active Users</h3>
+                        <p class="stat-value" id="activeUsersStat">0</p>
+                        <span class="stat-change positive">Can log in & use system</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⛔</div>
+                    <div class="stat-info">
+                        <h3>Inactive Users</h3>
+                        <p class="stat-value" id="inactiveUsersStat">0</p>
+                        <span class="stat-change warning">Locked / deactivated</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">👑</div>
+                    <div class="stat-info">
+                        <h3>Admin & Staff</h3>
+                        <p class="stat-value" id="adminStaffStat">0 admin / 0 staff</p>
+                        <span class="stat-change info">Privileged accounts</span>
+                    </div>
                 </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">✅</div>
-                <div class="stat-info">
-                    <h3>Active Users</h3>
-                    <p class="stat-value" id="activeUsersStat">0</p>
-                    <span class="stat-change positive">Can log in & use system</span>
+            <!-- giữ lại 2 card demo cũ nếu muốn -->
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>Recent Orders</h3>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentOrdersTable">
+                                <tr>
+                                    <td>#ORD-001</td>
+                                    <td>John Doe</td>
+                                    <td>$125.00</td>
+                                    <td><span class="badge success">Purchased</span></td>
+                                </tr>
+                                <tr>
+                                    <td>#ORD-002</td>
+                                    <td>Jane Smith</td>
+                                    <td>$89.50</td>
+                                    <td><span class="badge warning">Pending</span></td>
+                                </tr>
+                                <tr>
+                                    <td>#ORD-003</td>
+                                    <td>Mike Johnson</td>
+                                    <td>$245.00</td>
+                                    <td><span class="badge warning">Pending</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Top Products</h3>
+                    <div class="product-list">
+                        <div class="product-item">
+                            <span class="product-name">Classic T-Shirt</span>
+                            <span class="product-sales">245 sales</span>
+                        </div>
+                        <div class="product-item">
+                            <span class="product-name">Denim Jeans</span>
+                            <span class="product-sales">198 sales</span>
+                        </div>
+                        <div class="product-item">
+                            <span class="product-name">Leather Jacket</span>
+                            <span class="product-sales">156 sales</span>
+                        </div>
+                        <div class="product-item">
+                            <span class="product-name">Summer Dress</span>
+                            <span class="product-sales">143 sales</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">⛔</div>
-                <div class="stat-info">
-                    <h3>Inactive Users</h3>
-                    <p class="stat-value" id="inactiveUsersStat">0</p>
-                    <span class="stat-change warning">Locked / deactivated</span>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">👑</div>
-                <div class="stat-info">
-                    <h3>Admin & Staff</h3>
-                    <p class="stat-value" id="adminStaffStat">0 admin / 0 staff</p>
-                    <span class="stat-change info">Privileged accounts</span>
-                </div>
-            </div>
-        </div>
+        </section>
 
-        <!-- giữ lại 2 card demo cũ nếu muốn -->
-        <div class="dashboard-grid">
+        <!-- Users Section -->
+        <section id="users" class="content-section">
+            <div class="section-header">
+                <h2>Users Management</h2>
+                <button class="btn btn-primary" id="addUserBtn">+ Add User</button>
+            </div>
             <div class="card">
-                <h3>Recent Orders</h3>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
-                        <tr>
-                            <th>Order ID</th>
-                            <th>Customer</th>
-                            <th>Amount</th>
-                            <th>Status</th>
-                        </tr>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
                         </thead>
-                        <tbody id="recentOrdersTable">
-                        <tr>
-                            <td>#ORD-001</td>
-                            <td>John Doe</td>
-                            <td>$125.00</td>
-                            <td><span class="badge success">Purchased</span></td>
-                        </tr>
-                        <tr>
-                            <td>#ORD-002</td>
-                            <td>Jane Smith</td>
-                            <td>$89.50</td>
-                            <td><span class="badge warning">Pending</span></td>
-                        </tr>
-                        <tr>
-                            <td>#ORD-003</td>
-                            <td>Mike Johnson</td>
-                            <td>$245.00</td>
-                            <td><span class="badge warning">Pending</span></td>
-                        </tr>
+                        <tbody>
+                            <tr th:each="user : ${users}" th:data-role="${user.role.code}" th:data-active="${user.active}">
+                                <td th:text="${user.id}"></td>
+                                <td th:text="${user.fullName}"></td>
+                                <td th:text="${user.email}"></td>
+                                <td>
+                                    <!-- Only show dropdown for non-admin users -->
+                                    <div th:if="${user.role.code != 'ROLE_ADMIN'}">
+                                        <form th:action="@{/admin/users/{id}/edit-role(id=${user.id})}" method="post" style="display:inline;">
+                                            <select name="roleCode" class="role-select" th:disabled="${user.id == currentUserId}" onchange="this.form.submit()">
+                                                <option th:each="role : ${roles}" th:value="${role.code}" th:text="${role.name}" th:selected="${user.role.code == role.code}">
+                                                </option>
+                                            </select>
+                                        </form>
+                                    </div>
+                                    <!-- Always show badge for admin users -->
+                                    <span th:if="${user.role.code == 'ROLE_ADMIN'}" class="badge admin" th:text="${user.role.name}"></span>
+                                </td>
+                                <td>
+                                    <span class="badge" th:classappend="${user.active ? 'success' : 'danger'}" th:text="${user.active ? 'Active' : 'Inactive'}"></span>
+                                </td>
+                                <td>
+                                    <div class="action-btns">
+                                        <button class="btn btn-sm btn-secondary" th:onclick="'viewUser(' + ${user.id} + ')'">View</button>
+                                        <button class="btn btn-sm btn-secondary" th:onclick="'editUser(' + ${user.id} + ')'" th:if="${user.id != currentUserId and user.role.code != 'ROLE_ADMIN'}">
+                                            Edit
+                                        </button>
+                                        <form th:action="@{/admin/users/{id}/toggle-active(id=${user.id})}" method="post" style="display:inline;" th:if="${user.role.code != 'ROLE_ADMIN'}">
+                                            <button type="submit" class="btn btn-sm" th:classappend="${user.active ? 'btn-danger' : 'btn-success'}" th:disabled="${user.id == currentUserId}">
+                                                <span th:text="${user.active ? 'Deactivate' : 'Activate'}"></span>
+                                            </button>
+                                        </form>
+                                        <form th:if="${!user.active and user.role.code != 'ROLE_ADMIN'}" th:action="@{/admin/users/{id}/delete(id=${user.id})}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to permanently delete this user? This action cannot be undone.');">
+                                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
+        </section>
 
-            <div class="card">
-                <h3>Top Products</h3>
-                <div class="product-list">
-                    <div class="product-item">
-                        <span class="product-name">Classic T-Shirt</span>
-                        <span class="product-sales">245 sales</span>
-                    </div>
-                    <div class="product-item">
-                        <span class="product-name">Denim Jeans</span>
-                        <span class="product-sales">198 sales</span>
-                    </div>
-                    <div class="product-item">
-                        <span class="product-name">Leather Jacket</span>
-                        <span class="product-sales">156 sales</span>
-                    </div>
-                    <div class="product-item">
-                        <span class="product-name">Summer Dress</span>
-                        <span class="product-sales">143 sales</span>
+        <!-- Analytics Section -->
+        <section id="analytics" class="content-section">
+            <div class="section-header">
+                <h2>Analytics</h2>
+            </div>
+            <div class="analytics-grid">
+                <div class="card">
+                    <h3>Sales Overview</h3>
+                    <div class="chart-placeholder">
+                        <p>📈 Sales chart visualization</p>
+                        <p class="chart-note">Connect to your Spring Boot backend to display real-time data</p>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Users Section -->
-    <section id="users" class="content-section">
-        <div class="section-header">
-            <h2>Users Management</h2>
-            <button class="btn btn-primary" id="addUserBtn">+ Add User</button>
-        </div>
-
-        <div class="card">
-            <div class="table-container">
-                <table class="data-table">
-                    <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="user : ${users}"
-                        th:data-role="${user.role.code}"
-                        th:data-active="${user.active}">
-                        <td th:text="${user.id}"></td>
-                        <td th:text="${user.fullName}"></td>
-                        <td th:text="${user.email}"></td>
-                        <td>
-                            <form th:action="@{/admin/users/{id}/edit-role(id=${user.id})}" method="post"
-                                  style="display:inline;">
-                                <select name="roleCode" class="role-select"
-                                        th:disabled="${user.id == currentUserId}">
-                                    <option th:each="role : ${roles}"
-                                            th:value="${role.code}"
-                                            th:text="${role.name}"
-                                            th:selected="${user.role.code == role.code}">
-                                    </option>
-                                </select>
-                                <button type="submit"
-                                        class="btn btn-sm btn-primary"
-                                        th:disabled="${user.id == currentUserId}"
-                                        style="margin-left: 5px;">
-                                    Update
-                                </button>
-                            </form>
-                        </td>
-                        <td>
-                            <span class="badge"
-                                  th:classappend="${user.active ? 'success' : 'danger'}"
-                                  th:text="${user.active ? 'Active' : 'Inactive'}"></span>
-                        </td>
-                        <td>
-                            <div class="action-btns">
-                                <button class="btn btn-sm btn-secondary"
-                                        th:onclick="'viewUser(' + ${user.id} + ')'">View
-                                </button>
-                                <button class="btn btn-sm btn-secondary"
-                                        th:onclick="'editUser(' + ${user.id} + ')'"
-                                        th:disabled="${user.id == currentUserId}">
-                                    Edit
-                                </button>
-                                <form th:action="@{/admin/users/{id}/toggle-active(id=${user.id})}" method="post"
-                                      style="display:inline;">
-                                    <button type="submit"
-                                            class="btn btn-sm"
-                                            th:classappend="${user.active ? 'btn-danger' : 'btn-success'}"
-                                            th:disabled="${user.id == currentUserId}">
-                                        <span th:text="${user.active ? 'Deactivate' : 'Activate'}"></span>
-                                    </button>
-                                </form>
-                                <form th:if="${!user.active}"
-                                      th:action="@{/admin/users/{id}/delete(id=${user.id})}"
-                                      method="post"
-                                      style="display:inline;"
-                                      onsubmit="return confirm('Are you sure you want to permanently delete this user? This action cannot be undone.');">
-                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                </form>
+                <div class="card">
+                    <h3>Category Distribution</h3>
+                    <div class="category-stats">
+                        <div class="category-item">
+                            <span class="category-name">T-Shirts</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 45%"></div>
                             </div>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </section>
-
-    <!-- Analytics Section -->
-    <section id="analytics" class="content-section">
-        <div class="section-header">
-            <h2>Analytics</h2>
-        </div>
-
-        <div class="analytics-grid">
-            <div class="card">
-                <h3>Sales Overview</h3>
-                <div class="chart-placeholder">
-                    <p>📈 Sales chart visualization</p>
-                    <p class="chart-note">Connect to your Spring Boot backend to display real-time data</p>
-                </div>
-            </div>
-            <div class="card">
-                <h3>Category Distribution</h3>
-                <div class="category-stats">
-                    <div class="category-item">
-                        <span class="category-name">T-Shirts</span>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 45%"></div>
+                            <span class="category-percent">45%</span>
                         </div>
-                        <span class="category-percent">45%</span>
-                    </div>
-                    <div class="category-item">
-                        <span class="category-name">Jeans</span>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 30%"></div>
+                        <div class="category-item">
+                            <span class="category-name">Jeans</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 30%"></div>
+                            </div>
+                            <span class="category-percent">30%</span>
                         </div>
-                        <span class="category-percent">30%</span>
-                    </div>
-                    <div class="category-item">
-                        <span class="category-name">Jackets</span>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 15%"></div>
+                        <div class="category-item">
+                            <span class="category-name">Jackets</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 15%"></div>
+                            </div>
+                            <span class="category-percent">15%</span>
                         </div>
-                        <span class="category-percent">15%</span>
-                    </div>
-                    <div class="category-item">
-                        <span class="category-name">Accessories</span>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 10%"></div>
+                        <div class="category-item">
+                            <span class="category-name">Accessories</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 10%"></div>
+                            </div>
+                            <span class="category-percent">10%</span>
                         </div>
-                        <span class="category-percent">10%</span>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Audit Log Section -->
-    <section id="auditlog" class="content-section">
-        <div class="section-header">
-            <h2>Audit Log</h2>
-            <div class="filter-group">
-                <select class="filter-select" id="auditAction">
-                    <option value="all">All Actions</option>
-                    <option value="CREATE">Create</option>
-                    <option value="UPDATE">Update</option>
-                    <option value="DELETE">Delete</option>
-                    <option value="VIEW">View</option>
-                </select>
-                <select class="filter-select" id="auditEntity">
-                    <option value="all">All Entities</option>
-                    <option value="Product">Product</option>
-                    <option value="Brand">Brand</option>
-                    <option value="Order">Order</option>
-                    <option value="User">User</option>
-                </select>
-                <input type="date" class="filter-select" id="auditDate">
+        <!-- Audit Log Section -->
+        <section id="auditlog" class="content-section">
+            <div class="section-header">
+                <h2>Audit Log</h2>
+                <div class="filter-group">
+                    <select class="filter-select" id="auditAction">
+                        <option value="all">All Actions</option>
+                        <option value="CREATE">Create</option>
+                        <option value="UPDATE">Update</option>
+                        <option value="DELETE">Delete</option>
+                        <option value="VIEW">View</option>
+                    </select>
+                    <select class="filter-select" id="auditEntity">
+                        <option value="all">All Entities</option>
+                        <option value="Product">Product</option>
+                        <option value="Brand">Brand</option>
+                        <option value="Order">Order</option>
+                        <option value="User">User</option>
+                    </select>
+                    <input type="date" class="filter-select" id="auditDate">
+                </div>
             </div>
-        </div>
+            <div class="card">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Actor</th>
+                                <th>Role</th>
+                                <th>Action</th>
+                                <th>Entity</th>
+                                <th>Changes</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auditLogTable">
+                            <tr th:each="log : ${auditLogs}">
+                                <td th:text="${log.id}"></td>
+                                <td th:text="${log.actor != null ? log.actor.fullName : 'System'}"></td>
+                                <td th:text="${log.actorRole}"></td>
+                                <td>
+                                    <span class="badge" th:classappend="${log.action == 'CREATE' ? 'success' : (log.action == 'DELETE' ? 'danger' : (log.action == 'UPDATE' ? 'warning' : 'info'))}" th:text="${log.action}"></span>
+                                </td>
+                                <td th:text="${log.entity}"></td>
+                                <td>
+                                    <span class="changes-preview" th:title="${log.changes}" th:text="${#strings.abbreviate(log.changes, 50)}"></span>
+                                </td>
+                                <td th:text="${#temporals.format(log.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
 
-        <div class="card">
-            <div class="table-container">
-                <table class="data-table">
-                    <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Actor</th>
-                        <th>Role</th>
-                        <th>Action</th>
-                        <th>Entity</th>
-                        <th>Changes</th>
-                        <th>Timestamp</th>
-                    </tr>
-                    </thead>
-                    <tbody id="auditLogTable">
-                    <tr th:each="log : ${auditLogs}">
-                        <td th:text="${log.id}"></td>
-                        <td th:text="${log.actor != null ? log.actor.fullName : 'System'}"></td>
-                        <td th:text="${log.actorRole}"></td>
-                        <td>
-                            <span class="badge"
-                                  th:classappend="${log.action == 'CREATE' ? 'success' : (log.action == 'DELETE' ? 'danger' : (log.action == 'UPDATE' ? 'warning' : 'info'))}"
-                                  th:text="${log.action}"></span>
-                        </td>
-                        <td th:text="${log.entity}"></td>
-                        <td>
-                            <span class="changes-preview"
-                                  th:title="${log.changes}"
-                                  th:text="${#strings.abbreviate(log.changes, 50)}"></span>
-                        </td>
-                        <td th:text="${#temporals.format(log.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
-                    </tr>
-                    </tbody>
-                </table>
+    <!-- User Detail Modal -->
+    <div id="userDetailModal" class="user-detail-modal">
+        <div class="user-detail-content">
+            <div class="user-detail-header">
+                <h2>User Details</h2>
+                <button class="close-btn" onclick="closeUserDetailModal()">&times;</button>
             </div>
-        </div>
-    </section>
-</main>
-
-<!-- User Detail Modal -->
-<div id="userDetailModal" class="user-detail-modal">
-    <div class="user-detail-content">
-        <div class="user-detail-header">
-            <h2>User Details</h2>
-            <button class="close-btn" onclick="closeUserDetailModal()">&times;</button>
-        </div>
-        <div class="user-detail-body">
-            <div class="detail-row">
-                <div class="detail-label">ID:</div>
-                <div class="detail-value" id="detailId"></div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">Full Name:</div>
-                <div class="detail-value" id="detailFullName"></div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">Email:</div>
-                <div class="detail-value" id="detailEmail"></div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">Role:</div>
-                <div class="detail-value" id="detailRole"></div>
-            </div>
-            <div class="detail-row">
-                <div class="detail-label">Status:</div>
-                <div class="detail-value" id="detailActive"></div>
+            <div class="user-detail-body">
+                <div class="detail-row">
+                    <div class="detail-label">ID:</div>
+                    <div class="detail-value" id="detailId"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Full Name:</div>
+                    <div class="detail-value" id="detailFullName"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Email:</div>
+                    <div class="detail-value" id="detailEmail"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Phone:</div>
+                    <div class="detail-value" id="detailPhone"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Address:</div>
+                    <div class="detail-value" id="detailAddress"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Role:</div>
+                    <div class="detail-value" id="detailRole"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Status:</div>
+                    <div class="detail-value" id="detailActive"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Profile Completed:</div>
+                    <div class="detail-value" id="detailProfileCompleted"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Login Method:</div>
+                    <div class="detail-value" id="detailLoginMethod"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Created At:</div>
+                    <div class="detail-value" id="detailCreatedAt"></div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal for Add/Edit User -->
-<div id="userModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 id="userModalTitle">Add New User</h2>
-            <button class="close-modal" onclick="closeUserModal()">&times;</button>
+    <!-- Modal for Add/Edit User -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="userModalTitle">Add New User</h2>
+                <button class="close-modal" onclick="closeUserModal()">&times;</button>
+            </div>
+            <form th:action="@{/admin/users/save}" method="post" id="userForm" onsubmit="return validateUserForm()">
+                <input type="hidden" id="userId" name="id">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="fullName" name="fullName" required maxlength="255" placeholder="e.g., John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="email" name="email" required maxlength="255" placeholder="e.g., john@example.com">
+                    <small id="emailError" style="color: #dc2626; font-size: 12px;"></small>
+                </div>
+                <div class="form-group" id="passwordGroup">
+                    <label>Password <span id="passwordHint" style="color: #6b7280; font-size: 12px;"> (required for new users) </span> </label>
+                    <input type="password" id="password" name="password" placeholder="Leave blank to keep current">
+                    <div class="password-hint">
+                        <strong>Password requirements:</strong>
+                        <ul>
+                            <li>At least 8 characters</li>
+                            <li>At least 1 uppercase letter</li>
+                            <li>At least 1 number</li>
+                            <li>At least 1 special character (@, #, $, %, ^, &, +, =, !)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="form-group" id="resetPasswordGroup" style="display:none;">
+                    <label>Reset Password</label>
+                    <input type="checkbox" name="resetPassword" id="resetPassword">
+                    <small>Check to reset password to 12345678</small>
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <select id="roleCode" name="roleCode" required>
+                        <option th:each="role : ${roles}" th:value="${role.code}" th:text="${role.name}">
+                        </option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary close-modal" onclick="closeUserModal()">Cancel </button>
+                    <button type="submit" class="btn btn-primary">Save User</button>
+                </div>
+            </form>
         </div>
-        <form th:action="@{/admin/users/save}" method="post" id="userForm">
-            <input type="hidden" id="userId" name="id">
-            <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" id="fullName" name="fullName" required maxlength="255"
-                       placeholder="e.g., John Doe">
-            </div>
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="email" name="email" required maxlength="255"
-                       placeholder="e.g., john@example.com">
-            </div>
-            <div class="form-group">
-                <label>Password
-                    <span id="passwordHint" style="color: #6b7280; font-size: 12px;">
-                        (required for new users)
-                    </span>
-                </label>
-                <input type="password" id="password" name="password"
-                       placeholder="Leave blank to keep current">
-            </div>
-            <div class="form-group">
-                <label>Role</label>
-                <select id="roleCode" name="roleCode" required>
-                    <option th:each="role : ${roles}"
-                            th:value="${role.code}"
-                            th:text="${role.name}">
-                    </option>
-                </select>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary close-modal" onclick="closeUserModal()">Cancel
-                </button>
-                <button type="submit" class="btn btn-primary">Save User</button>
-            </div>
-        </form>
     </div>
-</div>
 
-<script>
-    // ============= Navigation =============
-    document.addEventListener('DOMContentLoaded', function () {
-        const navItems = document.querySelectorAll('.nav-item');
-        const sections = document.querySelectorAll('.content-section');
-        const pageTitle = document.getElementById('pageTitle');
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const contextPath = /*[[@{/}]]*/ '/';
+        /*]]>*/
 
-        navItems.forEach(item => {
-            item.addEventListener('click', function (e) {
-                e.preventDefault();
-                const targetSection = this.dataset.section;
-
-                navItems.forEach(nav => nav.classList.remove('active'));
-                this.classList.add('active');
-
-                sections.forEach(section => section.classList.remove('active'));
-                document.getElementById(targetSection).classList.add('active');
-
-                pageTitle.textContent = this.textContent.trim();
+        // ============= Navigation =============
+        document.addEventListener('DOMContentLoaded', function () {
+            const navItems = document.querySelectorAll('.nav-item');
+            const sections = document.querySelectorAll('.content-section');
+            const pageTitle = document.getElementById('pageTitle');
+            navItems.forEach(item => {
+                item.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetSection = this.dataset.section;
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    sections.forEach(section => section.classList.remove('active'));
+                    document.getElementById(targetSection).classList.add('active');
+                    pageTitle.textContent = this.textContent.trim();
+                });
             });
+
+            // cập nhật số liệu user lên dashboard
+            updateUserStats();
+
+            // Email validation on blur
+            const emailInput = document.getElementById('email');
+            if (emailInput) {
+                emailInput.addEventListener('blur', checkEmailAvailability);
+            }
         });
 
-        // cập nhật số liệu user lên dashboard
-        updateUserStats();
-    });
+        function updateUserStats() {
+            const rows = document.querySelectorAll('#users tbody tr');
+            let total = 0, active = 0, inactive = 0, admin = 0, staff = 0;
+            rows.forEach(row => {
+                total++;
+                const isActive = row.dataset.active === 'true';
+                if (isActive) active++; else inactive++;
+                const role = (row.dataset.role || '').toUpperCase();
+                if (role === 'ROLE_ADMIN') admin++;
+                if (role === 'ROLE_STAFF') staff++;
+            });
+            const totalUsersStat = document.getElementById('totalUsersStat');
+            const activeUsersStat = document.getElementById('activeUsersStat');
+            const inactiveUsersStat = document.getElementById('inactiveUsersStat');
+            const adminStaffStat = document.getElementById('adminStaffStat');
+            const headerActiveUsers = document.getElementById('headerActiveUsers');
+            const headerTotalUsers = document.getElementById('headerTotalUsers');
+            if (totalUsersStat) totalUsersStat.textContent = total;
+            if (activeUsersStat) activeUsersStat.textContent = active;
+            if (inactiveUsersStat) inactiveUsersStat.textContent = inactive;
+            if (adminStaffStat) adminStaffStat.textContent = `${admin} admin / ${staff} staff`;
+            if (headerActiveUsers) headerActiveUsers.textContent = active;
+            if (headerTotalUsers) headerTotalUsers.textContent = total;
+        }
 
-    function updateUserStats() {
-        const rows = document.querySelectorAll('#users tbody tr');
-        let total = 0, active = 0, inactive = 0, admin = 0, staff = 0;
-
-        rows.forEach(row => {
-            total++;
-            const isActive = row.dataset.active === 'true';
-            if (isActive) active++; else inactive++;
-
-            const role = (row.dataset.role || '').toUpperCase();
-            if (role === 'ROLE_ADMIN') admin++;
-            if (role === 'ROLE_STAFF') staff++;
+        // User Management Functions
+        document.getElementById('addUserBtn')?.addEventListener('click', function () {
+            document.getElementById('userModalTitle').textContent = 'Add New User';
+            document.getElementById('userForm').reset();
+            document.getElementById('userId').value = '';
+            document.getElementById('passwordGroup').style.display = 'block';
+            document.getElementById('resetPasswordGroup').style.display = 'none';
+            document.getElementById('passwordHint').textContent = '(required for new users)';
+            document.getElementById('password').required = true;
+            document.getElementById('emailError').textContent = '';
+            const submitButton = document.querySelector('#userModal button[type="submit"]');
+            submitButton.disabled = false;
+            document.getElementById('userModal').style.display = 'flex';
+            // Trigger check after open
+            checkEmailAvailability();
         });
 
-        const totalUsersStat = document.getElementById('totalUsersStat');
-        const activeUsersStat = document.getElementById('activeUsersStat');
-        const inactiveUsersStat = document.getElementById('inactiveUsersStat');
-        const adminStaffStat = document.getElementById('adminStaffStat');
-        const headerActiveUsers = document.getElementById('headerActiveUsers');
-        const headerTotalUsers = document.getElementById('headerTotalUsers');
-
-        if (totalUsersStat) totalUsersStat.textContent = total;
-        if (activeUsersStat) activeUsersStat.textContent = active;
-        if (inactiveUsersStat) inactiveUsersStat.textContent = inactive;
-        if (adminStaffStat) adminStaffStat.textContent = `${admin} admin / ${staff} staff`;
-        if (headerActiveUsers) headerActiveUsers.textContent = active;
-        if (headerTotalUsers) headerTotalUsers.textContent = total;
-    }
-
-    // User Management Functions
-    document.getElementById('addUserBtn')?.addEventListener('click', function () {
-        document.getElementById('userModalTitle').textContent = 'Add New User';
-        document.getElementById('userForm').reset();
-        document.getElementById('userId').value = '';
-        document.getElementById('passwordHint').textContent = '(required for new users)';
-        document.getElementById('password').required = true;
-        document.getElementById('userModal').style.display = 'flex';
-    });
-
-    function editUser(id) {
-        fetch(`/admin/users/${id}`)
-            .then(response => response.json())
-            .then(user => {
-                document.getElementById('userModalTitle').textContent = 'Edit User';
-                document.getElementById('userId').value = user.id;
-                document.getElementById('fullName').value = user.fullName;
-                document.getElementById('email').value = user.email;
-                document.getElementById('password').value = '';
-                document.getElementById('password').required = false;
-                document.getElementById('passwordHint').textContent = '(leave blank to keep current)';
-                document.getElementById('roleCode').value = user.role.code;
-                document.getElementById('userModal').style.display = 'flex';
-            })
-            .catch(error => {
-                alert('Error loading user data');
-                console.error(error);
-            });
-    }
-
-    function viewUser(id) {
-        fetch(`/admin/users/${id}`)
-            .then(response => response.json())
-            .then(user => {
-                document.getElementById('detailId').textContent = user.id;
-                document.getElementById('detailFullName').textContent = user.fullName;
-                document.getElementById('detailEmail').textContent = user.email;
-                document.getElementById('detailRole').textContent = user.role.name + ' (' + user.role.code + ')';
-
-                const activeSpan = document.createElement('span');
-                activeSpan.className = 'badge ' + (user.active ? 'success' : 'danger');
-                activeSpan.textContent = user.active ? 'Active' : 'Inactive';
-                document.getElementById('detailActive').innerHTML = '';
-                document.getElementById('detailActive').appendChild(activeSpan);
-
-                document.getElementById('userDetailModal').style.display = 'flex';
-            })
-            .catch(error => {
-                alert('Error loading user data');
-                console.error(error);
-            });
-    }
-
-    function closeUserModal() {
-        document.getElementById('userModal').style.display = 'none';
-    }
-
-    function closeUserDetailModal() {
-        document.getElementById('userDetailModal').style.display = 'none';
-    }
-
-    window.addEventListener('click', function (e) {
-        const userModal = document.getElementById('userModal');
-        const userDetailModal = document.getElementById('userDetailModal');
-
-        if (e.target === userModal) {
-            closeUserModal();
+        function editUser(id) {
+            fetch(contextPath + 'admin/users/' + id)
+                .then(response => response.json())
+                .then(user => {
+                    document.getElementById('userModalTitle').textContent = 'Edit User';
+                    document.getElementById('userId').value = user.id;
+                    document.getElementById('fullName').value = user.fullName;
+                    document.getElementById('email').value = user.email;
+                    document.getElementById('password').value = '';
+                    document.getElementById('passwordGroup').style.display = 'none';
+                    document.getElementById('resetPasswordGroup').style.display = 'block';
+                    document.getElementById('password').required = false;
+                    document.getElementById('roleCode').value = user.role.code;
+                    document.getElementById('emailError').textContent = '';
+                    const submitButton = document.querySelector('#userModal button[type="submit"]');
+                    submitButton.disabled = false;
+                    document.getElementById('userModal').style.display = 'flex';
+                    // Trigger check for edit
+                    checkEmailAvailability();
+                })
+                .catch(error => {
+                    alert('Error loading user data');
+                    console.error(error);
+                });
         }
-        if (e.target === userDetailModal) {
-            closeUserDetailModal();
+
+        function viewUser(id) {
+            fetch(contextPath + 'admin/users/' + id)
+                .then(response => response.json())
+                .then(user => {
+                    document.getElementById('detailId').textContent = user.id;
+                    document.getElementById('detailFullName').textContent = user.fullName;
+                    document.getElementById('detailEmail').textContent = user.email;
+                    document.getElementById('detailPhone').textContent = user.phone || 'Not provided';
+                    document.getElementById('detailAddress').textContent = user.defaultAddress || 'Not provided';
+                    document.getElementById('detailRole').textContent = user.role.name + ' (' + user.role.code + ')';
+                    const activeSpan = document.createElement('span');
+                    activeSpan.className = 'badge ' + (user.active ? 'success' : 'danger');
+                    activeSpan.textContent = user.active ? 'Active' : 'Inactive';
+                    document.getElementById('detailActive').innerHTML = '';
+                    document.getElementById('detailActive').appendChild(activeSpan);
+                    const profileSpan = document.createElement('span');
+                    profileSpan.className = 'badge ' + (user.profileCompleted ? 'success' : 'danger');
+                    profileSpan.textContent = user.profileCompleted ? 'Yes' : 'No';
+                    document.getElementById('detailProfileCompleted').innerHTML = '';
+                    document.getElementById('detailProfileCompleted').appendChild(profileSpan);
+                    document.getElementById('detailLoginMethod').textContent = user.googleSub ? 'Google OAuth' : 'Email/Password';
+                    document.getElementById('detailCreatedAt').textContent = user.createdAt;
+                    document.getElementById('userDetailModal').style.display = 'flex';
+                })
+                .catch(error => {
+                    alert('Error loading user data');
+                    console.error(error);
+                });
         }
-    });
 
-    // Display flash messages
-    window.addEventListener('DOMContentLoaded', function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        const success = urlParams.get('success');
-        const error = urlParams.get('error');
-
-        if (success) {
-            showNotification(success, 'success');
+        function closeUserModal() {
+            document.getElementById('userModal').style.display = 'none';
         }
-        if (error) {
-            showNotification(error, 'error');
+
+        function closeUserDetailModal() {
+            document.getElementById('userDetailModal').style.display = 'none';
         }
-    });
 
-    function showNotification(message, type = 'success') {
-        const notification = document.createElement('div');
-        notification.textContent = message;
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, ${type === 'success' ? '#059669, #047857' : '#dc2626, #991b1b'});
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(${type === 'success' ? '5, 150, 105' : '220, 38, 38'}, 0.4);
-            z-index: 3000;
-            animation: slideIn 0.3s ease;
-            max-width: 400px;
-        `;
+        window.addEventListener('click', function (e) {
+            const userModal = document.getElementById('userModal');
+            const userDetailModal = document.getElementById('userDetailModal');
+            if (e.target === userModal) {
+                closeUserModal();
+            }
+            if (e.target === userDetailModal) {
+                closeUserDetailModal();
+            }
+        });
 
-        document.body.appendChild(notification);
+        // Validate user form
+        function validateUserForm() {
+            const isNew = !document.getElementById('userId').value;
+            const password = document.getElementById('password').value;
+            const passwordPattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&+=!])(?=\S+$).{8,}$/;
+            if (isNew && !passwordPattern.test(password)) {
+                alert('Password must be at least 8 characters with 1 uppercase, 1 number, and 1 special character (@#$%^&+=!)');
+                return false;
+            }
+            return true;
+        }
 
-        setTimeout(() => {
-            notification.style.animation = 'slideOut 0.3s ease';
-            setTimeout(() => notification.remove(), 300);
-        }, 4000);
-    }
-</script>
+        // Check email availability
+        function checkEmailAvailability() {
+            const email = document.getElementById('email').value;
+            const id = document.getElementById('userId').value || null;
+            const submitButton = document.querySelector('#userModal button[type="submit"]');
+            const emailError = document.getElementById('emailError');
+            if (email) {
+                fetch(contextPath + 'admin/check-email?email=' + encodeURIComponent(email) + (id ? '&id=' + id : ''))
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.exists) {
+                            emailError.textContent = 'Email already exists.';
+                            submitButton.disabled = true;
+                        } else {
+                            emailError.textContent = '';
+                            submitButton.disabled = false;
+                        }
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+            } else {
+                emailError.textContent = '';
+                submitButton.disabled = false;
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed; top: 20px; right: 20px;
+                background: linear-gradient(135deg, ${type === 'success' ? '#059669, #047857' : '#dc2626, #991b1b'});
+                color: white; padding: 1rem 2rem; border-radius: 8px;
+                box-shadow: 0 5px 15px rgba(${type === 'success' ? '5, 150, 105' : '220, 38, 38'}, 0.4);
+                z-index: 3000; animation: slideIn 0.3s ease;
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Display flash messages
+        window.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const success = urlParams.get('success');
+            const error = urlParams.get('error');
+            if (success) {
+                showNotification(success, 'success');
+            }
+            if (error) {
+                showNotification(error, 'error');
+            }
+        });
+    </script>
 </body>
-
 </html>

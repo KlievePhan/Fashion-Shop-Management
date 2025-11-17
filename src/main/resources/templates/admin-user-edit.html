@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User - Fashion Shop Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <style>
+        .user-edit-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-edit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .user-edit-header h1 {
+            font-size: 28px;
+            color: #111827;
+            margin: 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 15px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #dc2626;
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .password-hint {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #92400e;
+        }
+
+        .password-hint ul {
+            margin: 8px 0 0 20px;
+            padding: 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-secondary {
+            background-color: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #4b5563;
+        }
+
+        .btn-primary {
+            background-color: #dc2626;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #991b1b;
+        }
+
+        .error-message {
+            background-color: #fee2e2;
+            border-left: 4px solid #dc2626;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <div class="user-edit-container">
+        <div class="user-edit-header">
+            <h1>Edit User</h1>
+            <a th:href="@{/admin#users}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to List
+            </a>
+        </div>
+        <div th:if="${param.error}" class="error-message">
+            <i class="bi bi-exclamation-triangle"></i>
+            <span th:text="${param.error[0]}"></span>
+        </div>
+        <form th:action="@{/admin/users/save}" method="post">
+            <input type="hidden" name="id" th:value="${user.id}">
+            <div class="form-group">
+                <label for="fullName">Full Name *</label>
+                <input type="text" id="fullName" name="fullName" th:value="${user.fullName}" required maxlength="255" placeholder="e.g., John Doe">
+            </div>
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" name="email" th:value="${user.email}" required maxlength="255" placeholder="e.g., john@example.com" readonly="readonly">
+            </div>
+            <div class="form-group">
+                <label for="resetPassword">Reset Password</label>
+                <input type="checkbox" id="resetPassword" name="resetPassword">
+                <small>Check to reset password to 12345678</small>
+            </div>
+            <div class="form-group">
+                <label for="roleCode">Role *</label>
+                <select id="roleCode" name="roleCode" required>
+                    <option th:each="role : ${roles}" th:value="${role.code}" th:text="${role.name}" th:selected="${user.role.code == role.code}">
+                    </option>
+                </select>
+                <small th:if="${currentUserRole != 'ROLE_ADMIN'}"> You can only assign User or Staff roles. </small>
+            </div>
+            <div class="action-buttons">
+                <a th:href="@{/admin#users}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
