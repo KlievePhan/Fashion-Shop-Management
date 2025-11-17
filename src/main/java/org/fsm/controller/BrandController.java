@@ -10,23 +10,21 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
-
 @Controller
-@RequestMapping("/admin/brand")
+@RequestMapping("/staff/brand")
 @RequiredArgsConstructor
 public class BrandController {
 
     private final BrandService brandService;
 
-    // List all brands (used when loading /admin page)
+    // List all brands (dùng khi load /staff)
     @GetMapping
     public String getAllBrands(Model model) {
         model.addAttribute("brands", brandService.getAllBrands());
-        return "admin";
+        return "staff";
     }
 
-    // AJAX: Get single brand by ID → /admin/brand/1
+    // AJAX: Get single brand by ID → /staff/brand/1
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<Brand> getBrandById(@PathVariable Integer id) {
@@ -48,7 +46,7 @@ public class BrandController {
         } catch (Exception e) {
             ra.addFlashAttribute("errorMessage", "Error: " + e.getMessage());
         }
-        return "redirect:/admin#brands";
+        return "redirect:/staff#brands";
     }
 
     @PostMapping("/{id}/delete")
@@ -59,6 +57,6 @@ public class BrandController {
         } catch (Exception e) {
             ra.addFlashAttribute("errorMessage", "Error deleting brand: " + e.getMessage());
         }
-        return "redirect:/admin#brands";
+        return "redirect:/staff#brands";
     }
 }

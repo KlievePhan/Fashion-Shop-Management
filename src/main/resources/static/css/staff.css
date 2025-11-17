@@ -1,0 +1,9 @@
+/* Staff panel can reuse admin layout but with slight tweaks */
+@import url("/css/admin.css");
+
+/* Ví dụ đổi màu logo cho Staff */
+.logo h2 {
+    font-size: 20px;
+}
+
+/* Có thể thêm custom style riêng cho staff ở đây */

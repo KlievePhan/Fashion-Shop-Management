@@ -153,69 +153,34 @@
 
     /* -------------------  MODAL LAYOUT  ------------------- */
     .modal-content {
-        /* Wider but not taller */
-        max-width: 1100px;      /* was ~900px */
+        max-width: 1100px;
         width: 92%;
-        max-height: 68vh;       /* reduced from 80vh → less vertical space */
+        max-height: 68vh;
         overflow-y: auto;
         padding: 28px;
         border-radius: 12px;
         background: #fff;
     }
 
-    /* Make every input / textarea / select bigger */
     .form-group input,
     .form-group select,
     .form-group textarea {
         width: 100%;
-        padding: 13px 16px;     /* larger padding */
-        font-size: 15px;        /* bigger text */
+        padding: 13px 16px;
+        font-size: 15px;
         border: 1px solid #d1d5db;
         border-radius: 8px;
         box-sizing: border-box;
     }
 
-    /* Slightly tighter row spacing */
     .form-row {
         display: flex;
         gap: 20px;
         margin-bottom: 16px;
     }
-    .form-row .form-group { flex: 1; }
 
-    /* Variant rows – keep them compact but readable */
-    .variant-row {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 10px;
-    }
-    .variant-row input {
+    .form-row .form-group {
         flex: 1;
-        min-width: 0;
-        padding: 9px 12px;
-        font-size: 14px;
-        border: 1px solid #d1d5db;
-        border-radius: 6px;
-    }
-    .variant-row button {
-        padding: 8px 14px;
-        background: #dc2626;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-    }
-    .variant-row button:hover { background: #991b1b; }
-
-    @media (max-width: 1200px) {
-        .table-container {
-            overflow-x: auto;
-        }
-
-        .data-table {
-            min-width: 1000px;
-        }
     }
 
     /* User Detail Modal */
@@ -291,6 +256,7 @@
         color: #dc2626;
     }
 </style>
+
 <body>
 <!-- Sidebar Navigation -->
 <aside class="sidebar">
@@ -301,18 +267,6 @@
         <a href="#" class="nav-item active" data-section="dashboard">
             <span class="icon">📊</span>
             Dashboard
-        </a>
-        <a href="#" class="nav-item" data-section="products">
-            <span class="icon">👕</span>
-            Products
-        </a>
-        <a href="#" class="nav-item" data-section="brands">
-            <span class="icon">🏷️</span>
-            Brands
-        </a>
-        <a href="#" class="nav-item" data-section="orders">
-            <span class="icon">📦</span>
-            Orders
         </a>
         <a href="#" class="nav-item" data-section="users">
             <span class="icon">👥</span>
@@ -343,18 +297,18 @@
         <div class="header-right">
             <div class="status-info">
                 <div class="status-item">
-                    <span class="status-label">Total Orders Today</span>
-                    <span class="status-value" id="ordersToday">12</span>
+                    <span class="status-label">Active Users</span>
+                    <span class="status-value" id="headerActiveUsers">0</span>
                 </div>
                 <div class="status-divider"></div>
                 <div class="status-item">
-                    <span class="status-label">Revenue Today</span>
-                    <span class="status-value" id="revenueToday">$2,450</span>
+                    <span class="status-label">Total Users</span>
+                    <span class="status-value" id="headerTotalUsers">0</span>
                 </div>
             </div>
 
             <div class="search-bar">
-                <input type="text" placeholder="Search products, orders..." id="searchInput">
+                <input type="text" placeholder="Search users, logs..." id="searchInput">
                 <i class="search-icon">🔍</i>
             </div>
 
@@ -397,39 +351,40 @@
     <section id="dashboard" class="content-section active">
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-icon red">💰</div>
+                <div class="stat-icon red">👥</div>
                 <div class="stat-info">
-                    <h3>Total Revenue</h3>
-                    <p class="stat-value">$24,580</p>
-                    <span class="stat-change positive">+12.5%</span>
+                    <h3>Total Users</h3>
+                    <p class="stat-value" id="totalUsersStat">0</p>
+                    <span class="stat-change">All registered accounts</span>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">💰</div>
+                <div class="stat-icon">✅</div>
                 <div class="stat-info">
-                    <h3>Orders</h3>
-                    <p class="stat-value">342</p>
-                    <span class="stat-change positive">+8.2%</span>
+                    <h3>Active Users</h3>
+                    <p class="stat-value" id="activeUsersStat">0</p>
+                    <span class="stat-change positive">Can log in & use system</span>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">💰</div>
+                <div class="stat-icon">⛔</div>
                 <div class="stat-info">
-                    <h3>Products</h3>
-                    <p class="stat-value">156</p>
-                    <span class="stat-change">0%</span>
+                    <h3>Inactive Users</h3>
+                    <p class="stat-value" id="inactiveUsersStat">0</p>
+                    <span class="stat-change warning">Locked / deactivated</span>
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">💰</div>
+                <div class="stat-icon">👑</div>
                 <div class="stat-info">
-                    <h3>Customers</h3>
-                    <p class="stat-value">1,249</p>
-                    <span class="stat-change positive">+15.3%</span>
+                    <h3>Admin & Staff</h3>
+                    <p class="stat-value" id="adminStaffStat">0 admin / 0 staff</p>
+                    <span class="stat-change info">Privileged accounts</span>
                 </div>
             </div>
         </div>
 
+        <!-- giữ lại 2 card demo cũ nếu muốn -->
         <div class="dashboard-grid">
             <div class="card">
                 <h3>Recent Orders</h3>
@@ -491,160 +446,6 @@
         </div>
     </section>
 
-    <!-- Products Section -->
-    <section id="products" class="content-section">
-        <div class="section-header">
-            <h2>Products Management</h2>
-            <div class="filter-group">
-                <select class="filter-select" id="productCategoryFilter">
-                    <option value="all">All Categories</option>
-                    <option value="man">Man</option>
-                    <option value="woman">Woman</option>
-                    <option value="unisex">Unisex</option>
-                </select>
-            </div>
-            <button class="btn btn-primary" id="addProductBtn">+ Add Product</button>
-        </div>
-
-        <div class="card">
-            <div class="table-container">
-                <table class="data-table">
-                    <thead>
-                    <tr>
-                        <th style="display: none;">ID</th>
-                        <th>SKU</th>
-                        <th>Image</th>
-                        <th>Title</th>
-                        <th>Category</th>
-                        <th>Brand</th>
-                        <th>Price</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody id="productsTableBody">
-                    <tr th:each="product : ${products}">
-                        <td style="display: none;" th:text="${product.id}"></td>
-                        <td th:text="${product.sku}"></td>
-                        <td>
-                            <img th:src="${product.primaryImageUrl}"
-                                 alt="Product"
-                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
-                        </td>
-                        <td th:text="${product.title}"></td>
-                        <td th:text="${product.category != null ? product.category.name : 'N/A'}"></td>
-                        <td th:text="${product.brand != null ? product.brand.name : 'N/A'}"></td>
-                        <td th:text="'$' + ${product.basePrice}"></td>
-                        <td>
-                            <span class="badge"
-                                  th:classappend="${product.active ? 'success' : 'danger'}"
-                                  th:text="${product.active ? 'Active' : 'Inactive'}"></span>
-                        </td>
-                        <td>
-                            <div class="action-btns">
-                                <button type="button"
-                                        class="btn btn-sm btn-secondary"
-                                        th:onclick="'editProduct(\'' + ${product.id} + '\')'">
-                                    Edit
-                                </button>
-                                <form th:action="@{/admin/products/{id}/toggle-active(id=${product.id})}"
-                                      method="post"
-                                      style="display:inline;">
-                                    <button type="submit"
-                                            class="btn btn-sm"
-                                            th:classappend="${product.active ? 'btn-warning' : 'btn-success'}">
-                                        <span th:text="${product.active ? 'Deactivate' : 'Activate'}"></span>
-                                    </button>
-                                </form>
-                                <form th:action="@{/admin/products/{id}/delete(id=${product.id})}"
-                                      method="post"
-                                      style="display:inline;"
-                                      onsubmit="return confirm('Delete this product?')">
-                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </section>
-
-    <!-- Brands Section -->
-    <section id="brands" class="content-section">
-        <div class="section-header">
-            <h2>Brand Management</h2>
-            <button class="btn btn-primary" id="addBrandBtn">+ Add Brand</button>
-        </div>
-
-        <div class="card">
-            <div class="table-container">
-                <table class="data-table">
-                    <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Slug</th>
-                        <th>Created At</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="brand : ${brands}">
-                        <td th:text="${brand.id}"></td>
-                        <td th:text="${brand.name}"></td>
-                        <td th:text="${brand.slug}"></td>
-                        <td th:text="${#temporals.format(brand.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
-                        <td>
-                            <div class="action-btns">
-                                <button class="btn btn-sm btn-secondary" th:onclick="'editBrand(' + ${brand.id} + ')'">Edit</button>
-                                <form th:action="@{/admin/brand/{id}/delete(id=${brand.id})}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this brand?')">
-                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </section>
-
-    <!-- Orders Section -->
-    <section id="orders" class="content-section">
-        <div class="section-header">
-            <h2>Orders Management</h2>
-            <div class="filter-group">
-                <select class="filter-select" id="orderStatus">
-                    <option value="all">All Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="shipped">Shipped</option>
-                    <option value="delivered">Delivered</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="table-container">
-                <table class="data-table">
-                    <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Customer</th>
-                        <th>Date</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody id="ordersTable">
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </section>
-
     <!-- Users Section -->
     <section id="users" class="content-section">
         <div class="section-header">
@@ -666,13 +467,17 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="user : ${users}">
+                    <tr th:each="user : ${users}"
+                        th:data-role="${user.role.code}"
+                        th:data-active="${user.active}">
                         <td th:text="${user.id}"></td>
                         <td th:text="${user.fullName}"></td>
                         <td th:text="${user.email}"></td>
                         <td>
-                            <form th:action="@{/admin/users/{id}/edit-role(id=${user.id})}" method="post" style="display:inline;">
-                                <select name="roleCode" class="role-select" th:disabled="${user.id == currentUserId}">
+                            <form th:action="@{/admin/users/{id}/edit-role(id=${user.id})}" method="post"
+                                  style="display:inline;">
+                                <select name="roleCode" class="role-select"
+                                        th:disabled="${user.id == currentUserId}">
                                     <option th:each="role : ${roles}"
                                             th:value="${role.code}"
                                             th:text="${role.name}"
@@ -688,18 +493,22 @@
                             </form>
                         </td>
                         <td>
-                            <span class="badge" th:classappend="${user.active ? 'success' : 'danger'}"
+                            <span class="badge"
+                                  th:classappend="${user.active ? 'success' : 'danger'}"
                                   th:text="${user.active ? 'Active' : 'Inactive'}"></span>
                         </td>
                         <td>
                             <div class="action-btns">
-                                <button class="btn btn-sm btn-secondary" th:onclick="'viewUser(' + ${user.id} + ')'">View</button>
+                                <button class="btn btn-sm btn-secondary"
+                                        th:onclick="'viewUser(' + ${user.id} + ')'">View
+                                </button>
                                 <button class="btn btn-sm btn-secondary"
                                         th:onclick="'editUser(' + ${user.id} + ')'"
                                         th:disabled="${user.id == currentUserId}">
                                     Edit
                                 </button>
-                                <form th:action="@{/admin/users/{id}/toggle-active(id=${user.id})}" method="post" style="display:inline;">
+                                <form th:action="@{/admin/users/{id}/toggle-active(id=${user.id})}" method="post"
+                                      style="display:inline;">
                                     <button type="submit"
                                             class="btn btn-sm"
                                             th:classappend="${user.active ? 'btn-danger' : 'btn-success'}"
@@ -822,7 +631,9 @@
                         </td>
                         <td th:text="${log.entity}"></td>
                         <td>
-                            <span class="changes-preview" th:title="${log.changes}" th:text="${#strings.abbreviate(log.changes, 50)}"></span>
+                            <span class="changes-preview"
+                                  th:title="${log.changes}"
+                                  th:text="${#strings.abbreviate(log.changes, 50)}"></span>
                         </td>
                         <td th:text="${#temporals.format(log.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
                     </tr>
@@ -832,70 +643,6 @@
         </div>
     </section>
 </main>
-
-<!-- Modal for Add/Edit Brand -->
-<div id="brandModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 id="brandModalTitle">Add New Brand</h2>
-            <button class="close-modal" onclick="closeBrandModal()">&times;</button>
-        </div>
-        <form th:action="@{/admin/brand/save}" method="post" id="brandForm">
-            <input type="hidden" id="brandId" name="id">
-            <div class="form-group">
-                <label>Brand Name</label>
-                <input type="text" id="brandName" name="name" required maxlength="150" placeholder="e.g., Nike, Adidas">
-            </div>
-            <div class="form-group">
-                <label>Slug</label>
-                <input type="text" id="brandSlug" name="slug" required maxlength="150" placeholder="e.g., nike, adidas">
-                <small style="color: #6b7280; font-size: 12px;">URL-friendly version (lowercase, no spaces)</small>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary close-modal" onclick="closeBrandModal()">Cancel</button>
-                <button type="submit" class="btn btn-primary">Save Brand</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Modal for Add/Edit User -->
-<div id="userModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 id="userModalTitle">Add New User</h2>
-            <button class="close-modal" onclick="closeUserModal()">&times;</button>
-        </div>
-        <form th:action="@{/admin/users/save}" method="post" id="userForm">
-            <input type="hidden" id="userId" name="id">
-            <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" id="fullName" name="fullName" required maxlength="255" placeholder="e.g., John Doe">
-            </div>
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="email" name="email" required maxlength="255" placeholder="e.g., john@example.com">
-            </div>
-            <div class="form-group">
-                <label>Password <span id="passwordHint" style="color: #6b7280; font-size: 12px;">(required for new users)</span></label>
-                <input type="password" id="password" name="password" placeholder="Leave blank to keep current">
-            </div>
-            <div class="form-group">
-                <label>Role</label>
-                <select id="roleCode" name="roleCode" required>
-                    <option th:each="role : ${roles}"
-                            th:value="${role.code}"
-                            th:text="${role.name}">
-                    </option>
-                </select>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary close-modal" onclick="closeUserModal()">Cancel</button>
-                <button type="submit" class="btn btn-primary">Save User</button>
-            </div>
-        </form>
-    </div>
-</div>
 
 <!-- User Detail Modal -->
 <div id="userDetailModal" class="user-detail-modal">
@@ -929,385 +676,109 @@
     </div>
 </div>
 
-<!-- ====================  PRODUCT MODAL  ==================== -->
-<div id="productModal" class="modal">
+<!-- Modal for Add/Edit User -->
+<div id="userModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2 id="productModalTitle">Add New Product</h2>
-            <button class="close-modal" onclick="closeProductModal()">X</button>
+            <h2 id="userModalTitle">Add New User</h2>
+            <button class="close-modal" onclick="closeUserModal()">&times;</button>
         </div>
-
-        <form th:action="@{/admin/products/save}" method="post" id="productForm">
-            <input type="hidden" id="productId" name="id">
-
-            <!-- ----------  BASIC INFO  ---------- -->
-            <div class="form-row">
-                <div class="form-group">
-                    <label>SKU *</label>
-                    <input type="text" id="productSku" name="sku" required placeholder="e.g., TS-001">
-                </div>
-                <div class="form-group">
-                    <label>Status</label>
-                    <select id="productActive" name="active">
-                        <option value="true">Active</option>
-                        <option value="false">Inactive</option>
-                    </select>
-                </div>
-            </div>
-
+        <form th:action="@{/admin/users/save}" method="post" id="userForm">
+            <input type="hidden" id="userId" name="id">
             <div class="form-group">
-                <label>Product Title *</label>
-                <input type="text" id="productTitle" name="title" required placeholder="e.g., Classic T-Shirt">
+                <label>Full Name</label>
+                <input type="text" id="fullName" name="fullName" required maxlength="255"
+                       placeholder="e.g., John Doe">
             </div>
-
             <div class="form-group">
-                <label>Description</label>
-                <textarea id="productDescription" name="description" rows="3"
-                          placeholder="Product description..."></textarea>
+                <label>Email</label>
+                <input type="email" id="email" name="email" required maxlength="255"
+                       placeholder="e.g., john@example.com">
             </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Category *</label>
-                    <select id="productCategoryId" name="categoryId" required>
-                        <option value="">Select Category</option>
-                        <option th:each="cat : ${categories}"
-                                th:value="${cat.id}"
-                                th:text="${cat.name}"></option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Brand</label>
-                    <select id="productBrandId" name="brandId">
-                        <option value="">Optional</option>
-                        <option th:each="brand : ${brands}"
-                                th:value="${brand.id}"
-                                th:text="${brand.name}"></option>
-                    </select>
-                </div>
-            </div>
-
             <div class="form-group">
-                <label>Base Price ($) *</label>
-                <input type="number" id="productPrice" name="basePrice"
-                       step="0.01" min="0" required placeholder="0.00">
+                <label>Password
+                    <span id="passwordHint" style="color: #6b7280; font-size: 12px;">
+                        (required for new users)
+                    </span>
+                </label>
+                <input type="password" id="password" name="password"
+                       placeholder="Leave blank to keep current">
             </div>
-
             <div class="form-group">
-                <label>Image URLs (comma-separated)</label>
-                <textarea id="productImageUrls" name="imageUrls" rows="2"
-                          placeholder="https://example.com/img1.jpg, https://example.com/img2.jpg"></textarea>
-                <small style="color:#6b7280;">First image = primary</small>
+                <label>Role</label>
+                <select id="roleCode" name="roleCode" required>
+                    <option th:each="role : ${roles}"
+                            th:value="${role.code}"
+                            th:text="${role.name}">
+                    </option>
+                </select>
             </div>
-
-            <!-- ----------  VARIANTS  ---------- -->
-            <div class="form-group">
-                <label>Variants</label>
-                <div id="variantsContainer"></div>
-                <button type="button" class="btn btn-secondary" id="addVariantBtn"
-                        style="margin-top:8px;">Add Variant</button>
-            </div>
-            <input type="hidden" id="variantsJson" name="variantsJson">
-
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary"
-                        onclick="closeProductModal()">Cancel</button>
-                <button type="submit" class="btn btn-primary">Save Product</button>
+                <button type="button" class="btn btn-secondary close-modal" onclick="closeUserModal()">Cancel
+                </button>
+                <button type="submit" class="btn btn-primary">Save User</button>
             </div>
         </form>
     </div>
 </div>
 
-<script th:inline="javascript">
-    const contextPath = /*[[@{/}]]*/ '/';
-
+<script>
     // ============= Navigation =============
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const navItems = document.querySelectorAll('.nav-item');
         const sections = document.querySelectorAll('.content-section');
         const pageTitle = document.getElementById('pageTitle');
 
         navItems.forEach(item => {
-            item.addEventListener('click', function(e) {
+            item.addEventListener('click', function (e) {
                 e.preventDefault();
                 const targetSection = this.dataset.section;
 
-                // Update active states
                 navItems.forEach(nav => nav.classList.remove('active'));
                 this.classList.add('active');
 
-                // Show target section
                 sections.forEach(section => section.classList.remove('active'));
                 document.getElementById(targetSection).classList.add('active');
 
-                // Update title
                 pageTitle.textContent = this.textContent.trim();
             });
         });
+
+        // cập nhật số liệu user lên dashboard
+        updateUserStats();
     });
 
-    function editBrand(id) {
-        fetch(contextPath + 'admin/brand/' + id, {
-            headers: {
-                'Accept': 'application/json'   // <-- THIS IS THE KEY
-            }
-        })
-            .then(response => {
-                if (!response.ok) {
-                    // 404 → brand not found
-                    throw new Error('Brand not found (HTTP ' + response.status + ')');
-                }
-                return response.json();
-            })
-            .then(brand => {
-                // ---- Fill the modal ----
-                document.getElementById('brandModalTitle').textContent = 'Edit Brand';
-                document.getElementById('brandId').value      = brand.id;
-                document.getElementById('brandName').value    = brand.name;
-                document.getElementById('brandSlug').value    = brand.slug;
+    function updateUserStats() {
+        const rows = document.querySelectorAll('#users tbody tr');
+        let total = 0, active = 0, inactive = 0, admin = 0, staff = 0;
 
-                // ---- Show the modal ----
-                document.getElementById('brandModal').style.display = 'flex';
-            })
-            .catch(err => {
-                console.error(err);
-                alert('Failed to load brand: ' + err.message);
-            });
-    }
+        rows.forEach(row => {
+            total++;
+            const isActive = row.dataset.active === 'true';
+            if (isActive) active++; else inactive++;
 
-    document.getElementById('productForm').addEventListener('submit', function (e) {
-        const variants = [];
-
-        document.querySelectorAll('.variant-row').forEach(row => {
-            const size  = row.querySelector('.variant-size').value.trim();
-            const color = row.querySelector('.variant-color').value.trim();
-            const sku   = row.querySelector('.variant-sku').value.trim();
-            const price = row.querySelector('.variant-price').value.trim();
-            const stock = row.querySelector('.variant-stock').value.trim();
-
-            // Only include if at least size OR color is filled
-            if (size || color) {
-                variants.push({
-                    sku: sku || '',
-                    attributeJson: JSON.stringify({ size, color }),
-                    price: price === '' ? '' : price,   // keep empty string
-                    stock: stock === '' ? '' : stock    // keep empty string
-                });
-            }
+            const role = (row.dataset.role || '').toUpperCase();
+            if (role === 'ROLE_ADMIN') admin++;
+            if (role === 'ROLE_STAFF') staff++;
         });
 
-        // Set the hidden field – even if empty array
-        document.getElementById('variantsJson').value = JSON.stringify(variants);
-    });
+        const totalUsersStat = document.getElementById('totalUsersStat');
+        const activeUsersStat = document.getElementById('activeUsersStat');
+        const inactiveUsersStat = document.getElementById('inactiveUsersStat');
+        const adminStaffStat = document.getElementById('adminStaffStat');
+        const headerActiveUsers = document.getElementById('headerActiveUsers');
+        const headerTotalUsers = document.getElementById('headerTotalUsers');
 
-    /* ---------- 1. OPEN ADD PRODUCT MODAL ---------- */
-    document.getElementById('addProductBtn')?.addEventListener('click', function () {
-        document.getElementById('productModalTitle').textContent = 'Add New Product';
-        document.getElementById('productForm').reset();
-        document.getElementById('productId').value = '';
-        document.getElementById('variantsContainer').innerHTML = '';
-        document.getElementById('productModal').classList.add('active');
-    });
-
-    /* ---------- 2. EDIT PRODUCT (AJAX → JSON) ---------- */
-    const originalEditProduct = editProduct;
-    function editProduct(id) {
-        fetch(contextPath + 'admin/products/' + id, {
-            headers: { 'Accept': 'application/json' }
-        })
-            .then(r => {
-                if (!r.ok) throw new Error('Product not found – HTTP ' + r.status);
-                return r.json();
-            })
-            .then(p => {
-                // Title
-                document.getElementById('productModalTitle').textContent = 'Edit Product';
-
-                // Basic fields
-                document.getElementById('productId').value          = p.id;
-                document.getElementById('productSku').value         = p.sku || '';
-                document.getElementById('productTitle').value       = p.title || '';
-                document.getElementById('productDescription').value = p.description || '';
-                document.getElementById('productCategoryId').value  = p.category?.id || '';
-                document.getElementById('productBrandId').value     = p.brand?.id || '';
-                document.getElementById('productPrice').value       = p.basePrice || '';
-                document.getElementById('productActive').value      = p.active ? 'true' : 'false';
-
-                // Images – comma separated
-                const imgs = p.images ? p.images.map(i => i.url).join(', ') : '';
-                document.getElementById('productImageUrls').value = imgs;
-
-                // Clear and load variants
-                const container = document.getElementById('variantsContainer');
-                container.innerHTML = '';  // clear
-                fetch(contextPath + 'admin/products/' + id + '/variants', {
-                    headers: { 'Accept': 'application/json' }
-                })
-                    .then(r => r.json())
-                    .then(variants => {
-                        variants.forEach(v => {
-                            let attr = {};
-                            try {
-                                attr = JSON.parse(v.attributeJson || '{}');
-                            } catch(e) {}
-                            addVariantRow({
-                                size: attr.size || '',
-                                color: attr.color || '',
-                                sku: v.sku || '',
-                                price: v.price || '',
-                                stock: v.stock || 0
-                            });
-                        });
-                    })
-                    .catch(err => console.error('Failed to load variants:', err));
-
-                // Show modal (same CSS class used everywhere)
-                document.getElementById('productModal').classList.add('active');
-            })
-            .catch(err => {
-                console.error(err);
-                alert('Failed to load product: ' + err.message);
-            });
+        if (totalUsersStat) totalUsersStat.textContent = total;
+        if (activeUsersStat) activeUsersStat.textContent = active;
+        if (inactiveUsersStat) inactiveUsersStat.textContent = inactive;
+        if (adminStaffStat) adminStaffStat.textContent = `${admin} admin / ${staff} staff`;
+        if (headerActiveUsers) headerActiveUsers.textContent = active;
+        if (headerTotalUsers) headerTotalUsers.textContent = total;
     }
-
-    /* ---------- 3. CLOSE MODAL ---------- */
-    function closeProductModal() {
-        document.getElementById('productModal').classList.remove('active');
-    }
-
-    /* ---------- 4. GLOBAL EXPORTS (used by th:onclick) ---------- */
-    window.editProduct      = editProduct;
-    window.closeProductModal = closeProductModal;
-
-    /* ---------- 5. CATEGORY FILTER (tiny improvement) ---------- */
-    document.getElementById('productCategoryFilter')?.addEventListener('change', function (e) {
-        const cat = e.target.value;
-
-        if (cat === 'all') {
-            location.href = contextPath + 'admin#products';
-            return;
-        }
-
-        fetch(contextPath + 'admin/products/filter?category=' + cat, {
-            headers: { 'Accept': 'application/json' }
-        })
-            .then(r => r.json())
-            .then(list => {
-                const tbody = document.getElementById('productsTableBody');
-                tbody.innerHTML = list.map(p => `
-                <tr>
-                    <td style="display: none;">${p.id}</td>
-                    <td>${p.sku || 'N/A'}</td>
-                    <td>
-                        <img src="${p.primaryImageUrl || '/images/default.jpg'}"
-                             style="width:50px;height:50px;object-fit:cover;border-radius:4px;">
-                    </td>
-                    <td>${p.title}</td>
-                    <td>${p.category ? p.category.name : 'N/A'}</td>
-                    <td>${p.brand ? p.brand.name : 'N/A'}</td>
-                    <td>$${p.basePrice}</td>
-                    <td>
-                        <span class="badge ${p.active ? 'success' : 'danger'}">
-                            ${p.active ? 'Active' : 'Inactive'}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="action-btns">
-                            <button type="button" class="btn btn-sm btn-secondary"
-                                   onclick="editProduct('${p.id}')">Edit</button>
-
-                            <form action="${contextPath}admin/products/${p.id}/toggle-active"
-                                  method="post" style="display:inline;">
-                                <button type="submit"
-                                        class="btn btn-sm ${p.active ? 'btn-warning' : 'btn-success'}">
-                                    ${p.active ? 'Deactivate' : 'Activate'}
-                                </button>
-                            </form>
-
-                            <form action="${contextPath}admin/products/${p.id}/delete"
-                                  method="post" style="display:inline;"
-                                  onsubmit="return confirm('Delete this product?')">
-                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-            })
-            .catch(err => console.error(err));
-    });
-
-    // Variants Management
-    function addVariantRow(data = {size: '', color: '', sku: '', price: '', stock: 0}) {
-        const container = document.getElementById('variantsContainer');
-        const row = document.createElement('div');
-        row.className = 'variant-row';
-        row.innerHTML = `
-            <input type="text" class="variant-size" placeholder="Size (e.g., M)" value="${data.size}">
-            <input type="text" class="variant-color" placeholder="Color (e.g., Red)" value="${data.color}">
-            <input type="text" class="variant-sku" placeholder="Variant SKU" value="${data.sku}">
-            <input type="number" step="0.01" class="variant-price" placeholder="Price" value="${data.price}">
-            <input type="number" class="variant-stock" placeholder="Stock" value="${data.stock}">
-            <button type="button" class="remove-variant">Remove</button>
-        `;
-        container.appendChild(row);
-        row.querySelector('.remove-variant').addEventListener('click', () => row.remove());
-    }
-
-    // Add variant button
-    document.getElementById('addVariantBtn').addEventListener('click', () => addVariantRow());
-
-    // On form submit, collect variants
-    document.getElementById('productForm').addEventListener('submit', function() {
-        const variants = [];
-        document.querySelectorAll('.variant-row').forEach(row => {
-            const size = row.querySelector('.variant-size').value.trim();
-            const color = row.querySelector('.variant-color').value.trim();
-            const sku = row.querySelector('.variant-sku').value.trim();
-            const price = row.querySelector('.variant-price').value;
-            const stock = row.querySelector('.variant-stock').value;
-            if (size || color) {  // at least size or color
-                variants.push({
-                    sku: sku,
-                    attributeJson: JSON.stringify({size, color}),
-                    price: price || null,
-                    stock: stock || 0
-                });
-            }
-        });
-        document.getElementById('variantsJson').value = JSON.stringify(variants);
-    });
-</script>
-<script>
-    // Brand Management Functions
-    document.getElementById('addBrandBtn')?.addEventListener('click', function() {
-        document.getElementById('brandModalTitle').textContent = 'Add New Brand';
-        document.getElementById('brandForm').reset();
-        document.getElementById('brandId').value = '';
-        document.getElementById('brandModal').style.display = 'flex';
-    });
-
-    function closeBrandModal() {
-        document.getElementById('brandModal').style.display = 'none';
-    }
-
-    document.getElementById('brandName')?.addEventListener('input', function(e) {
-        const slug = e.target.value
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-+|-+$/g, '');
-        document.getElementById('brandSlug').value = slug;
-    });
-
-    window.addEventListener('click', function(e) {
-        const brandModal = document.getElementById('brandModal');
-        if (e.target === brandModal) {
-            closeBrandModal();
-        }
-    });
 
     // User Management Functions
-    document.getElementById('addUserBtn')?.addEventListener('click', function() {
+    document.getElementById('addUserBtn')?.addEventListener('click', function () {
         document.getElementById('userModalTitle').textContent = 'Add New User';
         document.getElementById('userForm').reset();
         document.getElementById('userId').value = '';
@@ -1367,7 +838,7 @@
         document.getElementById('userDetailModal').style.display = 'none';
     }
 
-    window.addEventListener('click', function(e) {
+    window.addEventListener('click', function (e) {
         const userModal = document.getElementById('userModal');
         const userDetailModal = document.getElementById('userDetailModal');
 
@@ -1380,7 +851,7 @@
     });
 
     // Display flash messages
-    window.addEventListener('DOMContentLoaded', function() {
+    window.addEventListener('DOMContentLoaded', function () {
         const urlParams = new URLSearchParams(window.location.search);
         const success = urlParams.get('success');
         const error = urlParams.get('error');
