@@ -1,8 +1,10 @@
 package org.fsm.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.fsm.dto.ProductDTO;
 import org.fsm.entity.*;
 import org.fsm.repository.UserRepository;
 import org.fsm.service.AuditLogService;
@@ -21,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -34,12 +37,13 @@ public class ProductController {
     private final ObjectMapper objectMapper;
 
     /**
-     * Get single product by ID (for AJAX edit)
+     * Get single product by ID (for AJAX edit) - Returns DTO instead of Entity
      */
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id) {
         return productService.getProductById(id)
+                .map(this::convertToDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -49,14 +53,21 @@ public class ProductController {
      */
     @GetMapping("/filter")
     @ResponseBody
-    public ResponseEntity<List<Product>> filterProductsByCategory(@RequestParam String category) {
+    public ResponseEntity<List<ProductDTO>> filterProductsByCategory(@RequestParam String category) {
+        List<Product> products;
+
         if (category.equals("all")) {
-            return ResponseEntity.ok(productService.getAllProducts());
+            products = productService.getAllProducts();
+        } else {
+            products = productService.getProductsByTopLevelCategory(category,
+                    org.springframework.data.domain.PageRequest.of(0, 1000)).getContent();
         }
 
-        List<Product> products = productService.getProductsByTopLevelCategory(category,
-                org.springframework.data.domain.PageRequest.of(0, 1000)).getContent();
-        return ResponseEntity.ok(products);
+        List<ProductDTO> dtos = products.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(dtos);
     }
 
     /**
@@ -72,8 +83,8 @@ public class ProductController {
             @RequestParam(required = false) Integer brandId,
             @RequestParam BigDecimal basePrice,
             @RequestParam(defaultValue = "true") Boolean active,
-            @RequestParam(required = false) String imageUrls, // Comma-separated URLs
-            @RequestParam(required = false) String variantsJson, // JSON array of variants
+            @RequestParam(required = false) String imageUrls,
+            @RequestParam(required = false) String variantsJson,
             RedirectAttributes redirectAttributes,
             HttpServletRequest request
     ) {
@@ -339,24 +350,108 @@ public class ProductController {
     }
 
     /**
+     * Convert Product entity to DTO to avoid serialization issues
+     */
+    private ProductDTO convertToDTO(Product product) {
+        ProductDTO dto = new ProductDTO();
+        dto.setId(product.getId());
+        dto.setSku(product.getSku());
+        dto.setTitle(product.getTitle());
+        dto.setDescription(product.getDescription());
+        dto.setBasePrice(product.getBasePrice());
+        dto.setActive(product.getActive());
+
+        // Convert category
+        if (product.getCategory() != null) {
+            dto.setCategory(new ProductDTO.CategoryInfo(
+                    product.getCategory().getId(),
+                    product.getCategory().getName()
+            ));
+        }
+
+        // Convert brand
+        if (product.getBrand() != null) {
+            dto.setBrand(new ProductDTO.BrandInfo(
+                    product.getBrand().getId(),
+                    product.getBrand().getName()
+            ));
+        }
+
+        // Convert images
+        if (product.getImages() != null) {
+            List<ProductDTO.ImageInfo> imageInfos = product.getImages().stream()
+                    .map(img -> new ProductDTO.ImageInfo(
+                            img.getId(),
+                            img.getUrl(),
+                            img.getPrimary(),
+                            img.getOrders()
+                    ))
+                    .collect(Collectors.toList());
+            dto.setImages(imageInfos);
+        }
+
+        // Set primary image URL
+        dto.setPrimaryImageUrl(product.getPrimaryImageUrl());
+
+        return dto;
+    }
+
+    /**
      * Helper method to parse variants JSON
      */
     private List<ProductVariant> parseVariantsJson(String variantsJson) {
         try {
-            // Expected format: [{"sku":"TS-L-R","size":"L","color":"Red","price":29.99,"stock":50}]
             List<ProductVariant> variants = new ArrayList<>();
 
-            // Simple JSON parsing - you can use ObjectMapper for complex cases
-            variantsJson = variantsJson.trim();
-            if (variantsJson.startsWith("[") && variantsJson.endsWith("]")) {
-                // Remove brackets and split by objects
-                String content = variantsJson.substring(1, variantsJson.length() - 1);
-                // This is simplified - use ObjectMapper in production
-                // For now, return empty list - you can implement proper JSON parsing
+            if (variantsJson == null || variantsJson.trim().isEmpty()) {
+                return variants;
+            }
+
+            // Parse JSON array
+            List<Map<String, Object>> variantMaps = objectMapper.readValue(
+                    variantsJson,
+                    new TypeReference<List<Map<String, Object>>>() {}
+            );
+
+            for (Map<String, Object> variantMap : variantMaps) {
+                ProductVariant variant = new ProductVariant();
+
+                // Set SKU
+                if (variantMap.containsKey("sku")) {
+                    variant.setSku((String) variantMap.get("sku"));
+                }
+
+                // Set attributeJson (contains size and color)
+                if (variantMap.containsKey("attributeJson")) {
+                    variant.setAttributeJson((String) variantMap.get("attributeJson"));
+                }
+
+                // Price
+                if (variantMap.containsKey("price")) {
+                    String priceStr = (String) variantMap.get("price");
+                    if (priceStr != null && !priceStr.isEmpty()) {
+                        variant.setPrice(new BigDecimal(priceStr));
+                    }
+                }
+
+                // Stock
+                if (variantMap.containsKey("stock")) {
+                    String stockStr = (String) variantMap.get("stock");
+                    if (stockStr != null && !stockStr.isEmpty()) {
+                        variant.setStock(Integer.parseInt(stockStr));
+                    } else {
+                        variant.setStock(0);
+                    }
+                }
+
+                variants.add(variant);
             }
 
             return variants;
+
         } catch (Exception e) {
+            System.err.println("Error parsing variants JSON: " + e.getMessage());
+            e.printStackTrace();
             return new ArrayList<>();
         }
     }

@@ -151,6 +151,63 @@
         cursor: pointer;
     }
 
+    /* -------------------  MODAL LAYOUT  ------------------- */
+    .modal-content {
+        /* Wider but not taller */
+        max-width: 1100px;      /* was ~900px */
+        width: 92%;
+        max-height: 68vh;       /* reduced from 80vh → less vertical space */
+        overflow-y: auto;
+        padding: 28px;
+        border-radius: 12px;
+        background: #fff;
+    }
+
+    /* Make every input / textarea / select bigger */
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 13px 16px;     /* larger padding */
+        font-size: 15px;        /* bigger text */
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        box-sizing: border-box;
+    }
+
+    /* Slightly tighter row spacing */
+    .form-row {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 16px;
+    }
+    .form-row .form-group { flex: 1; }
+
+    /* Variant rows – keep them compact but readable */
+    .variant-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 10px;
+    }
+    .variant-row input {
+        flex: 1;
+        min-width: 0;
+        padding: 9px 12px;
+        font-size: 14px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+    }
+    .variant-row button {
+        padding: 8px 14px;
+        background: #dc2626;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+    .variant-row button:hover { background: #991b1b; }
+
     @media (max-width: 1200px) {
         .table-container {
             overflow-x: auto;
@@ -872,16 +929,18 @@
     </div>
 </div>
 
-<!-- Product Modal -->
+<!-- ====================  PRODUCT MODAL  ==================== -->
 <div id="productModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
             <h2 id="productModalTitle">Add New Product</h2>
-            <button class="close-modal" onclick="closeProductModal()">&times;</button>
+            <button class="close-modal" onclick="closeProductModal()">X</button>
         </div>
+
         <form th:action="@{/admin/products/save}" method="post" id="productForm">
             <input type="hidden" id="productId" name="id">
 
+            <!-- ----------  BASIC INFO  ---------- -->
             <div class="form-row">
                 <div class="form-group">
                     <label>SKU *</label>
@@ -930,18 +989,29 @@
 
             <div class="form-group">
                 <label>Base Price ($) *</label>
-                <input type="number" id="productPrice" name="basePrice" step="0.01" min="0" required placeholder="0.00">
+                <input type="number" id="productPrice" name="basePrice"
+                       step="0.01" min="0" required placeholder="0.00">
             </div>
 
             <div class="form-group">
                 <label>Image URLs (comma-separated)</label>
                 <textarea id="productImageUrls" name="imageUrls" rows="2"
-                          placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"></textarea>
-                <small style="color: #6b7280;">First image will be primary</small>
+                          placeholder="https://example.com/img1.jpg, https://example.com/img2.jpg"></textarea>
+                <small style="color:#6b7280;">First image = primary</small>
             </div>
 
+            <!-- ----------  VARIANTS  ---------- -->
+            <div class="form-group">
+                <label>Variants</label>
+                <div id="variantsContainer"></div>
+                <button type="button" class="btn btn-secondary" id="addVariantBtn"
+                        style="margin-top:8px;">Add Variant</button>
+            </div>
+            <input type="hidden" id="variantsJson" name="variantsJson">
+
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeProductModal()">Cancel</button>
+                <button type="button" class="btn btn-secondary"
+                        onclick="closeProductModal()">Cancel</button>
                 <button type="submit" class="btn btn-primary">Save Product</button>
             </div>
         </form>
@@ -1005,15 +1075,42 @@
             });
     }
 
+    document.getElementById('productForm').addEventListener('submit', function (e) {
+        const variants = [];
+
+        document.querySelectorAll('.variant-row').forEach(row => {
+            const size  = row.querySelector('.variant-size').value.trim();
+            const color = row.querySelector('.variant-color').value.trim();
+            const sku   = row.querySelector('.variant-sku').value.trim();
+            const price = row.querySelector('.variant-price').value.trim();
+            const stock = row.querySelector('.variant-stock').value.trim();
+
+            // Only include if at least size OR color is filled
+            if (size || color) {
+                variants.push({
+                    sku: sku || '',
+                    attributeJson: JSON.stringify({ size, color }),
+                    price: price === '' ? '' : price,   // keep empty string
+                    stock: stock === '' ? '' : stock    // keep empty string
+                });
+            }
+        });
+
+        // Set the hidden field – even if empty array
+        document.getElementById('variantsJson').value = JSON.stringify(variants);
+    });
+
     /* ---------- 1. OPEN ADD PRODUCT MODAL ---------- */
     document.getElementById('addProductBtn')?.addEventListener('click', function () {
         document.getElementById('productModalTitle').textContent = 'Add New Product';
         document.getElementById('productForm').reset();
         document.getElementById('productId').value = '';
+        document.getElementById('variantsContainer').innerHTML = '';
         document.getElementById('productModal').classList.add('active');
     });
 
     /* ---------- 2. EDIT PRODUCT (AJAX → JSON) ---------- */
+    const originalEditProduct = editProduct;
     function editProduct(id) {
         fetch(contextPath + 'admin/products/' + id, {
             headers: { 'Accept': 'application/json' }
@@ -1039,6 +1136,30 @@
                 // Images – comma separated
                 const imgs = p.images ? p.images.map(i => i.url).join(', ') : '';
                 document.getElementById('productImageUrls').value = imgs;
+
+                // Clear and load variants
+                const container = document.getElementById('variantsContainer');
+                container.innerHTML = '';  // clear
+                fetch(contextPath + 'admin/products/' + id + '/variants', {
+                    headers: { 'Accept': 'application/json' }
+                })
+                    .then(r => r.json())
+                    .then(variants => {
+                        variants.forEach(v => {
+                            let attr = {};
+                            try {
+                                attr = JSON.parse(v.attributeJson || '{}');
+                            } catch(e) {}
+                            addVariantRow({
+                                size: attr.size || '',
+                                color: attr.color || '',
+                                sku: v.sku || '',
+                                price: v.price || '',
+                                stock: v.stock || 0
+                            });
+                        });
+                    })
+                    .catch(err => console.error('Failed to load variants:', err));
 
                 // Show modal (same CSS class used everywhere)
                 document.getElementById('productModal').classList.add('active');
@@ -1115,8 +1236,48 @@
             })
             .catch(err => console.error(err));
     });
+
+    // Variants Management
+    function addVariantRow(data = {size: '', color: '', sku: '', price: '', stock: 0}) {
+        const container = document.getElementById('variantsContainer');
+        const row = document.createElement('div');
+        row.className = 'variant-row';
+        row.innerHTML = `
+            <input type="text" class="variant-size" placeholder="Size (e.g., M)" value="${data.size}">
+            <input type="text" class="variant-color" placeholder="Color (e.g., Red)" value="${data.color}">
+            <input type="text" class="variant-sku" placeholder="Variant SKU" value="${data.sku}">
+            <input type="number" step="0.01" class="variant-price" placeholder="Price" value="${data.price}">
+            <input type="number" class="variant-stock" placeholder="Stock" value="${data.stock}">
+            <button type="button" class="remove-variant">Remove</button>
+        `;
+        container.appendChild(row);
+        row.querySelector('.remove-variant').addEventListener('click', () => row.remove());
+    }
+
+    // Add variant button
+    document.getElementById('addVariantBtn').addEventListener('click', () => addVariantRow());
+
+    // On form submit, collect variants
+    document.getElementById('productForm').addEventListener('submit', function() {
+        const variants = [];
+        document.querySelectorAll('.variant-row').forEach(row => {
+            const size = row.querySelector('.variant-size').value.trim();
+            const color = row.querySelector('.variant-color').value.trim();
+            const sku = row.querySelector('.variant-sku').value.trim();
+            const price = row.querySelector('.variant-price').value;
+            const stock = row.querySelector('.variant-stock').value;
+            if (size || color) {  // at least size or color
+                variants.push({
+                    sku: sku,
+                    attributeJson: JSON.stringify({size, color}),
+                    price: price || null,
+                    stock: stock || 0
+                });
+            }
+        });
+        document.getElementById('variantsJson').value = JSON.stringify(variants);
+    });
 </script>
-<script th:src="@{/js/admin.js}"></script>
 <script>
     // Brand Management Functions
     document.getElementById('addBrandBtn')?.addEventListener('click', function() {
