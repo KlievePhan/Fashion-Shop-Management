@@ -20,14 +20,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/admin/products")
+@RequestMapping("/staff/products")
 @RequiredArgsConstructor
 public class ProductController {
 
@@ -35,6 +32,12 @@ public class ProductController {
     private final AuditLogService auditLogService;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
+
+    @GetMapping
+    public String listProducts(Model model) {
+        model.addAttribute("products", productService.getAllProducts());
+        return "staff";
+    }
 
     /**
      * Get single product by ID (for AJAX edit) - Returns DTO instead of Entity
@@ -59,8 +62,10 @@ public class ProductController {
         if (category.equals("all")) {
             products = productService.getAllProducts();
         } else {
-            products = productService.getProductsByTopLevelCategory(category,
-                    org.springframework.data.domain.PageRequest.of(0, 1000)).getContent();
+            products = productService
+                    .getProductsByTopLevelCategory(category,
+                            org.springframework.data.domain.PageRequest.of(0, 1000))
+                    .getContent();
         }
 
         List<ProductDTO> dtos = products.stream()
@@ -165,7 +170,7 @@ public class ProductController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Error: " + e.getMessage());
         }
-        return "redirect:/admin#products";
+        return "redirect:/staff#products";
     }
 
     /**
@@ -199,7 +204,7 @@ public class ProductController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Error deleting product: " + e.getMessage());
         }
-        return "redirect:/admin#products";
+        return "redirect:/staff#products";
     }
 
     /**
@@ -233,12 +238,9 @@ public class ProductController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Error: " + e.getMessage());
         }
-        return "redirect:/admin#products";
+        return "redirect:/staff#products";
     }
 
-    /**
-     * Get variants for a product
-     */
     @GetMapping("/{id}/variants")
     @ResponseBody
     public ResponseEntity<List<ProductVariant>> getProductVariants(@PathVariable Long id) {
@@ -246,9 +248,6 @@ public class ProductController {
         return ResponseEntity.ok(variants);
     }
 
-    /**
-     * Add variant to product
-     */
     @PostMapping("/{id}/variants")
     @ResponseBody
     public ResponseEntity<ProductVariant> addVariant(
@@ -263,9 +262,6 @@ public class ProductController {
         }
     }
 
-    /**
-     * Update variant
-     */
     @PutMapping("/variants/{variantId}")
     @ResponseBody
     public ResponseEntity<ProductVariant> updateVariant(
@@ -280,9 +276,6 @@ public class ProductController {
         }
     }
 
-    /**
-     * Delete variant
-     */
     @DeleteMapping("/variants/{variantId}")
     @ResponseBody
     public ResponseEntity<Void> deleteVariant(@PathVariable Long variantId) {
@@ -294,9 +287,6 @@ public class ProductController {
         }
     }
 
-    /**
-     * Get images for a product
-     */
     @GetMapping("/{id}/images")
     @ResponseBody
     public ResponseEntity<List<ProductImage>> getProductImages(@PathVariable Long id) {
@@ -304,9 +294,6 @@ public class ProductController {
         return ResponseEntity.ok(images);
     }
 
-    /**
-     * Add image to product
-     */
     @PostMapping("/{id}/images")
     @ResponseBody
     public ResponseEntity<ProductImage> addImage(
@@ -321,9 +308,6 @@ public class ProductController {
         }
     }
 
-    /**
-     * Delete image
-     */
     @DeleteMapping("/images/{imageId}")
     @ResponseBody
     public ResponseEntity<Void> deleteImage(@PathVariable Long imageId) {
@@ -335,9 +319,6 @@ public class ProductController {
         }
     }
 
-    /**
-     * Set primary image
-     */
     @PostMapping("/images/{imageId}/set-primary")
     @ResponseBody
     public ResponseEntity<Void> setPrimaryImage(@PathVariable Long imageId) {
@@ -349,9 +330,8 @@ public class ProductController {
         }
     }
 
-    /**
-     * Convert Product entity to DTO to avoid serialization issues
-     */
+    // ===== helper methods =====
+
     private ProductDTO convertToDTO(Product product) {
         ProductDTO dto = new ProductDTO();
         dto.setId(product.getId());
@@ -361,7 +341,6 @@ public class ProductController {
         dto.setBasePrice(product.getBasePrice());
         dto.setActive(product.getActive());
 
-        // Convert category
         if (product.getCategory() != null) {
             dto.setCategory(new ProductDTO.CategoryInfo(
                     product.getCategory().getId(),
@@ -369,7 +348,6 @@ public class ProductController {
             ));
         }
 
-        // Convert brand
         if (product.getBrand() != null) {
             dto.setBrand(new ProductDTO.BrandInfo(
                     product.getBrand().getId(),
@@ -377,7 +355,6 @@ public class ProductController {
             ));
         }
 
-        // Convert images
         if (product.getImages() != null) {
             List<ProductDTO.ImageInfo> imageInfos = product.getImages().stream()
                     .map(img -> new ProductDTO.ImageInfo(
@@ -390,24 +367,17 @@ public class ProductController {
             dto.setImages(imageInfos);
         }
 
-        // Set primary image URL
         dto.setPrimaryImageUrl(product.getPrimaryImageUrl());
-
         return dto;
     }
 
-    /**
-     * Helper method to parse variants JSON
-     */
     private List<ProductVariant> parseVariantsJson(String variantsJson) {
         try {
             List<ProductVariant> variants = new ArrayList<>();
-
             if (variantsJson == null || variantsJson.trim().isEmpty()) {
                 return variants;
             }
 
-            // Parse JSON array
             List<Map<String, Object>> variantMaps = objectMapper.readValue(
                     variantsJson,
                     new TypeReference<List<Map<String, Object>>>() {}
@@ -416,17 +386,14 @@ public class ProductController {
             for (Map<String, Object> variantMap : variantMaps) {
                 ProductVariant variant = new ProductVariant();
 
-                // Set SKU
                 if (variantMap.containsKey("sku")) {
                     variant.setSku((String) variantMap.get("sku"));
                 }
 
-                // Set attributeJson (contains size and color)
                 if (variantMap.containsKey("attributeJson")) {
                     variant.setAttributeJson((String) variantMap.get("attributeJson"));
                 }
 
-                // Price
                 if (variantMap.containsKey("price")) {
                     String priceStr = (String) variantMap.get("price");
                     if (priceStr != null && !priceStr.isEmpty()) {
@@ -434,7 +401,6 @@ public class ProductController {
                     }
                 }
 
-                // Stock
                 if (variantMap.containsKey("stock")) {
                     String stockStr = (String) variantMap.get("stock");
                     if (stockStr != null && !stockStr.isEmpty()) {
@@ -448,7 +414,6 @@ public class ProductController {
             }
 
             return variants;
-
         } catch (Exception e) {
             System.err.println("Error parsing variants JSON: " + e.getMessage());
             e.printStackTrace();
@@ -456,9 +421,6 @@ public class ProductController {
         }
     }
 
-    /**
-     * Helper method to get current authenticated user
-     */
     private User getCurrentUser() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

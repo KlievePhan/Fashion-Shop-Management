@@ -49,6 +49,11 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
             return;
         }
 
+        if ("ROLE_STAFF".equals(roleCode)) {
+            response.sendRedirect(contextPath + "/staff");
+            return;
+        }
+
         if (Boolean.TRUE.equals(user.getProfileCompleted())) {
             response.sendRedirect(contextPath + "/");
         } else {
