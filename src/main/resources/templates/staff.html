@@ -6,603 +6,862 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff Panel - Fashion Shop</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" th:href="@{/css/admin.css}">
     <link rel="stylesheet" th:href="@{/css/staff.css}">
+    <style>
+        /* Toast notification styles */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 9999;
+            animation: slideIn 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+        }
+
+        .toast-notification.error {
+            background: #dc3545;
+        }
+
+        .toast-notification.warning {
+            background: #ffc107;
+            color: #000;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .toast-notification.hiding {
+            animation: slideOut 0.3s ease-out forwards;
+        }
+
+        .toast-icon {
+            font-size: 24px;
+        }
+
+        .toast-message {
+            flex: 1;
+            font-weight: 500;
+        }
+    </style>
 </head>
+
 <body>
-<!-- Sidebar Navigation -->
-<aside class="sidebar">
-    <div class="logo">
-        <h2>Fashion Staff</h2>
-    </div>
-    <nav class="nav-menu">
-        <a href="#" class="nav-item active" data-section="dashboard">
-            <span class="icon">📊</span>
-            Staff Dashboard
-        </a>
-        <a href="#" class="nav-item" data-section="products">
-            <span class="icon">👕</span>
-            Products
-        </a>
-        <a href="#" class="nav-item" data-section="brands">
-            <span class="icon">🏷️</span>
-            Brands
-        </a>
-        <a href="#" class="nav-item" data-section="orders">
-            <span class="icon">📦</span>
-            Orders
-        </a>
-    </nav>
-</aside>
-
-<!-- Main Content -->
-<main class="main-content">
-    <!-- Header -->
-    <header class="header">
-        <div class="header-left">
-            <button class="menu-toggle" id="menuToggle">☰</button>
-            <div class="header-title-section">
-                <h1 id="pageTitle">Staff Dashboard</h1>
-                <p class="header-subtitle" id="headerSubtitle">Manage products, brands & orders</p>
-            </div>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="logo">
+            <h2>Fashion Staff</h2>
         </div>
-        <div class="header-right">
-            <div class="search-bar">
-                <input type="text" placeholder="Search products, orders..." id="searchInput">
-                <i class="search-icon">🔍</i>
-            </div>
+        <nav class="nav-menu">
+            <a href="#" class="nav-item active" data-section="dashboard">
+                <span class="icon">📊</span>
+                Staff Dashboard
+            </a>
+            <a href="#" class="nav-item" data-section="products">
+                <span class="icon">👕</span>
+                Products
+            </a>
+            <a href="#" class="nav-item" data-section="brands">
+                <span class="icon">🏷️</span>
+                Brands
+            </a>
+            <a href="#" class="nav-item" data-section="orders">
+                <span class="icon">📦</span>
+                Orders
+            </a>
+        </nav>
+    </aside>
 
-            <div class="user-profile">
-                <div class="avatar">S</div>
-                <div class="user-info">
-                    <span class="user-name">Staff</span>
-                    <span class="user-role">Staff Panel</span>
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">☰</button>
+                <div class="header-title-section">
+                    <h1 id="pageTitle">Staff Dashboard</h1>
+                    <p class="header-subtitle" id="headerSubtitle">Manage products, brands & orders</p>
                 </div>
-                <div class="profile-dropdown">
-                    <button class="dropdown-toggle">⋮</button>
-                    <div class="dropdown-menu">
-                        <a href="#" class="dropdown-item">
-                            <i>👤</i> Profile
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <form th:action="@{/logout}" method="post" style="margin:0;">
-                            <button type="submit" class="dropdown-item logout-item">
-                                <i class="bi bi-box-arrow-right"></i> Logout
-                            </button>
-                        </form>
+            </div>
+            <div class="header-right">
+                <div class="search-bar">
+                    <input type="text" placeholder="Search products, orders..." id="searchInput">
+                    <i class="search-icon">🔍</i>
+                </div>
+
+                <div class="user-profile">
+                    <div class="avatar">S</div>
+                    <div class="user-info">
+                        <span class="user-name">Staff</span>
+                        <span class="user-role">Staff Panel</span>
+                    </div>
+                    <div class="profile-dropdown">
+                        <button class="dropdown-toggle">⋮</button>
+                        <div class="dropdown-menu">
+                            <a href="#" class="dropdown-item">
+                                <i>👤</i> Profile
+                            </a>
+                            <a href="#" class="dropdown-item">
+                                <i>⚙️</i> Settings
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <form th:action="@{/logout}" method="post" style="margin:0;">
+                                <button type="submit" class="dropdown-item logout-item">
+                                    <i class="bi bi-box-arrow-right"></i> Logout
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </header>
+        </header>
 
-    <!-- Staff Dashboard Section -->
-    <section id="dashboard" class="content-section active">
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon red">👕</div>
-                <div class="stat-info">
-                    <h3>Total Products</h3>
-                    <p class="stat-value" th:text="${#lists.size(products)}">0</p>
+        <!-- Staff Dashboard Section -->
+        <section id="dashboard" class="content-section active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon red">👕</div>
+                    <div class="stat-info">
+                        <h3>Total Products</h3>
+                        <p class="stat-value" th:text="${#lists.size(products)}">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🏷️</div>
+                    <div class="stat-info">
+                        <h3>Total Brands</h3>
+                        <p class="stat-value" th:text="${#lists.size(brands)}">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-info">
+                        <h3>Total Orders</h3>
+                        <p class="stat-value" th:text="${orders != null ? #lists.size(orders) : 0}">0</p>
+                    </div>
                 </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">🏷️</div>
-                <div class="stat-info">
-                    <h3>Total Brands</h3>
-                    <p class="stat-value" th:text="${#lists.size(brands)}">0</p>
+        </section>
+
+        <!-- Products Section -->
+        <section id="products" class="content-section">
+            <div class="section-header">
+                <h2>Products Management</h2>
+                <div class="filter-group">
+                    <select class="filter-select" id="productCategoryFilter">
+                        <option value="all">All Categories</option>
+                        <option value="man">Man</option>
+                        <option value="woman">Woman</option>
+                        <option value="unisex">Unisex</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" id="addProductBtn">+ Add Product</button>
+            </div>
+
+            <div class="card">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="display: none;">ID</th>
+                                <th>SKU</th>
+                                <th>Image</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Brand</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTableBody">
+                            <tr th:each="product : ${products}">
+                                <td style="display: none;" th:text="${product.id}"></td>
+                                <td th:text="${product.sku}"></td>
+                                <td>
+                                    <img th:src="${product.primaryImageUrl}" alt="Product"
+                                        style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                                </td>
+                                <td th:text="${product.title}"></td>
+                                <td th:text="${product.category != null ? product.category.name : 'N/A'}"></td>
+                                <td th:text="${product.brand != null ? product.brand.name : 'N/A'}"></td>
+                                <td th:text="'$' + ${product.basePrice}"></td>
+                                <td>
+                                    <span class="badge" th:classappend="${product.active ? 'success' : 'danger'}"
+                                        th:text="${product.active ? 'Active' : 'Inactive'}"></span>
+                                </td>
+                                <td>
+                                    <div class="action-btns">
+                                        <button type="button" class="btn btn-secondary"
+                                            th:onclick="'editProduct(\'' + ${product.id} + '\')'">
+                                            Edit
+                                        </button>
+                                        <button type="button" class="btn btn-sm toggle-active-btn"
+                                            th:classappend="${product.active ? 'btn-warning' : 'btn-success'}"
+                                            th:data-id="${product.id}" th:data-active="${product.active}">
+                                            <span th:text="${product.active ? 'Deactivate' : 'Activate'}"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-danger delete-product-btn"
+                                            th:data-id="${product.id}" th:data-title="${product.title}">
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">📦</div>
-                <div class="stat-info">
-                    <h3>Total Orders</h3>
-                    <p class="stat-value" th:text="${orders != null ? #lists.size(orders) : 0}">0</p>
+        </section>
+
+        <!-- Brands Section -->
+        <section id="brands" class="content-section">
+            <div class="section-header">
+                <h2>Brand Management</h2>
+                <button class="btn btn-primary" id="addBrandBtn">+ Add Brand</button>
+            </div>
+
+            <div class="card">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Slug</th>
+                                <th>Created At</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="brandsTableBody">
+                            <tr th:each="brand : ${brands}" th:id="'brand-row-' + ${brand.id}">
+                                <td th:text="${brand.id}"></td>
+                                <td class="brand-name" th:text="${brand.name}"></td>
+                                <td class="brand-slug" th:text="${brand.slug}"></td>
+                                <td th:text="${#temporals.format(brand.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                                <td>
+                                    <div class="action-btns">
+                                        <button type="button" class="btn btn-sm btn-secondary edit-brand-btn"
+                                            th:data-id="${brand.id}">Edit</button>
+                                        <button type="button" class="btn btn-sm btn-danger delete-brand-btn"
+                                            th:data-id="${brand.id}" th:data-name="${brand.name}">Delete</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Products Section -->
-    <section id="products" class="content-section">
-        <div class="section-header">
-            <h2>Products Management</h2>
-            <div class="filter-group">
-                <select class="filter-select" id="productCategoryFilter">
-                    <option value="all">All Categories</option>
-                    <option value="man">Man</option>
-                    <option value="woman">Woman</option>
-                    <option value="unisex">Unisex</option>
-                </select>
+        <!-- Orders Section -->
+        <section id="orders" class="content-section">
+            <div class="section-header">
+                <h2>Orders Management</h2>
+                <div class="filter-group">
+                    <select class="filter-select" id="orderStatus">
+                        <option value="all">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="paid">Paid</option>
+                        <option value="shipped">Shipped</option>
+                    </select>
+                </div>
             </div>
-            <button class="btn btn-primary" id="addProductBtn">+ Add Product</button>
-        </div>
 
-        <div class="card">
-            <div class="table-container">
-                <table class="data-table">
-                    <thead>
-                    <tr>
-                        <th style="display: none;">ID</th>
-                        <th>SKU</th>
-                        <th>Image</th>
-                        <th>Title</th>
-                        <th>Category</th>
-                        <th>Brand</th>
-                        <th>Price</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody id="productsTableBody">
-                    <tr th:each="product : ${products}">
-                        <td style="display: none;" th:text="${product.id}"></td>
-                        <td th:text="${product.sku}"></td>
-                        <td>
-                            <img th:src="${product.primaryImageUrl}"
-                                 alt="Product"
-                                 style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
-                        </td>
-                        <td th:text="${product.title}"></td>
-                        <td th:text="${product.category != null ? product.category.name : 'N/A'}"></td>
-                        <td th:text="${product.brand != null ? product.brand.name : 'N/A'}"></td>
-                        <td th:text="'$' + ${product.basePrice}"></td>
-                        <td>
-                            <span class="badge"
-                                  th:classappend="${product.active ? 'success' : 'danger'}"
-                                  th:text="${product.active ? 'Active' : 'Inactive'}"></span>
-                        </td>
-                        <td>
-                            <div class="action-btns">
-                                <button type="button"
-                                        class="btn btn-sm btn-secondary"
-                                        th:onclick="'editProduct(\'' + ${product.id} + '\')'">
-                                    Edit
-                                </button>
-                                <form th:action="@{/staff/products/{id}/toggle-active(id=${product.id})}"
-                                      method="post"
-                                      style="display:inline;">
-                                    <button type="submit"
-                                            class="btn btn-sm"
-                                            th:classappend="${product.active ? 'btn-warning' : 'btn-success'}">
-                                        <span th:text="${product.active ? 'Deactivate' : 'Activate'}"></span>
-                                    </button>
-                                </form>
-                                <form th:action="@{/staff/products/{id}/delete(id=${product.id})}"
-                                      method="post"
-                                      style="display:inline;"
-                                      onsubmit="return confirm('Delete this product?')">
-                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+            <div class="card">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTable">
+                            <tr th:each="o : ${orders}">
+                                <td th:text="${o.id}"></td>
+                                <td th:text="${o.user != null ? o.user.fullName : 'N/A'}"></td>
+                                <td th:text="${#temporals.format(o.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                                <td th:text="'$' + ${o.totalAmount}"></td>
+                                <td th:text="${o.status}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </main>
 
-    <!-- Brands Section -->
-    <section id="brands" class="content-section">
-        <div class="section-header">
-            <h2>Brand Management</h2>
-            <button class="btn btn-primary" id="addBrandBtn">+ Add Brand</button>
+    <!-- Brand Modal -->
+    <div id="brandModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="brandModalTitle">Add New Brand</h2>
+                <button class="close-modal" onclick="closeBrandModal()">&times;</button>
+            </div>
+            <form th:action="@{/staff/brand/save}" method="post" id="brandForm">
+                <input type="hidden" id="brandId" name="id">
+                <div class="form-group">
+                    <label>Brand Name</label>
+                    <input type="text" id="brandName" name="name" required maxlength="150"
+                        placeholder="e.g., Nike, Adidas">
+                </div>
+                <div class="form-group">
+                    <label>Slug</label>
+                    <input type="text" id="brandSlug" name="slug" required maxlength="150"
+                        placeholder="e.g., nike, adidas">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary close-modal"
+                        onclick="closeBrandModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Brand</button>
+                </div>
+            </form>
         </div>
-
-        <div class="card">
-            <div class="table-container">
-                <table class="data-table">
-                    <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Slug</th>
-                        <th>Created At</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="brand : ${brands}">
-                        <td th:text="${brand.id}"></td>
-                        <td th:text="${brand.name}"></td>
-                        <td th:text="${brand.slug}"></td>
-                        <td th:text="${#temporals.format(brand.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
-                        <td>
-                            <div class="action-btns">
-                                <button class="btn btn-sm btn-secondary"
-                                        th:onclick="'editBrand(' + ${brand.id} + ')'">Edit</button>
-                                <form th:action="@{/staff/brand/{id}/delete(id=${brand.id})}" method="post"
-                                      style="display:inline;"
-                                      onsubmit="return confirm('Are you sure you want to delete this brand?')">
-                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </section>
-
-    <!-- Orders Section -->
-    <section id="orders" class="content-section">
-        <div class="section-header">
-            <h2>Orders Management</h2>
-            <div class="filter-group">
-                <select class="filter-select" id="orderStatus">
-                    <option value="all">All Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="paid">Paid</option>
-                    <option value="shipped">Shipped</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="table-container">
-                <table class="data-table">
-                    <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Customer</th>
-                        <th>Date</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                    </tr>
-                    </thead>
-                    <tbody id="ordersTable">
-                    <tr th:each="o : ${orders}">
-                        <td th:text="${o.id}"></td>
-                        <td th:text="${o.user != null ? o.user.fullName : 'N/A'}"></td>
-                        <td th:text="${#temporals.format(o.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
-                        <td th:text="'$' + ${o.totalAmount}"></td>
-                        <td th:text="${o.status}"></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </section>
-</main>
-
-<!-- Brand Modal -->
-<div id="brandModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 id="brandModalTitle">Add New Brand</h2>
-            <button class="close-modal" onclick="closeBrandModal()">&times;</button>
-        </div>
-        <form th:action="@{/staff/brand/save}" method="post" id="brandForm">
-            <input type="hidden" id="brandId" name="id">
-            <div class="form-group">
-                <label>Brand Name</label>
-                <input type="text" id="brandName" name="name" required maxlength="150" placeholder="e.g., Nike, Adidas">
-            </div>
-            <div class="form-group">
-                <label>Slug</label>
-                <input type="text" id="brandSlug" name="slug" required maxlength="150"
-                       placeholder="e.g., nike, adidas">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary close-modal" onclick="closeBrandModal()">Cancel</button>
-                <button type="submit" class="btn btn-primary">Save Brand</button>
-            </div>
-        </form>
     </div>
-</div>
 
-<!-- PRODUCT MODAL -->
-<div id="productModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 id="productModalTitle">Add New Product</h2>
-            <button class="close-modal" onclick="closeProductModal()">X</button>
+    <!-- PRODUCT MODAL -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="productModalTitle">Add New Product</h2>
+                <button class="close-modal" onclick="closeProductModal()">X</button>
+            </div>
+
+            <form th:action="@{/staff/products/save}" method="post" id="productForm">
+                <input type="hidden" id="productId" name="id">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>SKU *</label>
+                        <input type="text" id="productSku" name="sku" required placeholder="e.g., TS-001">
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="productActive" name="active">
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Product Title *</label>
+                    <input type="text" id="productTitle" name="title" required placeholder="e.g., Classic T-Shirt">
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="productDescription" name="description" rows="3"
+                        placeholder="Product description..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select id="productCategoryId" name="categoryId" required>
+                            <option value="">Select Category</option>
+                            <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Brand</label>
+                        <select id="productBrandId" name="brandId">
+                            <option value="">Optional</option>
+                            <option th:each="brand : ${brands}" th:value="${brand.id}" th:text="${brand.name}"></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Base Price ($) *</label>
+                    <input type="number" id="productPrice" name="basePrice" step="0.01" min="0" required
+                        placeholder="0.00">
+                </div>
+
+                <div class="form-group">
+                    <label>Image URLs (comma-separated)</label>
+                    <textarea id="productImageUrls" name="imageUrls" rows="2"
+                        placeholder="https://example.com/img1.jpg, https://example.com/img2.jpg"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Variants</label>
+                    <div id="variantsContainer"></div>
+                    <button type="button" class="btn btn-secondary" id="addVariantBtn" style="margin-top:8px;">Add
+                        Variant</button>
+                </div>
+                <input type="hidden" id="variantsJson" name="variantsJson">
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeProductModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Product</button>
+                </div>
+            </form>
         </div>
-
-        <form th:action="@{/staff/products/save}" method="post" id="productForm">
-            <input type="hidden" id="productId" name="id">
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>SKU *</label>
-                    <input type="text" id="productSku" name="sku" required placeholder="e.g., TS-001">
-                </div>
-                <div class="form-group">
-                    <label>Status</label>
-                    <select id="productActive" name="active">
-                        <option value="true">Active</option>
-                        <option value="false">Inactive</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Product Title *</label>
-                <input type="text" id="productTitle" name="title" required placeholder="e.g., Classic T-Shirt">
-            </div>
-
-            <div class="form-group">
-                <label>Description</label>
-                <textarea id="productDescription" name="description" rows="3"
-                          placeholder="Product description..."></textarea>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Category *</label>
-                    <select id="productCategoryId" name="categoryId" required>
-                        <option value="">Select Category</option>
-                        <option th:each="cat : ${categories}"
-                                th:value="${cat.id}"
-                                th:text="${cat.name}"></option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Brand</label>
-                    <select id="productBrandId" name="brandId">
-                        <option value="">Optional</option>
-                        <option th:each="brand : ${brands}"
-                                th:value="${brand.id}"
-                                th:text="${brand.name}"></option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Base Price ($) *</label>
-                <input type="number" id="productPrice" name="basePrice"
-                       step="0.01" min="0" required placeholder="0.00">
-            </div>
-
-            <div class="form-group">
-                <label>Image URLs (comma-separated)</label>
-                <textarea id="productImageUrls" name="imageUrls" rows="2"
-                          placeholder="https://example.com/img1.jpg, https://example.com/img2.jpg"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label>Variants</label>
-                <div id="variantsContainer"></div>
-                <button type="button" class="btn btn-secondary" id="addVariantBtn"
-                        style="margin-top:8px;">Add Variant</button>
-            </div>
-            <input type="hidden" id="variantsJson" name="variantsJson">
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary"
-                        onclick="closeProductModal()">Cancel</button>
-                <button type="submit" class="btn btn-primary">Save Product</button>
-            </div>
-        </form>
     </div>
-</div>
 
-<script th:src="@{/js/staff.js}"></script>
+    <script th:src="@{/js/staff.js}"></script>
 
-<script th:inline="javascript">
-    const contextPath = /*[[@{/}]]*/ '/';
+    <script th:inline="javascript">
+        const contextPath = /*[[@{/}]]*/ '/';
 
-    // Navigation
-    document.addEventListener('DOMContentLoaded', function () {
-        const navItems = document.querySelectorAll('.nav-item');
-        const sections = document.querySelectorAll('.content-section');
-        const pageTitle = document.getElementById('pageTitle');
+        // --- 1. UTILITIES ---
 
-        navItems.forEach(item => {
-            item.addEventListener('click', function (e) {
-                e.preventDefault();
-                const targetSection = this.dataset.section;
+        // Toast Notification
+        function showToast(message, type = 'success') {
+            // Xóa toast cũ nếu có để tránh chồng chéo
+            const existingToast = document.querySelector('.toast-notification');
+            if (existingToast) existingToast.remove();
 
-                navItems.forEach(nav => nav.classList.remove('active'));
-                this.classList.add('active');
+            const toast = document.createElement('div');
+            toast.className = `toast-notification ${type}`;
+            const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : '⚠';
 
-                sections.forEach(section => section.classList.remove('active'));
-                document.getElementById(targetSection).classList.add('active');
+            toast.innerHTML = `
+                <span class="toast-icon">${icon}</span>
+                <span class="toast-message">${message}</span>
+            `;
 
-                pageTitle.textContent = this.textContent.trim();
-            });
-        });
-    });
+            document.body.appendChild(toast);
 
-    // Brand
-    document.getElementById('addBrandBtn')?.addEventListener('click', function () {
-        document.getElementById('brandModalTitle').textContent = 'Add New Brand';
-        document.getElementById('brandForm').reset();
-        document.getElementById('brandId').value = '';
-        document.getElementById('brandModal').style.display = 'flex';
-    });
-
-    function closeBrandModal() {
-        document.getElementById('brandModal').style.display = 'none';
-    }
-
-    function editBrand(id) {
-        fetch(contextPath + 'staff/brand/' + id, {
-            headers: {'Accept': 'application/json'}
-        })
-            .then(r => {
-                if (!r.ok) throw new Error('Brand not found');
-                return r.json();
-            })
-            .then(brand => {
-                document.getElementById('brandModalTitle').textContent = 'Edit Brand';
-                document.getElementById('brandId').value = brand.id;
-                document.getElementById('brandName').value = brand.name;
-                document.getElementById('brandSlug').value = brand.slug;
-                document.getElementById('brandModal').style.display = 'flex';
-            })
-            .catch(err => alert(err.message));
-    }
-
-    document.getElementById('brandName')?.addEventListener('input', function (e) {
-        const slug = e.target.value
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-+|-+$/g, '');
-        document.getElementById('brandSlug').value = slug;
-    });
-
-    // Product modal + variants
-    document.getElementById('addProductBtn')?.addEventListener('click', function () {
-        document.getElementById('productModalTitle').textContent = 'Add New Product';
-        document.getElementById('productForm').reset();
-        document.getElementById('productId').value = '';
-        document.getElementById('variantsContainer').innerHTML = '';
-        document.getElementById('productModal').classList.add('active');
-    });
-
-    function closeProductModal() {
-        document.getElementById('productModal').classList.remove('active');
-    }
-
-    function addVariantRow(data = {size: '', color: '', sku: '', price: '', stock: 0}) {
-        const container = document.getElementById('variantsContainer');
-        const row = document.createElement('div');
-        row.className = 'variant-row';
-        row.innerHTML = `
-            <input type="text" class="variant-size" placeholder="Size" value="${data.size}">
-            <input type="text" class="variant-color" placeholder="Color" value="${data.color}">
-            <input type="text" class="variant-sku" placeholder="Variant SKU" value="${data.sku}">
-            <input type="number" step="0.01" class="variant-price" placeholder="Price" value="${data.price}">
-            <input type="number" class="variant-stock" placeholder="Stock" value="${data.stock}">
-            <button type="button" class="remove-variant">Remove</button>
-        `;
-        container.appendChild(row);
-        row.querySelector('.remove-variant').addEventListener('click', () => row.remove());
-    }
-
-    document.getElementById('addVariantBtn')?.addEventListener('click', () => addVariantRow());
-
-    // On submit → build variantsJson
-    document.getElementById('productForm')?.addEventListener('submit', function () {
-        const variants = [];
-        document.querySelectorAll('.variant-row').forEach(row => {
-            const size = row.querySelector('.variant-size').value.trim();
-            const color = row.querySelector('.variant-color').value.trim();
-            const sku = row.querySelector('.variant-sku').value.trim();
-            const price = row.querySelector('.variant-price').value;
-            const stock = row.querySelector('.variant-stock').value;
-            if (size || color) {
-                variants.push({
-                    sku: sku,
-                    attributeJson: JSON.stringify({size, color}),
-                    price: price || '',
-                    stock: stock || ''
-                });
-            }
-        });
-        document.getElementById('variantsJson').value = JSON.stringify(variants);
-    });
-
-    function editProduct(id) {
-        fetch(contextPath + 'staff/products/' + id, {
-            headers: {'Accept': 'application/json'}
-        })
-            .then(r => {
-                if (!r.ok) throw new Error('Product not found');
-                return r.json();
-            })
-            .then(p => {
-                document.getElementById('productModalTitle').textContent = 'Edit Product';
-                document.getElementById('productId').value = p.id;
-                document.getElementById('productSku').value = p.sku || '';
-                document.getElementById('productTitle').value = p.title || '';
-                document.getElementById('productDescription').value = p.description || '';
-                document.getElementById('productCategoryId').value = p.category?.id || '';
-                document.getElementById('productBrandId').value = p.brand?.id || '';
-                document.getElementById('productPrice').value = p.basePrice || '';
-                document.getElementById('productActive').value = p.active ? 'true' : 'false';
-
-                const imgs = p.images ? p.images.map(i => i.url).join(', ') : '';
-                document.getElementById('productImageUrls').value = imgs;
-
-                const container = document.getElementById('variantsContainer');
-                container.innerHTML = '';
-                fetch(contextPath + 'staff/products/' + id + '/variants')
-                    .then(r => r.json())
-                    .then(variants => {
-                        variants.forEach(v => {
-                            let attr = {};
-                            try {
-                                attr = JSON.parse(v.attributeJson || '{}');
-                            } catch (e) {}
-                            addVariantRow({
-                                size: attr.size || '',
-                                color: attr.color || '',
-                                sku: v.sku || '',
-                                price: v.price || '',
-                                stock: v.stock || 0
-                            });
-                        });
-                    });
-
-                document.getElementById('productModal').classList.add('active');
-            })
-            .catch(err => alert(err.message));
-    }
-
-    // filter by category
-    document.getElementById('productCategoryFilter')?.addEventListener('change', function (e) {
-        const cat = e.target.value;
-
-        if (cat === 'all') {
-            location.href = contextPath + 'staff#products';
-            return;
+            // Animation CSS handling (Assuming CSS exists)
+            setTimeout(() => {
+                toast.classList.add('hiding');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
         }
 
-        fetch(contextPath + 'staff/products/filter?category=' + cat, {
-            headers: {'Accept': 'application/json'}
-        })
-            .then(r => r.json())
-            .then(list => {
-                const tbody = document.getElementById('productsTableBody');
-                tbody.innerHTML = list.map(p => `
-                    <tr>
-                        <td style="display:none;">${p.id}</td>
-                        <td>${p.sku || 'N/A'}</td>
-                        <td>
-                            <img src="${p.primaryImageUrl || '/images/default.jpg'}"
-                                 style="width:50px;height:50px;object-fit:cover;border-radius:4px;">
-                        </td>
-                        <td>${p.title}</td>
-                        <td>${p.category ? p.category.name : 'N/A'}</td>
-                        <td>${p.brand ? p.brand.name : 'N/A'}</td>
-                        <td>$${p.basePrice}</td>
-                        <td>
-                            <span class="badge ${p.active ? 'success' : 'danger'}">
-                                ${p.active ? 'Active' : 'Inactive'}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="action-btns">
-                                <button type="button" class="btn btn-sm btn-secondary"
-                                        onclick="editProduct('${p.id}')">Edit</button>
-                                <form action="${contextPath}staff/products/${p.id}/toggle-active"
-                                      method="post" style="display:inline;">
-                                    <button type="submit"
-                                            class="btn btn-sm ${p.active ? 'btn-warning' : 'btn-success'}">
-                                        ${p.active ? 'Deactivate' : 'Activate'}
-                                    </button>
-                                </form>
-                                <form action="${contextPath}staff/products/${p.id}/delete"
-                                      method="post" style="display:inline;"
-                                      onsubmit="return confirm('Delete this product?')">
-                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                `).join('');
-            })
-            .catch(err => console.error(err));
-    });
+        // Helper: Toggle Modal visibility
+        function toggleModal(modalId, show) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = show ? 'flex' : 'none';
+                if (show) modal.classList.add('active'); // For product modal style compatibility
+                else modal.classList.remove('active');
+            }
+        }
 
-    window.editBrand = editBrand;
-    window.editProduct = editProduct;
-    window.closeProductModal = closeProductModal;
-    window.closeBrandModal = closeBrandModal;
-</script>
+        // --- 2. NAVIGATION & PERSISTENCE ---
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const navItems = document.querySelectorAll('.nav-item');
+            const sections = document.querySelectorAll('.content-section');
+            const pageTitle = document.getElementById('pageTitle');
+
+            // Lấy tab đã lưu từ localStorage, mặc định là dashboard
+            const activeSectionId = localStorage.getItem('staffActiveTab') || 'dashboard';
+
+            // Hàm kích hoạt tab
+            function activateTab(sectionId) {
+                // Update Nav state
+                navItems.forEach(nav => {
+                    if (nav.dataset.section === sectionId) nav.classList.add('active');
+                    else nav.classList.remove('active');
+                });
+
+                // Update Section visibility
+                sections.forEach(section => {
+                    if (section.id === sectionId) section.classList.add('active');
+                    else section.classList.remove('active');
+                });
+
+                // Update Title
+                const activeNav = document.querySelector(`.nav-item[data-section="${sectionId}"]`);
+                if (activeNav) pageTitle.textContent = activeNav.textContent.trim();
+
+                // Save to storage
+                localStorage.setItem('staffActiveTab', sectionId);
+            }
+
+            // Khởi chạy tab ban đầu
+            activateTab(activeSectionId);
+
+            // Sự kiện click menu
+            navItems.forEach(item => {
+                item.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    activateTab(this.dataset.section);
+                });
+            });
+        });
+
+        // --- 3. BRAND MANAGEMENT (Đã sửa lỗi Reload) ---
+
+        // Open Add Brand Modal
+        document.getElementById('addBrandBtn')?.addEventListener('click', function () {
+            document.getElementById('brandModalTitle').textContent = 'Add New Brand';
+            document.getElementById('brandForm').reset();
+            document.getElementById('brandId').value = ''; // ID rỗng = Add new
+            toggleModal('brandModal', true);
+        });
+
+        // Auto Generate Slug
+        document.getElementById('brandName')?.addEventListener('input', function (e) {
+            const slug = e.target.value.toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+            document.getElementById('brandSlug').value = slug;
+        });
+
+        // Close Brand Modal
+        window.closeBrandModal = function () { toggleModal('brandModal', false); };
+
+        // Edit Brand: Fetch Data
+        window.editBrand = function (id) {
+            const btn = document.querySelector(`.edit-brand-btn[data-id="${id}"]`);
+            if (btn) btn.textContent = '...'; // Loading indicator
+
+            fetch(contextPath + 'staff/brand/' + id, { headers: { 'Accept': 'application/json' } })
+                .then(r => {
+                    if (!r.ok) throw new Error('Brand not found');
+                    return r.json();
+                })
+                .then(brand => {
+                    document.getElementById('brandModalTitle').textContent = 'Edit Brand';
+                    document.getElementById('brandId').value = brand.id;
+                    document.getElementById('brandName').value = brand.name;
+                    document.getElementById('brandSlug').value = brand.slug;
+                    toggleModal('brandModal', true);
+                })
+                .catch(err => showToast(err.message, 'error'))
+                .finally(() => { if (btn) btn.textContent = 'Edit'; });
+        }
+
+        // *** BRAND SUBMIT HANDLER (CORE FIX) ***
+        document.getElementById('brandForm')?.addEventListener('submit', function (e) {
+            e.preventDefault(); // Chặn reload form mặc định
+
+            const form = this;
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+
+            // UI Loading state
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
+
+            const isEdit = formData.get('id') && formData.get('id') !== '';
+
+            fetch(contextPath + 'staff/brand/save', {
+                method: 'POST',
+                body: new URLSearchParams(formData)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        toggleModal('brandModal', false);
+
+                        if (isEdit) {
+                            // LOGIC CẬP NHẬT GIAO DIỆN KHÔNG RELOAD
+                            const id = formData.get('id');
+                            const name = formData.get('name');
+                            const slug = formData.get('slug');
+
+                            // Tìm dòng trong bảng dựa vào ID (đã thêm ở Bước 1)
+                            const row = document.getElementById('brand-row-' + id);
+                            if (row) {
+                                row.querySelector('.brand-name').textContent = name;
+                                row.querySelector('.brand-slug').textContent = slug;
+
+                                // Hiệu ứng nháy màu xanh để báo hiệu đã sửa
+                                row.style.backgroundColor = '#d4edda';
+                                row.style.transition = 'background-color 0.5s';
+                                setTimeout(() => row.style.backgroundColor = '', 1000);
+                            }
+                            showToast('Brand updated successfully!', 'success');
+                        } else {
+                            // Nếu là Thêm mới (Add), ta vẫn nên reload để lấy ID mới từ server 
+                            // (hoặc append row nếu backend trả về JSON object đầy đủ)
+                            showToast('New brand added! Reloading...', 'success');
+                            setTimeout(() => window.location.reload(), 1000);
+                        }
+                    } else {
+                        throw new Error('Failed to save brand');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Save failed. Please try again.', 'error');
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                });
+        });
+
+        // --- 4. PRODUCT MANAGEMENT ---
+
+        // Toggle Active
+        window.toggleProductActive = function (btn) {
+            const productId = btn.dataset.id;
+            const isActive = btn.dataset.active === 'true';
+            btn.disabled = true;
+
+            fetch(contextPath + 'staff/products/' + productId + '/toggle-active', { method: 'POST' })
+                .then(res => {
+                    if (!res.ok) throw new Error('Failed');
+
+                    const newActive = !isActive;
+                    btn.dataset.active = newActive;
+
+                    // Update Button Style
+                    btn.classList.toggle('btn-warning', newActive);
+                    btn.classList.toggle('btn-success', !newActive);
+                    btn.querySelector('span').textContent = newActive ? 'Deactivate' : 'Activate';
+
+                    // Update Badge
+                    const row = btn.closest('tr');
+                    const badge = row.querySelector('.badge');
+                    badge.className = `badge ${newActive ? 'success' : 'danger'}`;
+                    badge.textContent = newActive ? 'Active' : 'Inactive';
+
+                    showToast(`Product ${newActive ? 'activated' : 'deactivated'}!`, 'success');
+                })
+                .catch(() => showToast('Error updating status', 'error'))
+                .finally(() => btn.disabled = false);
+        };
+
+        // Delete Product
+        window.deleteProduct = function (btn) {
+            const id = btn.dataset.id;
+            const title = btn.dataset.title;
+
+            if (!confirm(`Delete product "${title}"?`)) return;
+
+            btn.disabled = true;
+            btn.textContent = '...';
+
+            fetch(contextPath + 'staff/products/' + id + '/delete', { method: 'POST' })
+                .then(res => {
+                    if (!res.ok) throw new Error('Failed');
+
+                    const row = btn.closest('tr');
+                    row.style.opacity = '0';
+                    setTimeout(() => row.remove(), 300);
+
+                    // Update counter
+                    const counter = document.querySelector('.stat-card .stat-value');
+                    if (counter) counter.textContent = parseInt(counter.textContent) - 1;
+
+                    showToast('Product deleted!', 'success');
+                })
+                .catch(() => {
+                    showToast('Delete failed', 'error');
+                    btn.disabled = false;
+                    btn.textContent = 'Delete';
+                });
+        };
+
+        // Product Modal & Variants
+        window.closeProductModal = function () { toggleModal('productModal', false); };
+
+        document.getElementById('addProductBtn')?.addEventListener('click', function () {
+            document.getElementById('productModalTitle').textContent = 'Add New Product';
+            document.getElementById('productForm').reset();
+            document.getElementById('productId').value = '';
+            document.getElementById('variantsContainer').innerHTML = '';
+            toggleModal('productModal', true);
+        });
+
+        function addVariantRow(data = { size: '', color: '', sku: '', price: '', stock: 0 }) {
+            const container = document.getElementById('variantsContainer');
+            const row = document.createElement('div');
+            row.className = 'variant-row';
+            row.innerHTML = `
+                <input type="text" class="variant-size" placeholder="Size" value="${data.size}">
+                <input type="text" class="variant-color" placeholder="Color" value="${data.color}">
+                <input type="text" class="variant-sku" placeholder="Variant SKU" value="${data.sku}">
+                <input type="number" step="0.01" class="variant-price" placeholder="Price" value="${data.price}">
+                <input type="number" class="variant-stock" placeholder="Stock" value="${data.stock}">
+                <button type="button" class="remove-variant">Remove</button>
+            `;
+            container.appendChild(row);
+            row.querySelector('.remove-variant').addEventListener('click', () => row.remove());
+        }
+
+        document.getElementById('addVariantBtn')?.addEventListener('click', () => addVariantRow());
+
+        // Product Submit: Gather JSON
+        // Product Submit: Gather JSON + AJAX giống Brands
+        document.getElementById('productForm')?.addEventListener('submit', function (e) {
+            e.preventDefault(); // không cho form redirect mặc định
+
+            const form = this;
+
+            // 1. Build variantsJson
+            const variants = Array.from(document.querySelectorAll('.variant-row')).map(row => {
+                const size = row.querySelector('.variant-size').value.trim();
+                const color = row.querySelector('.variant-color').value.trim();
+                if (!size && !color) return null;
+
+                return {
+                    sku: row.querySelector('.variant-sku').value.trim(),
+                    attributeJson: JSON.stringify({ size, color }),
+                    price: row.querySelector('.variant-price').value || '',
+                    stock: row.querySelector('.variant-stock').value || ''
+                };
+            }).filter(v => v !== null);
+
+            document.getElementById('variantsJson').value = JSON.stringify(variants);
+
+            // 2. Gửi form bằng fetch
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            const isEdit = formData.get('id') && formData.get('id') !== '';
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
+
+            fetch(contextPath + 'staff/products/save', {
+                method: 'POST',
+                body: new URLSearchParams(formData)
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error('Failed to save product');
+
+                    // Đóng modal
+                    toggleModal('productModal', false);
+
+                    // Lưu tab hiện tại là Products để sau reload vẫn ở đó
+                    localStorage.setItem('staffActiveTab', 'products');
+
+                    // Thông báo
+                    showToast(isEdit ? 'Product updated successfully!' : 'New product created!', 'success');
+
+                    // Reload lại trang để load lại list product
+                    setTimeout(() => window.location.reload(), 800);
+                })
+                .catch(err => {
+                    console.error(err);
+                    showToast('Save product failed. Please try again.', 'error');
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                });
+        });
+
+
+        // Edit Product Fetch
+        window.editProduct = function (id) {
+            fetch(contextPath + 'staff/products/' + id, { headers: { 'Accept': 'application/json' } })
+                .then(r => r.ok ? r.json() : Promise.reject('Error'))
+                .then(p => {
+                    document.getElementById('productModalTitle').textContent = 'Edit Product';
+                    document.getElementById('productId').value = p.id;
+                    document.getElementById('productSku').value = p.sku || '';
+                    document.getElementById('productTitle').value = p.title || '';
+                    document.getElementById('productDescription').value = p.description || '';
+                    document.getElementById('productCategoryId').value = p.category?.id || '';
+                    document.getElementById('productBrandId').value = p.brand?.id || '';
+                    document.getElementById('productPrice').value = p.basePrice || '';
+                    document.getElementById('productActive').value = p.active ? 'true' : 'false';
+                    document.getElementById('productImageUrls').value = p.images ? p.images.map(i => i.url).join(', ') : '';
+
+                    // Variants
+                    const container = document.getElementById('variantsContainer');
+                    container.innerHTML = 'Loading variants...';
+
+                    fetch(contextPath + 'staff/products/' + id + '/variants')
+                        .then(r => r.json())
+                        .then(variants => {
+                            container.innerHTML = '';
+                            variants.forEach(v => {
+                                let attr = {};
+                                try { attr = JSON.parse(v.attributeJson || '{}'); } catch (e) { }
+                                addVariantRow({
+                                    size: attr.size || '', color: attr.color || '',
+                                    sku: v.sku || '', price: v.price || '', stock: v.stock || 0
+                                });
+                            });
+                        });
+
+                    toggleModal('productModal', true);
+                })
+                .catch(err => showToast('Failed to load product', 'error'));
+        }
+
+        // --- 5. GLOBAL EVENT DELEGATION (Cleaner way) ---
+        document.addEventListener('click', function (e) {
+            // Brand Edit
+            if (e.target.closest('.edit-brand-btn')) {
+                window.editBrand(e.target.closest('.edit-brand-btn').dataset.id);
+            }
+            // Brand Delete
+            if (e.target.closest('.delete-brand-btn')) {
+                const btn = e.target.closest('.delete-brand-btn');
+                const id = btn.dataset.id;
+                const name = btn.dataset.name;
+                if (confirm(`Delete brand "${name}"?`)) {
+                    // Logic delete tương tự product, có thể tách hàm riêng nếu muốn
+                    btn.disabled = true;
+                    fetch(contextPath + 'staff/brand/' + id + '/delete', { method: 'POST' })
+                        .then(r => {
+                            if (r.ok) {
+                                const row = document.getElementById('brand-row-' + id); // Sử dụng ID đã thêm ở bước 1
+                                if (row) row.remove();
+                                showToast('Brand deleted', 'success');
+                            } else throw new Error();
+                        })
+                        .catch(() => { showToast('Error deleting brand', 'error'); btn.disabled = false; });
+                }
+            }
+            // Product Actions
+            if (e.target.closest('.toggle-active-btn')) {
+                e.preventDefault();
+                window.toggleProductActive(e.target.closest('.toggle-active-btn'));
+            }
+            if (e.target.closest('.delete-product-btn')) {
+                e.preventDefault();
+                window.deleteProduct(e.target.closest('.delete-product-btn'));
+            }
+        });
+
+        // Dropdown Profile
+        document.querySelector('.dropdown-toggle')?.addEventListener('click', function (e) {
+            e.stopPropagation();
+            this.nextElementSibling.classList.toggle('show');
+        });
+        document.addEventListener('click', function () {
+            document.querySelector('.dropdown-menu')?.classList.remove('show');
+        });
+
+    </script>
 </body>
+
 </html>
