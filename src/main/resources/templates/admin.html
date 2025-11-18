@@ -1,258 +1,14 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fashion Shop Management</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+    <link rel="stylesheet" th:href="@{/css/admin.css}" />
 </head>
-<style>
-    /* Badge Styles */
-    .badge {
-        display: inline-block;
-        padding: 4px 12px;
-        border-radius: 6px;
-        font-size: 12px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
 
-    .badge.success {
-        background-color: #d1fae5;
-        color: #065f46;
-        border: 1px solid #6ee7b7;
-    }
-
-    .badge.danger {
-        background-color: #fee2e2;
-        color: #991b1b;
-        border: 1px solid #fca5a5;
-    }
-
-    .badge.warning {
-        background-color: #fef3c7;
-        color: #92400e;
-        border: 1px solid #fcd34d;
-    }
-
-    .badge.info {
-        background-color: #dbeafe;
-        color: #1e40af;
-        border: 1px solid #93c5fd;
-    }
-
-    .changes-preview {
-        display: inline-block;
-        max-width: 200px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        cursor: help;
-        color: #6b7280;
-        font-size: 13px;
-    }
-
-    .changes-preview:hover {
-        color: #111827;
-    }
-
-    .filter-group {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-    }
-
-    .filter-select {
-        padding: 8px 12px;
-        border: 2px solid #e5e7eb;
-        border-radius: 8px;
-        font-size: 14px;
-        background-color: white;
-        cursor: pointer;
-        transition: border-color 0.3s;
-    }
-
-    .filter-select:hover {
-        border-color: #9ca3af;
-    }
-
-    .filter-select:focus {
-        outline: none;
-        border-color: #dc2626;
-    }
-
-    .action-btns {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-
-    .action-btns form {
-        margin: 0;
-        display: inline-block;
-    }
-
-    .btn-sm {
-        padding: 6px 12px;
-        font-size: 13px;
-        border-radius: 6px;
-        border: none;
-        cursor: pointer;
-        font-weight: 500;
-        transition: all 0.3s;
-    }
-
-    .btn-secondary {
-        background-color: #6b7280;
-        color: white;
-    }
-
-    .btn-secondary:hover {
-        background-color: #4b5563;
-    }
-
-    .btn-danger {
-        background-color: #dc2626;
-        color: white;
-    }
-
-    .btn-danger:hover {
-        background-color: #991b1b;
-    }
-
-    .btn-primary {
-        background-color: #dc2626;
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background-color: #991b1b;
-    }
-
-    .btn-success {
-        background-color: #059669;
-        color: white;
-    }
-
-    .btn-success:hover {
-        background-color: #047857;
-    }
-
-    .role-select {
-        padding: 4px 8px;
-        border: 1px solid #e5e7eb;
-        border-radius: 4px;
-        font-size: 13px;
-        background-color: white;
-        cursor: pointer;
-    }
-
-    /* ------------------- MODAL LAYOUT ------------------- */
-    .modal-content {
-        max-width: 1100px;
-        width: 92%;
-        max-height: 68vh;
-        overflow-y: auto;
-        padding: 28px;
-        border-radius: 12px;
-        background: #fff;
-    }
-
-    .form-group input, .form-group select, .form-group textarea {
-        width: 100%;
-        padding: 13px 16px;
-        font-size: 15px;
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        box-sizing: border-box;
-    }
-
-    .form-row {
-        display: flex;
-        gap: 20px;
-        margin-bottom: 16px;
-    }
-
-    .form-row .form-group {
-        flex: 1;
-    }
-
-    /* User Detail Modal */
-    .user-detail-modal {
-        display: none;
-        position: fixed;
-        z-index: 2000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        justify-content: center;
-        align-items: center;
-    }
-
-    .user-detail-content {
-        background-color: white;
-        padding: 30px;
-        border-radius: 12px;
-        max-width: 600px;
-        width: 90%;
-        max-height: 80vh;
-        overflow-y: auto;
-    }
-
-    .user-detail-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 2px solid #e5e7eb;
-    }
-
-    .user-detail-body {
-        display: grid;
-        gap: 15px;
-    }
-
-    .detail-row {
-        display: grid;
-        grid-template-columns: 150px 1fr;
-        gap: 15px;
-        padding: 10px 0;
-        border-bottom: 1px solid #f3f4f6;
-    }
-
-    .detail-label {
-        font-weight: 600;
-        color: #4b5563;
-    }
-
-    .detail-value {
-        color: #111827;
-    }
-
-    .close-btn {
-        background: none;
-        border: none;
-        font-size: 24px;
-        cursor: pointer;
-        color: #6b7280;
-        padding: 0;
-        width: 30px;
-        height: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .close-btn:hover {
-        color: #dc2626;
-    }
-</style>
 <body>
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
@@ -283,7 +39,9 @@
                 <button class="menu-toggle" id="menuToggle">☰</button>
                 <div class="header-title-section">
                     <h1 id="pageTitle">Dashboard</h1>
-                    <p class="header-subtitle" id="headerSubtitle">Welcome back, Admin</p>
+                    <p class="header-subtitle" id="headerSubtitle">
+                        Welcome back, Admin
+                    </p>
                 </div>
             </div>
             <div class="header-right">
@@ -299,7 +57,7 @@
                     </div>
                 </div>
                 <div class="search-bar">
-                    <input type="text" placeholder="Search users, logs..." id="searchInput">
+                    <input type="text" placeholder="Search users, logs..." id="searchInput" />
                     <i class="search-icon">🔍</i>
                 </div>
                 <div class="notifications">
@@ -317,14 +75,10 @@
                     <div class="profile-dropdown">
                         <button class="dropdown-toggle">⋮</button>
                         <div class="dropdown-menu">
-                            <a href="#" class="dropdown-item">
-                                <i>👤</i> Profile
-                            </a>
-                            <a href="#" class="dropdown-item">
-                                <i>⚙️</i> Settings
-                            </a>
+                            <a href="#" class="dropdown-item"> <i>👤</i> Profile </a>
+                            <a href="#" class="dropdown-item"> <i>⚙️</i> Settings </a>
                             <div class="dropdown-divider"></div>
-                            <form th:action="@{/logout}" method="post" style="margin:0;">
+                            <form th:action="@{/logout}" method="post" style="margin: 0">
                                 <button type="submit" class="dropdown-item logout-item">
                                     <i class="bi bi-box-arrow-right"></i> Logout
                                 </button>
@@ -452,40 +206,56 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="user : ${users}" th:data-role="${user.role.code}" th:data-active="${user.active}">
+                            <tr th:each="user : ${users}" th:data-role="${user.role.code}"
+                                th:data-active="${user.active}">
                                 <td th:text="${user.id}"></td>
                                 <td th:text="${user.fullName}"></td>
                                 <td th:text="${user.email}"></td>
                                 <td>
-                                    <!-- Only show dropdown for non-admin users -->
                                     <div th:if="${user.role.code != 'ROLE_ADMIN'}">
-                                        <form th:action="@{/admin/users/{id}/edit-role(id=${user.id})}" method="post" style="display:inline;">
-                                            <select name="roleCode" class="role-select" th:disabled="${user.id == currentUserId}" onchange="this.form.submit()">
-                                                <option th:each="role : ${roles}" th:value="${role.code}" th:text="${role.name}" th:selected="${user.role.code == role.code}">
-                                                </option>
-                                            </select>
-                                        </form>
+                                        <select class="role-select form-control input-sm"
+                                            th:disabled="${user.id == currentUserId}"
+                                            th:data-original-value="${user.role.code}"
+                                            onfocus="this.setAttribute('data-original-value', this.value)"
+                                            th:onchange="'updateUserRole(' + ${user.id} + ', this)'">
+                                            <option th:each="role : ${roles}" th:value="${role.code}"
+                                                th:text="${role.name}" th:selected="${user.role.code == role.code}">
+                                            </option>
+                                        </select>
                                     </div>
-                                    <!-- Always show badge for admin users -->
-                                    <span th:if="${user.role.code == 'ROLE_ADMIN'}" class="badge admin" th:text="${user.role.name}"></span>
+
+                                    <span th:if="${user.role.code == 'ROLE_ADMIN'}" class="badge admin"
+                                        th:text="${user.role.name}"></span>
                                 </td>
                                 <td>
-                                    <span class="badge" th:classappend="${user.active ? 'success' : 'danger'}" th:text="${user.active ? 'Active' : 'Inactive'}"></span>
+                                    <span class="badge" th:classappend="${user.active ? 'success' : 'danger'}"
+                                        th:text="${user.active ? 'Active' : 'Inactive'}"></span>
                                 </td>
                                 <td>
                                     <div class="action-btns">
-                                        <button class="btn btn-sm btn-secondary" th:onclick="'viewUser(' + ${user.id} + ')'">View</button>
-                                        <button class="btn btn-sm btn-secondary" th:onclick="'editUser(' + ${user.id} + ')'" th:if="${user.id != currentUserId and user.role.code != 'ROLE_ADMIN'}">
+                                        <button class="btn btn-sm btn-secondary"
+                                            th:onclick="'viewUser(' + ${user.id} + ')'">
+                                            View
+                                        </button>
+
+                                        <button class="btn btn-sm btn-secondary"
+                                            th:onclick="'editUser(' + ${user.id} + ')'"
+                                            th:if="${user.id != currentUserId and user.role.code != 'ROLE_ADMIN'}">
                                             Edit
                                         </button>
-                                        <form th:action="@{/admin/users/{id}/toggle-active(id=${user.id})}" method="post" style="display:inline;" th:if="${user.role.code != 'ROLE_ADMIN'}">
-                                            <button type="submit" class="btn btn-sm" th:classappend="${user.active ? 'btn-danger' : 'btn-success'}" th:disabled="${user.id == currentUserId}">
-                                                <span th:text="${user.active ? 'Deactivate' : 'Activate'}"></span>
-                                            </button>
-                                        </form>
-                                        <form th:if="${!user.active and user.role.code != 'ROLE_ADMIN'}" th:action="@{/admin/users/{id}/delete(id=${user.id})}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to permanently delete this user? This action cannot be undone.');">
-                                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                        </form>
+
+                                        <button th:if="${user.role.code != 'ROLE_ADMIN'}" class="btn btn-sm"
+                                            th:classappend="${user.active ? 'btn-danger' : 'btn-success'}"
+                                            th:onclick="'toggleUserStatus(' + ${user.id} + ', this)'"
+                                            th:disabled="${user.id == currentUserId}">
+                                            <span th:text="${user.active ? 'Deactivate' : 'Activate'}"></span>
+                                        </button>
+
+                                        <button th:if="${!user.active and user.role.code != 'ROLE_ADMIN'}"
+                                            class="btn btn-sm btn-danger btn-delete"
+                                            th:onclick="'deleteUser(' + ${user.id} + ', this)'">
+                                            Delete
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -505,7 +275,9 @@
                     <h3>Sales Overview</h3>
                     <div class="chart-placeholder">
                         <p>📈 Sales chart visualization</p>
-                        <p class="chart-note">Connect to your Spring Boot backend to display real-time data</p>
+                        <p class="chart-note">
+                            Connect to your Spring Boot backend to display real-time data
+                        </p>
                     </div>
                 </div>
                 <div class="card">
@@ -563,7 +335,7 @@
                         <option value="Order">Order</option>
                         <option value="User">User</option>
                     </select>
-                    <input type="date" class="filter-select" id="auditDate">
+                    <input type="date" class="filter-select" id="auditDate" />
                 </div>
             </div>
             <div class="card">
@@ -586,11 +358,14 @@
                                 <td th:text="${log.actor != null ? log.actor.fullName : 'System'}"></td>
                                 <td th:text="${log.actorRole}"></td>
                                 <td>
-                                    <span class="badge" th:classappend="${log.action == 'CREATE' ? 'success' : (log.action == 'DELETE' ? 'danger' : (log.action == 'UPDATE' ? 'warning' : 'info'))}" th:text="${log.action}"></span>
+                                    <span class="badge"
+                                        th:classappend="${log.action == 'CREATE' ? 'success' : (log.action == 'DELETE' ? 'danger' : (log.action == 'UPDATE' ? 'warning' : 'info'))}"
+                                        th:text="${log.action}"></span>
                                 </td>
                                 <td th:text="${log.entity}"></td>
                                 <td>
-                                    <span class="changes-preview" th:title="${log.changes}" th:text="${#strings.abbreviate(log.changes, 50)}"></span>
+                                    <span class="changes-preview" th:title="${log.changes}"
+                                        th:text="${#strings.abbreviate(log.changes, 50)}"></span>
                                 </td>
                                 <td th:text="${#temporals.format(log.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
                             </tr>
@@ -606,7 +381,9 @@
         <div class="user-detail-content">
             <div class="user-detail-header">
                 <h2>User Details</h2>
-                <button class="close-btn" onclick="closeUserDetailModal()">&times;</button>
+                <button class="close-btn" onclick="closeUserDetailModal()">
+                    &times;
+                </button>
             </div>
             <div class="user-detail-body">
                 <div class="detail-row">
@@ -658,46 +435,60 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="userModalTitle">Add New User</h2>
-                <button class="close-modal" onclick="closeUserModal()">&times;</button>
+                <button class="close-modal" onclick="closeUserModal()">
+                    &times;
+                </button>
             </div>
-            <form th:action="@{/admin/users/save}" method="post" id="userForm" onsubmit="return validateUserForm()">
-                <input type="hidden" id="userId" name="id">
+            <form id="userForm" onsubmit="handleSaveUser(event)">
+                <input type="hidden" id="userId" name="id" />
+
                 <div class="form-group">
                     <label>Full Name</label>
-                    <input type="text" id="fullName" name="fullName" required maxlength="255" placeholder="e.g., John Doe">
+                    <input type="text" id="fullName" name="fullName" required maxlength="255" class="form-control"
+                        placeholder="e.g., John Doe" />
                 </div>
+
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="email" id="email" name="email" required maxlength="255" placeholder="e.g., john@example.com">
-                    <small id="emailError" style="color: #dc2626; font-size: 12px;"></small>
+                    <input type="email" id="email" name="email" required maxlength="255" class="form-control"
+                        placeholder="e.g., john@example.com" />
+                    <small id="emailError" style="color: #dc2626; font-size: 12px"></small>
                 </div>
+
                 <div class="form-group" id="passwordGroup">
-                    <label>Password <span id="passwordHint" style="color: #6b7280; font-size: 12px;"> (required for new users) </span> </label>
-                    <input type="password" id="password" name="password" placeholder="Leave blank to keep current">
+                    <label>Password
+                        <span id="passwordHint" style="color: #6b7280; font-size: 12px">
+                            (required for new users)
+                        </span>
+                    </label>
+                    <input type="password" id="password" name="password" class="form-control"
+                        placeholder="Leave blank to keep current" />
                     <div class="password-hint">
                         <strong>Password requirements:</strong>
                         <ul>
                             <li>At least 8 characters</li>
-                            <li>At least 1 uppercase letter</li>
-                            <li>At least 1 number</li>
-                            <li>At least 1 special character (@, #, $, %, ^, &, +, =, !)</li>
+                            <li>At least 1 uppercase letter, 1 number, 1 special char</li>
                         </ul>
                     </div>
                 </div>
-                <div class="form-group" id="resetPasswordGroup" style="display:none;">
+
+                <div class="form-group" id="resetPasswordGroup" style="display: none">
                     <label>Reset Password</label>
-                    <input type="checkbox" name="resetPassword" id="resetPassword">
+                    <input type="checkbox" name="resetPassword" id="resetPassword" />
                     <small>Check to reset password to 12345678</small>
                 </div>
+
                 <div class="form-group">
                     <label>Role</label>
-                    <select id="roleCode" name="roleCode" required>
-                        <option th:each="role : ${roles}" th:value="${role.code}" th:text="${role.name}">
-                        </option>
+                    <select id="roleCode" name="roleCode" required class="form-control">
+                        <option th:each="role : ${roles}" th:value="${role.code}" th:text="${role.name}"></option>
                     </select>
                 </div>
+
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary close-modal" onclick="closeUserModal()">Cancel </button>
+                    <button type="button" class="btn btn-secondary close-modal" onclick="closeUserModal()">
+                        Cancel
+                    </button>
                     <button type="submit" class="btn btn-primary">Save User</button>
                 </div>
             </form>
@@ -706,221 +497,453 @@
 
     <script th:inline="javascript">
         /*<![CDATA[*/
-        const contextPath = /*[[@{/}]]*/ '/';
+        const contextPath = /*[[@{/}]]*/ "/";
+        const csrfToken = document
+            .querySelector("meta[name='_csrf']")
+            ?.getAttribute("content");
+        const csrfHeader = document
+            .querySelector("meta[name='_csrf_header']")
+            ?.getAttribute("content");
         /*]]>*/
 
-        // ============= Navigation =============
-        document.addEventListener('DOMContentLoaded', function () {
-            const navItems = document.querySelectorAll('.nav-item');
-            const sections = document.querySelectorAll('.content-section');
-            const pageTitle = document.getElementById('pageTitle');
-            navItems.forEach(item => {
-                item.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const targetSection = this.dataset.section;
-                    navItems.forEach(nav => nav.classList.remove('active'));
-                    this.classList.add('active');
-                    sections.forEach(section => section.classList.remove('active'));
-                    document.getElementById(targetSection).classList.add('active');
-                    pageTitle.textContent = this.textContent.trim();
-                });
-            });
-
-            // cập nhật số liệu user lên dashboard
-            updateUserStats();
-
-            // Email validation on blur
-            const emailInput = document.getElementById('email');
-            if (emailInput) {
-                emailInput.addEventListener('blur', checkEmailAvailability);
+        // --- 1. Helper: Fetch có bảo mật CSRF ---
+        async function secureFetch(url, options = {}) {
+            if (!options.headers) options.headers = {};
+            if (csrfToken && options.method && options.method !== "GET") {
+                options.headers[csrfHeader] = csrfToken;
             }
-        });
-
-        function updateUserStats() {
-            const rows = document.querySelectorAll('#users tbody tr');
-            let total = 0, active = 0, inactive = 0, admin = 0, staff = 0;
-            rows.forEach(row => {
-                total++;
-                const isActive = row.dataset.active === 'true';
-                if (isActive) active++; else inactive++;
-                const role = (row.dataset.role || '').toUpperCase();
-                if (role === 'ROLE_ADMIN') admin++;
-                if (role === 'ROLE_STAFF') staff++;
-            });
-            const totalUsersStat = document.getElementById('totalUsersStat');
-            const activeUsersStat = document.getElementById('activeUsersStat');
-            const inactiveUsersStat = document.getElementById('inactiveUsersStat');
-            const adminStaffStat = document.getElementById('adminStaffStat');
-            const headerActiveUsers = document.getElementById('headerActiveUsers');
-            const headerTotalUsers = document.getElementById('headerTotalUsers');
-            if (totalUsersStat) totalUsersStat.textContent = total;
-            if (activeUsersStat) activeUsersStat.textContent = active;
-            if (inactiveUsersStat) inactiveUsersStat.textContent = inactive;
-            if (adminStaffStat) adminStaffStat.textContent = `${admin} admin / ${staff} staff`;
-            if (headerActiveUsers) headerActiveUsers.textContent = active;
-            if (headerTotalUsers) headerTotalUsers.textContent = total;
+            if (
+                !options.headers["Content-Type"] &&
+                !(options.body instanceof FormData)
+            ) {
+                options.headers["Content-Type"] = "application/json";
+            }
+            return fetch(url, options);
         }
 
-        // User Management Functions
-        document.getElementById('addUserBtn')?.addEventListener('click', function () {
-            document.getElementById('userModalTitle').textContent = 'Add New User';
-            document.getElementById('userForm').reset();
-            document.getElementById('userId').value = '';
-            document.getElementById('passwordGroup').style.display = 'block';
-            document.getElementById('resetPasswordGroup').style.display = 'none';
-            document.getElementById('passwordHint').textContent = '(required for new users)';
-            document.getElementById('password').required = true;
-            document.getElementById('emailError').textContent = '';
-            const submitButton = document.querySelector('#userModal button[type="submit"]');
-            submitButton.disabled = false;
-            document.getElementById('userModal').style.display = 'flex';
-            // Trigger check after open
-            checkEmailAvailability();
+        // --- 2. Notification (Thông báo đẹp) ---
+        function showNotification(message, type = "success") {
+            const notif = document.createElement("div");
+            notif.style.cssText = `
+                position: fixed; top: 20px; right: 20px;
+                background: ${type === "success" ? "#10B981" : "#EF4444"};
+                color: white; padding: 12px 24px; border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 9999;
+                display: flex; align-items: center; gap: 10px;
+                animation: slideIn 0.3s ease; font-family: system-ui;
+            `;
+            notif.innerHTML = `<span>${message}</span>`;
+            document.body.appendChild(notif);
+            setTimeout(() => {
+                notif.style.opacity = "0";
+                notif.style.transition = "0.3s";
+                setTimeout(() => notif.remove(), 300);
+            }, 3000);
+        }
+        // Thêm animation cho notification
+        const style = document.createElement("style");
+        style.innerHTML = `@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }`;
+        document.head.appendChild(style);
+
+        // --- 3. Handle Actions (AJAX) ---
+
+        // TOGGLE STATUS
+        async function toggleUserStatus(id, btn) {
+            const originalText = btn.innerText;
+            btn.innerText = "...";
+            btn.disabled = true;
+
+            try {
+                const res = await secureFetch(
+                    contextPath + `admin/users/${id}/toggle-active`,
+                    { method: "POST" }
+                );
+                if (res.ok) {
+                    showNotification("Status updated successfully", "success");
+
+                    const tr = btn.closest("tr");
+                    const isDeactivating = originalText.trim() === "Deactivate";
+                    const span = btn.querySelector("span") || btn;
+                    const actionBtnsContainer = btn.closest(".action-btns");
+
+                    // 1. Cập nhật data-active attribute
+                    tr.setAttribute("data-active", isDeactivating ? "false" : "true");
+
+                    // 2. Cập nhật badge status
+                    const statusBadge = tr.querySelector("td:nth-last-child(2) .badge");
+                    if (statusBadge) {
+                        statusBadge.className = isDeactivating
+                            ? "badge danger"
+                            : "badge success";
+                        statusBadge.innerText = isDeactivating ? "Inactive" : "Active";
+                    }
+
+                    // 3. Cập nhật nút Activate/Deactivate
+                    if (isDeactivating) {
+                        span.innerText = "Activate";
+                        btn.className = "btn btn-sm btn-success";
+                    } else {
+                        span.innerText = "Deactivate";
+                        btn.className = "btn btn-sm btn-danger";
+                    }
+
+                    // 4. Xử lý nút Delete (★ PHẦN QUAN TRỌNG ★)
+                    const existingDeleteBtn =
+                        actionBtnsContainer.querySelector(".btn-delete");
+                    const userRole = tr.getAttribute("data-role");
+
+                    if (isDeactivating && userRole !== "ROLE_ADMIN") {
+                        // User vừa bị deactivate → Hiển thị nút Delete
+                        if (!existingDeleteBtn) {
+                            const deleteBtn = document.createElement("button");
+                            deleteBtn.className = "btn btn-sm btn-danger btn-delete";
+                            deleteBtn.innerHTML = "Delete";
+                            deleteBtn.onclick = function () {
+                                deleteUser(id, this);
+                            };
+                            actionBtnsContainer.appendChild(deleteBtn);
+                        }
+                    } else {
+                        // User vừa được activate → Ẩn nút Delete
+                        if (existingDeleteBtn) {
+                            existingDeleteBtn.remove();
+                        }
+                    }
+
+                    // 5. Cập nhật thống kê
+                    updateUserStats();
+                } else {
+                    showNotification(await res.text(), "error");
+                    btn.innerText = originalText;
+                }
+            } catch (e) {
+                showNotification("Error connecting to server", "error");
+                btn.innerText = originalText;
+            } finally {
+                btn.disabled = false;
+            }
+        }
+        // SAVE USER
+        // SAVE USER FUNCTION
+        async function handleSaveUser(e) {
+    e.preventDefault(); // không cho submit reload trang
+
+    // 1. Validate
+    if (!validateUserForm()) return;
+
+    // 2. Lấy data từ form
+    const form = document.getElementById("userForm");
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    // Fix Checkbox & ID
+    const isNew = !data.id; // true = thêm mới, false = update
+    data.resetPassword = document.getElementById("resetPassword").checked;
+    if (!data.id) data.id = null;
+
+    // 3. UI Feedback
+    const btn = form.querySelector('button[type="submit"]');
+    const originalText = btn.innerText;
+    btn.disabled = true;
+    btn.innerText = "Saving...";
+
+    try {
+        // 4. Gửi request AJAX
+        const res = await secureFetch(contextPath + "admin/users/save", {
+            method: "POST",
+            body: JSON.stringify(data),
+        });
+
+        if (res.ok) {
+            showNotification(
+                isNew ? "User created successfully" : "User updated successfully",
+                "success"
+            );
+            closeUserModal();
+
+            // 🌟 Quan trọng: đảm bảo sau reload vẫn ở tab Users
+            localStorage.setItem("adminActiveTab", "users");
+
+            // Reload lại trang để load data mới
+            setTimeout(() => location.reload(), 800);
+        } else {
+            const text = await res.text();
+            showNotification(text || "Error saving user", "error");
+        }
+    } catch (err) {
+        console.error(err);
+        showNotification("System error occurred", "error");
+    } finally {
+        btn.disabled = false;
+        btn.innerText = originalText;
+    }
+}
+
+        // UPDATE ROLE (AJAX)
+        async function updateUserRole(userId, selectElement) {
+            const newRoleCode = selectElement.value;
+            const originalRole = selectElement.getAttribute("data-original-value");
+
+            selectElement.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append("roleCode", newRoleCode);
+
+                const res = await secureFetch(
+                    contextPath + `admin/users/${userId}/edit-role`,
+                    {
+                        method: "POST",
+                        body: formData,
+                    }
+                );
+
+                if (res.ok) {
+                    const successMsg = await res.text();
+                    showNotification(successMsg, "success");
+                    selectElement.setAttribute("data-original-value", newRoleCode);
+
+                    // Cập nhật data-role để stats chính xác
+                    selectElement.closest("tr").setAttribute("data-role", newRoleCode);
+                    updateUserStats();
+                } else {
+                    const errorMsg = await res.text();
+                    showNotification(errorMsg, "error");
+                    selectElement.value = originalRole;
+                }
+            } catch (error) {
+                console.error(error);
+                showNotification("Connection error", "error");
+                selectElement.value = originalRole;
+            } finally {
+                selectElement.disabled = false;
+            }
+        }
+
+        // DELETE USER
+        async function deleteUser(id, btn) {
+            if (!confirm('⚠️ Delete this user permanently? This action cannot be undone!')) return;
+
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = '...';
+
+            try {
+                const res = await secureFetch(contextPath + `admin/users/${id}/delete`, { method: 'POST' });
+                if (res.ok) {
+                    showNotification('User deleted successfully', 'success');
+
+                    // Xóa row khỏi bảng với hiệu ứng fade out
+                    const tr = btn.closest('tr');
+                    tr.style.transition = 'opacity 0.3s ease';
+                    tr.style.opacity = '0';
+
+                    setTimeout(() => {
+                        tr.remove();
+                        updateUserStats();
+                    }, 300);
+
+                } else {
+                    showNotification(await res.text(), 'error');
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }
+            } catch (e) {
+                showNotification('Error deleting user', 'error');
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // --- 4. Helpers & Init ---
+       document.addEventListener("DOMContentLoaded", () => {
+    const navItems = document.querySelectorAll(".nav-item");
+    const sections = document.querySelectorAll(".content-section");
+    const pageTitleEl = document.getElementById("pageTitle");
+
+    // Hàm kích hoạt 1 tab + lưu vào localStorage
+    function activateTab(sectionId) {
+        // clear trạng thái cũ
+        navItems.forEach(n => n.classList.remove("active"));
+        sections.forEach(s => s.classList.remove("active"));
+
+        // set active cho nav
+        const activeNav = document.querySelector(`.nav-item[data-section="${sectionId}"]`);
+        if (activeNav) {
+            activeNav.classList.add("active");
+            if (pageTitleEl) {
+                pageTitleEl.textContent = activeNav.textContent.trim();
+            }
+        }
+
+        // set active cho section
+        const activeSection = document.getElementById(sectionId);
+        if (activeSection) {
+            activeSection.classList.add("active");
+        }
+
+        // lưu tab hiện tại
+        localStorage.setItem("adminActiveTab", sectionId);
+    }
+
+    // Lấy tab đã lưu, mặc định là dashboard
+    const savedTab = localStorage.getItem("adminActiveTab") || "dashboard";
+    activateTab(savedTab);
+
+    // Gắn event click cho menu
+    navItems.forEach((item) => {
+        item.addEventListener("click", function (e) {
+            e.preventDefault();
+            const sectionId = this.dataset.section;
+            if (sectionId) {
+                activateTab(sectionId);
+            }
+        });
+    });
+
+    updateUserStats();
+
+    // Email check
+    const emailInput = document.getElementById("email");
+    if (emailInput) {
+        emailInput.addEventListener("blur", function () {
+            const email = this.value;
+            const id = document.getElementById("userId").value;
+            if (!email) return;
+            fetch(
+                `${contextPath}admin/check-email?email=${encodeURIComponent(
+                    email
+                )}${id ? "&id=" + id : ""}`
+            )
+                .then((r) => r.json())
+                .then((d) => {
+                    const err = document.getElementById("emailError");
+                    const btn = document.querySelector(
+                        '#userModal button[type="submit"]'
+                    );
+                    if (d.exists) {
+                        err.textContent = "Email exists";
+                        btn.disabled = true;
+                    } else {
+                        err.textContent = "";
+                        btn.disabled = false;
+                    }
+                });
+        });
+    }
+
+    // Mobile dropdown toggle
+    const dropdownToggle = document.querySelector(".dropdown-toggle");
+    const dropdownMenu = document.querySelector(".dropdown-menu");
+
+    if (dropdownToggle && dropdownMenu) {
+        dropdownToggle.addEventListener("click", (e) => {
+            e.stopPropagation();
+            dropdownMenu.classList.toggle("show");
+        });
+
+        // Close when clicking outside
+        document.addEventListener("click", (e) => {
+            if (!e.target.closest(".profile-dropdown")) {
+                dropdownMenu.classList.remove("show");
+            }
+        });
+    }
+});
+
+        function updateUserStats() {
+            const rows = document.querySelectorAll("#users tbody tr");
+            let active = 0,
+                inactive = 0,
+                admins = 0,
+                staff = 0;
+
+            rows.forEach((r) => {
+                const isActive = r.getAttribute("data-active") === "true";
+                const roleCode = r.getAttribute("data-role");
+
+                if (isActive) active++;
+                else inactive++;
+                if (roleCode === "ROLE_ADMIN") admins++;
+                if (roleCode === "ROLE_STAFF") staff++;
+            });
+
+            const set = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.innerText = val;
+            };
+            set("totalUsersStat", rows.length);
+            set("activeUsersStat", active);
+            set("inactiveUsersStat", inactive);
+            set("adminStaffStat", `${admins} admin / ${staff} staff`);
+            set("headerActiveUsers", active);
+            set("headerTotalUsers", rows.length);
+        }
+
+        // Modal Helpers
+        document.getElementById("addUserBtn")?.addEventListener("click", () => {
+            document.getElementById("userModalTitle").textContent = "Add User";
+            document.getElementById("userForm").reset();
+            document.getElementById("userId").value = "";
+            document.getElementById("passwordGroup").style.display = "block";
+            document.getElementById("resetPasswordGroup").style.display = "none";
+            document.getElementById("password").required = true;
+            document.getElementById("userModal").style.display = "flex";
         });
 
         function editUser(id) {
-            fetch(contextPath + 'admin/users/' + id)
-                .then(response => response.json())
-                .then(user => {
-                    document.getElementById('userModalTitle').textContent = 'Edit User';
-                    document.getElementById('userId').value = user.id;
-                    document.getElementById('fullName').value = user.fullName;
-                    document.getElementById('email').value = user.email;
-                    document.getElementById('password').value = '';
-                    document.getElementById('passwordGroup').style.display = 'none';
-                    document.getElementById('resetPasswordGroup').style.display = 'block';
-                    document.getElementById('password').required = false;
-                    document.getElementById('roleCode').value = user.role.code;
-                    document.getElementById('emailError').textContent = '';
-                    const submitButton = document.querySelector('#userModal button[type="submit"]');
-                    submitButton.disabled = false;
-                    document.getElementById('userModal').style.display = 'flex';
-                    // Trigger check for edit
-                    checkEmailAvailability();
+            fetch(contextPath + "admin/users/" + id)
+                .then((r) => r.json())
+                .then((u) => {
+                    document.getElementById("userModalTitle").textContent = "Edit User";
+                    document.getElementById("userId").value = u.id;
+                    document.getElementById("fullName").value = u.fullName;
+                    document.getElementById("email").value = u.email;
+                    document.getElementById("roleCode").value = u.role.code;
+                    document.getElementById("password").value = "";
+                    document.getElementById("passwordGroup").style.display = "none";
+                    document.getElementById("resetPasswordGroup").style.display =
+                        "block";
+                    document.getElementById("password").required = false;
+                    document.getElementById("userModal").style.display = "flex";
                 })
-                .catch(error => {
-                    alert('Error loading user data');
-                    console.error(error);
-                });
+                .catch(() => showNotification("Error loading user", "error"));
         }
 
         function viewUser(id) {
-            fetch(contextPath + 'admin/users/' + id)
-                .then(response => response.json())
-                .then(user => {
-                    document.getElementById('detailId').textContent = user.id;
-                    document.getElementById('detailFullName').textContent = user.fullName;
-                    document.getElementById('detailEmail').textContent = user.email;
-                    document.getElementById('detailPhone').textContent = user.phone || 'Not provided';
-                    document.getElementById('detailAddress').textContent = user.defaultAddress || 'Not provided';
-                    document.getElementById('detailRole').textContent = user.role.name + ' (' + user.role.code + ')';
-                    const activeSpan = document.createElement('span');
-                    activeSpan.className = 'badge ' + (user.active ? 'success' : 'danger');
-                    activeSpan.textContent = user.active ? 'Active' : 'Inactive';
-                    document.getElementById('detailActive').innerHTML = '';
-                    document.getElementById('detailActive').appendChild(activeSpan);
-                    const profileSpan = document.createElement('span');
-                    profileSpan.className = 'badge ' + (user.profileCompleted ? 'success' : 'danger');
-                    profileSpan.textContent = user.profileCompleted ? 'Yes' : 'No';
-                    document.getElementById('detailProfileCompleted').innerHTML = '';
-                    document.getElementById('detailProfileCompleted').appendChild(profileSpan);
-                    document.getElementById('detailLoginMethod').textContent = user.googleSub ? 'Google OAuth' : 'Email/Password';
-                    document.getElementById('detailCreatedAt').textContent = user.createdAt;
-                    document.getElementById('userDetailModal').style.display = 'flex';
-                })
-                .catch(error => {
-                    alert('Error loading user data');
-                    console.error(error);
+            fetch(contextPath + "admin/users/" + id)
+                .then((r) => r.json())
+                .then((u) => {
+                    document.getElementById("detailId").textContent = u.id;
+                    document.getElementById("detailFullName").textContent = u.fullName;
+                    document.getElementById("detailEmail").textContent = u.email;
+                    document.getElementById("detailRole").textContent = u.role.name;
+                    document.getElementById(
+                        "detailActive"
+                    ).innerHTML = `<span class="badge ${u.active ? "success" : "danger"
+                    }">${u.active ? "Active" : "Inactive"}</span>`;
+                    document.getElementById("userDetailModal").style.display = "flex";
                 });
         }
 
         function closeUserModal() {
-            document.getElementById('userModal').style.display = 'none';
+            document.getElementById("userModal").style.display = "none";
         }
-
         function closeUserDetailModal() {
-            document.getElementById('userDetailModal').style.display = 'none';
+            document.getElementById("userDetailModal").style.display = "none";
         }
 
-        window.addEventListener('click', function (e) {
-            const userModal = document.getElementById('userModal');
-            const userDetailModal = document.getElementById('userDetailModal');
-            if (e.target === userModal) {
-                closeUserModal();
-            }
-            if (e.target === userDetailModal) {
-                closeUserDetailModal();
-            }
-        });
-
-        // Validate user form
         function validateUserForm() {
-            const isNew = !document.getElementById('userId').value;
-            const password = document.getElementById('password').value;
-            const passwordPattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&+=!])(?=\S+$).{8,}$/;
-            if (isNew && !passwordPattern.test(password)) {
-                alert('Password must be at least 8 characters with 1 uppercase, 1 number, and 1 special character (@#$%^&+=!)');
+            const isNew = !document.getElementById("userId").value;
+            const pwd = document.getElementById("password").value;
+            const pattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&+=!])(?=\S+$).{8,}$/;
+            if ((isNew || pwd) && !pattern.test(pwd)) {
+                showNotification("Password too weak!", "error");
                 return false;
             }
             return true;
         }
-
-        // Check email availability
-        function checkEmailAvailability() {
-            const email = document.getElementById('email').value;
-            const id = document.getElementById('userId').value || null;
-            const submitButton = document.querySelector('#userModal button[type="submit"]');
-            const emailError = document.getElementById('emailError');
-            if (email) {
-                fetch(contextPath + 'admin/check-email?email=' + encodeURIComponent(email) + (id ? '&id=' + id : ''))
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.exists) {
-                            emailError.textContent = 'Email already exists.';
-                            submitButton.disabled = true;
-                        } else {
-                            emailError.textContent = '';
-                            submitButton.disabled = false;
-                        }
-                    })
-                    .catch(error => {
-                        console.error(error);
-                    });
-            } else {
-                emailError.textContent = '';
-                submitButton.disabled = false;
-            }
-        }
-
-        function showNotification(message, type = 'success') {
-            const notification = document.createElement('div');
-            notification.textContent = message;
-            notification.style.cssText = `
-                position: fixed; top: 20px; right: 20px;
-                background: linear-gradient(135deg, ${type === 'success' ? '#059669, #047857' : '#dc2626, #991b1b'});
-                color: white; padding: 1rem 2rem; border-radius: 8px;
-                box-shadow: 0 5px 15px rgba(${type === 'success' ? '5, 150, 105' : '220, 38, 38'}, 0.4);
-                z-index: 3000; animation: slideIn 0.3s ease;
-            `;
-            document.body.appendChild(notification);
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
-
-        // Display flash messages
-        window.addEventListener('DOMContentLoaded', function () {
-            const urlParams = new URLSearchParams(window.location.search);
-            const success = urlParams.get('success');
-            const error = urlParams.get('error');
-            if (success) {
-                showNotification(success, 'success');
-            }
-            if (error) {
-                showNotification(error, 'error');
-            }
-        });
     </script>
 </body>
+
 </html>
