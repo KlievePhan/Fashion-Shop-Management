@@ -9,7 +9,6 @@ import org.fsm.repository.CartRepository;
 import org.fsm.repository.UserRepository;
 import org.fsm.service.CartService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -31,10 +30,13 @@ public class CartController {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
 
+    /**
+     * Hiển thị trang giỏ hàng
+     */
     @GetMapping("/cart")
     public String getCart(Principal principal, Model model) {
         if (principal == null) {
-            return "redirect:/";
+            return "redirect:/login";
         }
 
         String email = principal.getName();
@@ -53,12 +55,15 @@ public class CartController {
 
         List<CartItem> cartItems = cartItemRepository.findByCart(cart);
 
+        // Tính toán tổng
         BigDecimal subtotal = cartItems.stream()
-                .map(item -> item.getProductVariant().getPrice()
-                        .multiply(BigDecimal.valueOf(item.getQty())))
+                .map(CartItem::getLineTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal shipping = subtotal.compareTo(BigDecimal.valueOf(100)) > 0 ? BigDecimal.ZERO
+
+        BigDecimal shipping = subtotal.compareTo(BigDecimal.valueOf(100)) > 0
+                ? BigDecimal.ZERO
                 : BigDecimal.valueOf(10);
+
         BigDecimal tax = subtotal.multiply(BigDecimal.valueOf(0.1));
         BigDecimal total = subtotal.add(shipping).add(tax);
 
@@ -72,20 +77,64 @@ public class CartController {
         return "cart";
     }
 
+    /**
+     * ⭐ UPDATED: Add to cart với selectedOptions từ JSON request
+     * Request body: {
+     *   "productId": 1,
+     *   "selectedOptions": {"size":"41", "color":"Red"},
+     *   "qty": 2
+     * }
+     */
     @PostMapping("/add")
     @ResponseBody
-    public String addToCart(Principal principal,
-            @RequestParam("variantId") Long variantId,
-            @RequestParam("qty") Integer qty) {
-        if (principal == null) {
-            return "User not logged in";
+    public ResponseEntity<Map<String, Object>> addToCart(
+            @RequestBody Map<String, Object> request,
+            Principal principal) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            if (principal == null) {
+                response.put("success", false);
+                response.put("message", "Please login first");
+                return ResponseEntity.status(401).body(response);
+            }
+
+            String email = principal.getName();
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            // Parse request
+            Long productId = Long.valueOf(request.get("productId").toString());
+            Integer qty = Integer.valueOf(request.get("qty").toString());
+
+            @SuppressWarnings("unchecked")
+            Map<String, String> selectedOptions = (Map<String, String>) request.get("selectedOptions");
+
+            // Validate
+            if (selectedOptions == null || selectedOptions.isEmpty()) {
+                response.put("success", false);
+                response.put("message", "Please select size and color");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            // Add to cart
+            cartService.addToCart(user, productId, selectedOptions, qty);
+
+            response.put("success", true);
+            response.put("message", "Product added to cart successfully");
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(500).body(response);
         }
-        String email = principal.getName();
-        User user = userRepository.findByEmail(email).get();
-        cartService.addToCart(user, variantId, qty);
-        return "success";
     }
 
+    /**
+     * Update quantity của cart item
+     */
     @PostMapping("/update")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> updateCartItem(
@@ -124,6 +173,7 @@ public class CartController {
 
             // Update quantity
             cartItem.setQty(qty);
+            cartItem.setUpdatedAt(LocalDateTime.now());
             cartItemRepository.save(cartItem);
 
             // Recalculate totals
@@ -131,7 +181,7 @@ public class CartController {
             Map<String, BigDecimal> totals = calculateTotals(cartItems);
 
             response.put("success", true);
-            response.put("itemTotal", cartItem.getProductVariant().getPrice().multiply(BigDecimal.valueOf(qty)));
+            response.put("itemTotal", cartItem.getLineTotal());
             response.put("subtotal", totals.get("subtotal"));
             response.put("shipping", totals.get("shipping"));
             response.put("tax", totals.get("tax"));
@@ -146,6 +196,9 @@ public class CartController {
         }
     }
 
+    /**
+     * Xóa cart item
+     */
     @DeleteMapping("/delete/{itemId}")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> deleteCartItem(
@@ -199,13 +252,14 @@ public class CartController {
         }
     }
 
-    // Helper method to calculate cart totals
+    /**
+     * Helper method: Tính tổng giá trị cart
+     */
     private Map<String, BigDecimal> calculateTotals(List<CartItem> cartItems) {
         Map<String, BigDecimal> totals = new HashMap<>();
 
         BigDecimal subtotal = cartItems.stream()
-                .map(item -> item.getProductVariant().getPrice()
-                        .multiply(BigDecimal.valueOf(item.getQty())))
+                .map(CartItem::getLineTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal shipping = subtotal.compareTo(BigDecimal.valueOf(100)) > 0
@@ -223,31 +277,11 @@ public class CartController {
         return totals;
     }
 
-    @PostMapping("/addCart")
-    @ResponseBody // ⭐ THÊM annotation này nếu chưa có
-    public Map<String, Object> addToCartJson(
-            @RequestBody Map<String, Object> request,
-            Authentication authentication) {
-
-        if (authentication == null || !(authentication.getPrincipal() instanceof User)) {
-            return Map.of("success", false, "message", "Please login first");
-        }
-
-        User user = (User) authentication.getPrincipal();
-        Long variantId = Long.valueOf(request.get("variantId").toString());
-        Integer qty = Integer.valueOf(request.get("qty").toString());
-
-        try {
-            cartService.addToCart(user, variantId, qty);
-            return Map.of("success", true);
-        } catch (Exception e) {
-            return Map.of("success", false, "message", e.getMessage());
-        }
-    }
-
-    // ⭐ SỬA LẠI METHOD NÀY - THÊM @ResponseBody
+    /**
+     * Get cart item count (cho badge)
+     */
     @GetMapping("/count")
-    @ResponseBody // ← QUAN TRỌNG: Phải có annotation này!
+    @ResponseBody
     public Map<String, Integer> getCartCount(Principal principal) {
         int count = 0;
 

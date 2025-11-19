@@ -1,947 +1,596 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title th:text="${product.title} + ' - Fashion Shop'">Product Detail</title>
-
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600;800&display=swap" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-  <link rel="icon" th:href="@{/images/store.png}" type="image/x-icon">
-
-  <link rel="stylesheet" th:href="@{/css/header.css}">
-  <link rel="stylesheet" th:href="@{/css/footer.css}">
-  <link rel="stylesheet" th:href="@{/css/theme-customizer.css}">
-
-  <style>
-    /* ===== Elegant Head Popup (Top Notification with Progress + Close X) ===== */
-    .head-popup {
-      --dur: 2600ms;
-      /* default, will be overridden in JS */
-      position: fixed;
-      top: 16px;
-      left: 50%;
-      transform: translate(-50%, -24px);
-      width: min(980px, 92vw);
-      background: linear-gradient(135deg, #ffffff 0%, #f6f9ff 100%);
-      color: #0f172a;
-      border-radius: 16px;
-      padding: 18px 22px 16px;
-      z-index: 10050;
-      box-shadow: 0 16px 48px rgba(15, 23, 42, 0.18);
-      border: 1px solid #e8eefc;
-      display: none;
-      /* off by default */
-      opacity: 0;
-      transition: opacity .28s ease, transform .28s ease;
-      font-family: "Lato", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-    }
-
-    .head-popup.show {
-      display: block;
-      opacity: 1;
-      transform: translate(-50%, 0);
-    }
-
-    .head-popup .row-flex {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: center;
-      gap: 10px 16px;
-      position: relative;
-    }
-
-    .head-popup .texts .title {
-      font-size: 18px;
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: 0.2px;
-    }
-
-    .head-popup .texts .desc {
-      font-size: 14px;
-      color: #334155;
-      margin-top: 4px;
-    }
-
-    /* Left soft accent stripe for variant */
-    .head-popup::before {
-      content: "";
-      position: absolute;
-      inset: 0 0 0 0;
-      border-radius: 16px;
-      pointer-events: none;
-      box-shadow: inset 4px 0 0 0 var(--accent);
-    }
-
-    /* Progress bar */
-    .head-popup .progress {
-      position: relative;
-      height: 4px;
-      background: #e9eefb;
-      border-radius: 99px;
-      overflow: hidden;
-      margin-top: 12px;
-    }
-
-    .head-popup .progress .fill {
-      position: absolute;
-      inset: 0 auto 0 0;
-      width: 100%;
-      background: var(--accent);
-      transform: translateX(-100%);
-    }
-
-    .head-popup.show .progress .fill {
-      animation: lineFill var(--dur) linear forwards;
-    }
-
-    @keyframes lineFill {
-      from {
-        transform: translateX(-100%);
-      }
-
-      to {
-        transform: translateX(0%);
-      }
-    }
-
-    /* Variant accents (change these to adjust theme color) */
-    .head-popup.success {
-      --accent: #10b981;
-    }
-
-    /* soft green */
-    .head-popup.warning {
-      --accent: #facc15;
-    }
-
-    /* yellow */
-    .head-popup.error {
-      --accent: #dc2626;
-    }
-
-    /* red */
-
-    /* Close (X) button */
-    .head-popup .hp-close {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      width: 34px;
-      height: 34px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 10px;
-      border: 1px solid #e7ecfa;
-      background: #fff;
-      color: #0f172a;
-      opacity: .9;
-      cursor: pointer;
-      transition: all .2s ease;
-    }
-
-    .head-popup .hp-close:hover {
-      opacity: 1;
-      transform: translateY(-1px);
-      box-shadow: 0 6px 18px rgba(15, 23, 42, .08);
-    }
-
-    /* ===== Page styles (giữ layout cũ) ===== */
-    .product-detail-container {
-      padding: 40px 0;
-    }
-
-    .product-images {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-
-    .main-image {
-      width: 100%;
-      height: 500px;
-      object-fit: cover;
-      border-radius: 8px;
-      background-color: #f5f5f5;
-    }
-
-    .thumbnail-images {
-      display: flex;
-      gap: 10px;
-    }
-
-    .thumbnail {
-      width: 80px;
-      height: 80px;
-      object-fit: cover;
-      border-radius: 4px;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: all 0.3s ease;
-    }
-
-    .thumbnail:hover,
-    .thumbnail.active {
-      border-color: #000;
-    }
-
-    .product-details-section {
-      padding: 20px 0;
-    }
-
-    .product-title {
-      font-size: 32px;
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
-
-    .product-category {
-      color: #999;
-      font-size: 14px;
-      margin-bottom: 20px;
-    }
-
-    .product-price-section {
-      margin-bottom: 25px;
-    }
-
-    .product-price {
-      font-size: 28px;
-      font-weight: 600;
-      color: #000;
-      margin-bottom: 10px;
-    }
-
-    .product-rating {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-
-    .stars {
-      color: #ffc107;
-    }
-
-    .rating-count {
-      color: #999;
-      font-size: 14px;
-    }
-
-    .product-description {
-      color: #666;
-      line-height: 1.6;
-      margin-bottom: 25px;
-      font-size: 15px;
-    }
-
-    .product-options {
-      margin-bottom: 25px;
-    }
-
-    .option-label {
-      font-weight: 600;
-      margin-bottom: 10px;
-      display: block;
-    }
-
-    .size-options,
-    .color-options {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
-
-    .size-btn,
-    .color-btn {
-      padding: 10px 15px;
-      border: 2px solid #ddd;
-      background: white;
-      cursor: pointer;
-      border-radius: 4px;
-      transition: all 0.3s ease;
-      font-size: 14px;
-    }
-
-    .size-btn:hover {
-      border-color: #000;
-    }
-
-    .size-btn.active {
-      border-color: #000;
-      background-color: #000;
-      color: #fff;
-    }
-
-    .color-btn {
-      width: 40px;
-      height: 40px;
-      padding: 0;
-      border-radius: 50%;
-    }
-
-    .color-btn.active {
-      box-shadow: 0 0 0 3px #000;
-    }
-
-    .quantity-section {
-      display: flex;
-      gap: 15px;
-      align-items: center;
-      margin-bottom: 25px;
-    }
-
-    .quantity-input {
-      display: flex;
-      align-items: center;
-      border: 2px solid #ddd;
-      border-radius: 4px;
-      width: 120px;
-    }
-
-    .quantity-input button {
-      background: none;
-      border: none;
-      width: 40px;
-      cursor: pointer;
-      font-size: 18px;
-    }
-
-    .quantity-input input {
-      border: none;
-      width: 40px;
-      text-align: center;
-      font-size: 16px;
-    }
-
-    .quantity-input input:focus {
-      outline: none;
-    }
-
-    .action-buttons {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 25px;
-    }
-
-    .add-to-cart-btn,
-    .buy-now-btn {
-      flex: 1;
-      padding: 15px;
-      font-size: 16px;
-      font-weight: 600;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .add-to-cart-btn {
-      background-color: #f5f5f5;
-      border: 2px solid #000;
-      color: #000;
-    }
-
-    .add-to-cart-btn:hover {
-      background-color: #000;
-      color: #fff;
-    }
-
-    .buy-now-btn {
-      background-color: #000;
-      color: #fff;
-    }
-
-    .buy-now-btn:hover {
-      background-color: #333;
-    }
-
-    .product-meta {
-      border-top: 1px solid #eee;
-      border-bottom: 1px solid #eee;
-      padding: 20px 0;
-      margin: 25px 0;
-      font-size: 14px;
-      color: #666;
-    }
-
-    .meta-item {
-      margin-bottom: 10px;
-    }
-
-    .related-products {
-      margin-top: 60px;
-      padding-top: 40px;
-      border-top: 1px solid #eee;
-    }
-
-    .related-products h2 {
-      font-size: 24px;
-      font-weight: 600;
-      margin-bottom: 30px;
-    }
-
-    .products-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
-    }
-
-    .product-card {
-      border-radius: 8px;
-      overflow: hidden;
-      transition: all 0.3s ease;
-    }
-
-    .product-card:hover {
-      transform: translateY(-5px);
-    }
-
-    .product-image {
-      width: 100%;
-      height: 280px;
-      background-color: #f5f5f5;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .product-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .product-info {
-      padding: 15px;
-    }
-
-    .product-info h3 {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 5px;
-    }
-
-    .product-info .price {
-      font-size: 16px;
-      font-weight: 600;
-      color: #000;
-      margin-top: 10px;
-    }
-
-    @media (max-width: 768px) {
-      .main-image {
-        height: 300px;
-      }
-
-      .product-title {
-        font-size: 24px;
-      }
-
-      .product-price {
-        font-size: 24px;
-      }
-
-      .action-buttons {
-        flex-direction: column;
-      }
-
-      .products-grid {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      }
-    }
-
-    /* ===== DARK MODE OVERRIDES for Product Detail Page (FIX) ===== */
-    body.dark-mode .product-detail-container {
-      color: #e5e7eb;
-    }
-
-    /* Breadcrumb */
-    body.dark-mode .breadcrumb-item a {
-      color: #9ca3af !important;
-    }
-
-    body.dark-mode .breadcrumb-item a:hover {
-      color: #dc2626 !important;
-    }
-
-    body.dark-mode .breadcrumb-item.active {
-      color: #e5e7eb;
-    }
-
-    /* Product Content */
-    body.dark-mode .main-image {
-      background-color: #374151;
-    }
-
-    body.dark-mode .thumbnail:hover,
-    body.dark-mode .thumbnail.active {
-      border-color: #dc2626;
-    }
-
-    body.dark-mode .product-title {
-      color: #e5e7eb;
-    }
-
-    body.dark-mode .product-category,
-    body.dark-mode .rating-count {
-      color: #9ca3af;
-    }
-
-    body.dark-mode .product-price {
-      color: #e5e7eb;
-    }
-
-    body.dark-mode .product-description {
-      color: #a1a1a1;
-    }
-
-    /* Options */
-    body.dark-mode .size-btn,
-    body.dark-mode .color-btn {
-      border: 2px solid #4b5563;
-      background: #374151;
-      color: #e5e7eb;
-    }
-
-    body.dark-mode .size-btn:hover {
-      border-color: #dc2626;
-      color: #dc2626;
-    }
-
-    body.dark-mode .size-btn.active {
-      border-color: #dc2626;
-      background-color: #dc2626;
-      color: #fff;
-    }
-
-    body.dark-mode .color-btn.active {
-      box-shadow: 0 0 0 3px #dc2626;
-    }
-
-    /* Quantity Input */
-    body.dark-mode .quantity-input {
-      border: 2px solid #4b5563;
-    }
-
-    body.dark-mode .quantity-input button {
-      color: #e5e7eb;
-    }
-
-    body.dark-mode .quantity-input button:hover {
-      color: #dc2626;
-    }
-
-    body.dark-mode .quantity-input input {
-      background: #2d2d2d;
-      color: #e5e7eb;
-    }
-
-    /* Action Buttons */
-    body.dark-mode .add-to-cart-btn {
-      background-color: #374151;
-      border: 2px solid #dc2626;
-      color: #dc2626;
-    }
-
-    body.dark-mode .add-to-cart-btn:hover {
-      background-color: #dc2626;
-      color: #fff;
-    }
-
-    body.dark-mode .buy-now-btn {
-      background-color: #dc2626;
-      color: #fff;
-    }
-
-    body.dark-mode .buy-now-btn:hover {
-      background-color: #991b1b;
-    }
-
-    /* Product Meta */
-    body.dark-mode .product-meta {
-      border-top: 1px solid #4b5563;
-      border-bottom: 1px solid #4b5563;
-      color: #9ca3af;
-    }
-
-    /* Share Icons */
-    body.dark-mode .product-details-section a {
-      color: #e5e7eb !important;
-    }
-
-    body.dark-mode .product-details-section a:hover {
-      color: #dc2626 !important;
-    }
-
-    /* Related Products */
-    body.dark-mode .related-products {
-      border-top: 1px solid #4b5563;
-    }
-
-    body.dark-mode .related-products h2 {
-      color: #e5e7eb;
-    }
-
-    body.dark-mode .product-card {
-      background: #2d2d2d;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-    }
-
-    body.dark-mode .product-card:hover {
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
-    }
-
-    body.dark-mode .product-info {
-      background: #2d2d2d;
-    }
-
-    body.dark-mode .product-info h3 {
-      color: #e5e7eb;
-    }
-
-    body.dark-mode .product-info .text-muted {
-      color: #9ca3af !important;
-    }
-
-    body.dark-mode .product-info .price {
-      color: #dc2626;
-    }
-
-    /* Head Popup Dark Mode (Crucial Fix) */
-    body.dark-mode .head-popup {
-      background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
-      color: #e5e7eb;
-      border: 1px solid #4b5563;
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
-    }
-
-    body.dark-mode .head-popup .texts .desc {
-      color: #a1a1a1;
-    }
-
-    body.dark-mode .head-popup .progress {
-      background: #374151;
-    }
-
-    body.dark-mode .head-popup .hp-close {
-      border: 1px solid #4b5563;
-      background: #374151;
-      color: #e5e7eb;
-    }
-
-    body.dark-mode .head-popup .hp-close:hover {
-      color: #dc2626;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, .4);
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${product.title} + ' - Fashion Shop'">Product Detail</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600;800&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="icon" th:href="@{/images/store.png}" type="image/x-icon">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/theme-customizer.css}">
+    <link rel="stylesheet" th:href="@{/css/cart-notification.css}">
+
+    <style>
+        :root {
+            --body-bg: #fafafa;
+            --container-bg: white;
+            --text-color: #333;
+            --border-color: #eee;
+            --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .dark-mode {
+            --body-bg: #121212;
+            --container-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --border-color: #333333;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: var(--body-bg);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .product-detail-container {
+            padding: 40px 0;
+        }
+        .main-image {
+            width: 100%;
+            height: 500px;
+            object-fit: cover;
+            border-radius: 8px;
+            background-color: #f5f5f5;
+        }
+        .product-title {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .product-price {
+            font-size: 28px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 10px;
+        }
+        .product-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        .product-options {
+            margin-bottom: 25px;
+        }
+        .option-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .size-options, .color-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .size-btn, .color-btn {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        .size-btn:hover {
+            border-color: #000;
+        }
+        .size-btn.active {
+            border-color: #000;
+            background-color: #000;
+            color: #fff;
+        }
+        .color-btn {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border-radius: 50%;
+        }
+        .color-btn.active {
+            box-shadow: 0 0 0 3px #000;
+        }
+        .quantity-section {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .quantity-input {
+            display: flex;
+            align-items: center;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            width: 120px;
+        }
+        .quantity-input button {
+            background: none;
+            border: none;
+            width: 40px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        .quantity-input input {
+            border: none;
+            width: 40px;
+            text-align: center;
+            font-size: 16px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .add-to-cart-btn, .buy-now-btn {
+            flex: 1;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .add-to-cart-btn {
+            background-color: #f5f5f5;
+            border: 2px solid #000;
+            color: #000;
+        }
+        .add-to-cart-btn:hover {
+            background-color: #000;
+            color: #fff;
+        }
+        .buy-now-btn {
+            background-color: #000;
+            color: #fff;
+        }
+        .buy-now-btn:hover {
+            background-color: #333;
+        }
+
+        /* Head Popup */
+        .head-popup {
+            --dur: 2600ms;
+            position: fixed;
+            top: 16px;
+            left: 50%;
+            transform: translate(-50%, -24px);
+            width: min(980px, 92vw);
+            background: linear-gradient(135deg, #ffffff 0%, #f6f9ff 100%);
+            color: #0f172a;
+            border-radius: 16px;
+            padding: 18px 22px 16px;
+            z-index: 10050;
+            box-shadow: 0 16px 48px rgba(15, 23, 42, 0.18);
+            border: 1px solid #e8eefc;
+            display: none;
+            opacity: 0;
+            transition: opacity .28s ease, transform .28s ease;
+            font-family: "Lato", sans-serif;
+        }
+        .head-popup.show {
+            display: block;
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+        .head-popup .row-flex {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 10px 16px;
+        }
+        .head-popup .texts .title {
+            font-size: 18px;
+            font-weight: 800;
+        }
+        .head-popup .texts .desc {
+            font-size: 14px;
+            color: #334155;
+            margin-top: 4px;
+        }
+        .head-popup::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            pointer-events: none;
+            box-shadow: inset 4px 0 0 0 var(--accent);
+        }
+        .head-popup .progress {
+            height: 4px;
+            background: #e9eefb;
+            border-radius: 99px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+        .head-popup .progress .fill {
+            width: 100%;
+            height: 100%;
+            background: var(--accent);
+            transform: translateX(-100%);
+        }
+        .head-popup.show .progress .fill {
+            animation: lineFill var(--dur) linear forwards;
+        }
+        @keyframes lineFill {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0%); }
+        }
+        .head-popup.success { --accent: #10b981; }
+        .head-popup.warning { --accent: #facc15; }
+        .head-popup.error { --accent: #dc2626; }
+        .head-popup .hp-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            border: 1px solid #e7ecfa;
+            background: #fff;
+            cursor: pointer;
+            transition: all .2s ease;
+        }
+
+        /* Dark Mode */
+        body.dark-mode .product-title,
+        body.dark-mode .product-price { color: #e5e7eb; }
+        body.dark-mode .product-description { color: #a1a1a1; }
+        body.dark-mode .size-btn, body.dark-mode .color-btn {
+            border: 2px solid #4b5563;
+            background: #374151;
+            color: #e5e7eb;
+        }
+        body.dark-mode .size-btn:hover { border-color: #dc2626; }
+        body.dark-mode .size-btn.active {
+            border-color: #dc2626;
+            background-color: #dc2626;
+            color: #fff;
+        }
+        body.dark-mode .color-btn.active { box-shadow: 0 0 0 3px #dc2626; }
+        body.dark-mode .add-to-cart-btn {
+            background-color: #374151;
+            border: 2px solid #dc2626;
+            color: #dc2626;
+        }
+        body.dark-mode .add-to-cart-btn:hover {
+            background-color: #dc2626;
+            color: #fff;
+        }
+        body.dark-mode .buy-now-btn { background-color: #dc2626; }
+        body.dark-mode .head-popup {
+            background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+            color: #e5e7eb;
+            border: 1px solid #4b5563;
+        }
+    </style>
 </head>
 
 <body>
-  <div th:insert="~{header}"></div>
+<div th:insert="~{header}"></div>
 
-  <div class="container mt-4">
+<div class="container mt-4">
     <nav aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/" style="text-decoration:none;color:#000;">Home</a></li>
-        <li class="breadcrumb-item"><a th:href="@{/shop}" style="text-decoration:none;color:#000;">Shop</a></li>
-        <li class="breadcrumb-item active" th:text="${product.category != null ? product.category.name : 'Products'}">
-        </li>
-        <li class="breadcrumb-item active" th:text="${product.title}"></li>
-      </ol>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" style="text-decoration:none;">Home</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/shop}" style="text-decoration:none;">Shop</a></li>
+            <li class="breadcrumb-item active" th:text="${product.category != null ? product.category.name : 'Products'}"></li>
+            <li class="breadcrumb-item active" th:text="${product.title}"></li>
+        </ol>
     </nav>
-  </div>
+</div>
 
-  <main class="container product-detail-container">
+<main class="container product-detail-container">
     <div class="row">
-      <div class="col-md-6">
-        <div class="product-images">
-          <img id="mainImage" th:src="${product.primaryImageUrl}" th:alt="${product.title}" class="main-image" />
-          <div class="thumbnail-images">
-            <img th:src="${product.primaryImageUrl}" alt="thumbnail" class="thumbnail active"
-              onclick="changeMainImage(this)" />
-          </div>
+        <div class="col-md-6">
+            <img id="mainImage" th:src="${product.primaryImageUrl}" th:alt="${product.title}" class="main-image" />
         </div>
-      </div>
 
-      <div class="col-md-6">
-        <div class="product-details-section">
-          <p class="product-category" th:text="${product.category != null ? product.category.name : 'Uncategorized'}">
-          </p>
-          <h1 class="product-title" th:text="${product.title}"></h1>
+        <div class="col-md-6">
+            <div class="product-details-section">
+                <p class="text-muted" th:text="${product.category != null ? product.category.name : 'Uncategorized'}"></p>
+                <h1 class="product-title" th:text="${product.title}"></h1>
+                <div class="product-price" th:text="'$' + ${#numbers.formatDecimal(product.basePrice, 1, 2)}"></div>
+                <p class="product-description" th:text="${product.description ?: 'High-quality product'}"></p>
 
-          <div class="product-price-section">
-            <div class="product-price"
-              th:text="${#numbers.formatDecimal(product.basePrice, 0, 'COMMA', 2, 'POINT')} + ' $'"></div>
-            <div class="product-rating">
-              <span class="stars">★★★★★</span>
-              <span class="rating-count">(128 reviews)</span>
+                <!-- Hidden variant data for JS -->
+                <div style="display:none;">
+                    <div th:each="v : ${product.variants}"
+                         class="variant-data"
+                         th:data-variant-id="${v.id}"
+                         th:data-attributes="${v.attributeJson}">
+                    </div>
+                </div>
+
+                <!-- Size Selection -->
+                <div class="product-options" th:if="${product.variants != null and product.variants.size() > 0}">
+                    <label class="option-label">Select Size:</label>
+                    <div class="size-options">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Color Selection -->
+                <div class="product-options" th:if="${product.variants != null and product.variants.size() > 0}">
+                    <label class="option-label">Select Color:</label>
+                    <div class="color-options">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="quantity-section">
+                    <label style="font-weight:600;">Quantity:</label>
+                    <div class="quantity-input">
+                        <button onclick="decreaseQuantity()">−</button>
+                        <input type="number" id="quantity" value="1" min="1" readonly />
+                        <button onclick="increaseQuantity()">+</button>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="add-to-cart-btn" onclick="addToCart()">
+                        <i class="bi bi-cart-plus"></i> Add to Cart
+                    </button>
+                    <button class="buy-now-btn" onclick="buyNow()">
+                        <i class="bi bi-bag-check"></i> Buy Now
+                    </button>
+                </div>
+
+                <div class="product-meta" style="border-top:1px solid var(--border-color);padding-top:20px;">
+                    <div><strong>SKU:</strong> <span th:text="${product.sku ?: product.id}"></span></div>
+                    <div><strong>Category:</strong> <span th:text="${product.category?.name ?: 'N/A'}"></span></div>
+                </div>
             </div>
-          </div>
-
-          <p class="product-description"
-            th:text="${product.description != null ? product.description : 'High-quality product with premium materials and craftsmanship.'}">
-          </p>
-
-          <div class="product-options" th:if="${product.variants != null and product.variants.size() > 0}">
-            <label class="option-label">Select Size:</label>
-            <div class="size-options">
-              <button class="size-btn active" th:each="v, iter : ${product.variants}" th:data-variant-id="${v.id}"
-                th:data-attributes="${v.attributeJson}" th:onclick="selectSize(this)"
-                th:classappend="${iter.index == 0} ? ' active' : ''">
-              </button>
-            </div>
-          </div>
-
-          <div class="product-options" th:if="${product.variants != null and product.variants.size() > 0}">
-            <label class="option-label">Select Color:</label>
-            <div class="color-options">
-              <button class="color-btn active" th:each="v, iter : ${product.variants}"
-                th:data-attributes="${v.attributeJson}" th:onclick="selectColor(this)"
-                th:classappend="${iter.index == 0} ? ' active' : ''">
-              </button>
-            </div>
-          </div>
-
-          <div class="quantity-section">
-            <label style="font-weight:600;">Quantity:</label>
-            <div class="quantity-input">
-              <button onclick="decreaseQuantity()">−</button>
-              <input type="number" id="quantity" value="1" min="1" readonly />
-              <button onclick="increaseQuantity()">+</button>
-            </div>
-          </div>
-
-          <div class="action-buttons">
-            <button class="add-to-cart-btn" onclick="addToCart()">
-              <i class="bi bi-cart-plus"></i> Add to Cart
-            </button>
-            <button class="buy-now-btn" onclick="buyNow()">
-              <i class="bi bi-bag-check"></i> Buy Now
-            </button>
-          </div>
-
-          <div class="product-meta">
-            <div class="meta-item">
-              <strong>SKU:</strong> <span th:text="${product.sku != null ? product.sku : product.id}"></span>
-            </div>
-            <div class="meta-item">
-              <strong>Category:</strong> <span
-                th:text="${product.category != null ? product.category.name : 'N/A'}"></span>
-            </div>
-            <div class="meta-item">
-              <strong>Stock:</strong>
-              <span th:if="${product.variants != null and product.variants.size() > 0}">
-                <span th:text="${#lists.size(product.variants) > 0 ? 'In Stock' : 'Out of Stock'}"></span>
-              </span>
-              <span th:unless="${product.variants != null and product.variants.size() > 0}">In Stock</span>
-            </div>
-            <div class="meta-item">
-              <strong>Shipping:</strong> Free worldwide shipping on orders over 100,000₫
-            </div>
-          </div>
-
-          <div style="margin-top:20px;">
-            <p style="font-weight:600;margin-bottom:10px;">Share:</p>
-            <div style="display:flex;gap:15px;">
-              <a href="#" style="color:#000;font-size:20px;text-decoration:none;"><i class="bi bi-facebook"></i></a>
-              <a href="#" style="color:#000;font-size:20px;text-decoration:none;"><i class="bi bi-twitter"></i></a>
-              <a href="#" style="color:#000;font-size:20px;text-decoration:none;"><i class="bi bi-pinterest"></i></a>
-            </div>
-          </div>
-
         </div>
-      </div>
     </div>
+</main>
 
-    <section class="related-products" th:if="${relatedProducts != null and relatedProducts.size() > 0}">
-      <h2>You Might Also Like</h2>
-      <div class="products-grid">
-        <div class="product-card" th:each="p : ${relatedProducts}">
-          <a th:href="@{'/product/' + ${p.id}}" style="text-decoration:none;color:inherit;">
-            <div class="product-image">
-              <img th:src="${p.primaryImageUrl}" th:alt="${p.title}" />
-            </div>
-            <div class="product-info">
-              <h3 th:text="${p.title}"></h3>
-              <p class="text-muted" style="font-size:13px;"
-                th:text="${p.category != null ? p.category.name : 'Uncategorized'}"></p>
-              <div class="price" th:text="${#numbers.formatDecimal(p.basePrice, 0, 'COMMA', 2, 'POINT')} + ' ₫'"></div>
-            </div>
-          </a>
-        </div>
-      </div>
-    </section>
-  </main>
+<div th:replace="~{footer :: footer}"></div>
 
-  <div th:replace="~{footer :: footer}"></div>
-
-  <div class="head-popup success" id="headPopup" role="status" aria-live="polite">
-    <button class="hp-close" id="hpCloseBtn" aria-label="Close notification" title="Close">
-      <i class="bi bi-x-lg" aria-hidden="true"></i>
+<!-- Head Popup -->
+<div class="head-popup success" id="headPopup" role="status" aria-live="polite">
+    <button class="hp-close" id="hpCloseBtn" aria-label="Close" title="Close">
+        <i class="bi bi-x-lg"></i>
     </button>
     <div class="row-flex">
-      <div class="texts">
-        <div class="title" id="hpTitle">Added to cart</div>
-        <div class="desc" id="hpDesc">The item was successfully added to your cart.</div>
-      </div>
+        <div class="texts">
+            <div class="title" id="hpTitle">Added to cart</div>
+            <div class="desc" id="hpDesc">Item added successfully.</div>
+        </div>
     </div>
-    <div class="progress">
-      <div class="fill"></div>
-    </div>
-  </div>
+    <div class="progress"><div class="fill"></div></div>
+</div>
 
-  <script>
-    // ---------- Head Popup (Progress + Close X) ----------
+<script th:src="@{/js/cart-update.js}"></script>
+<script th:src="@{/js/theme-customizer.js}"></script>
+<script th:src="@{/js/header.js}"></script>
+
+<script th:inline="javascript">
+    // ========== GLOBAL STATE ==========
+    let productVariants = [];
+    let uniqueSizes = [];
+    let uniqueColors = [];
     let hideTimer = null;
 
-    function showHeadNotification(title, desc = '', options = {}) {
-      const popup = document.getElementById('headPopup');
-      const t = document.getElementById('hpTitle');
-      const d = document.getElementById('hpDesc');
-      const closeBtn = document.getElementById('hpCloseBtn');
+    // ⭐ Get productId from Thymeleaf
+    const productId = /*[[${product.id}]]*/ 1;
 
-      // Variant & duration
-      popup.classList.remove('success', 'warning', 'error');
-      const variant = options.variant || 'success';
-      popup.classList.add(variant);
-
-      const duration = options.duration || 2600;
-      popup.style.setProperty('--dur', duration + 'ms');
-
-      // Set texts
-      t.textContent = title || 'Notice';
-      d.textContent = desc || '';
-
-      // Restart progress animation cleanly
-      const fill = popup.querySelector('.fill');
-      fill.style.animation = 'none';
-      void fill.offsetWidth; // force reflow
-      fill.style.animation = '';
-
-      // Show
-      popup.classList.add('show');
-
-      // Clear previous timers if any
-      clearTimeout(hideTimer);
-      hideTimer = setTimeout(() => hideHeadNotification(), duration + 80);
-
-      // Close button binds (idempotent)
-      if (closeBtn && !closeBtn.dataset.bound) {
-        closeBtn.addEventListener('click', () => {
-          clearTimeout(hideTimer);
-          hideHeadNotification();
-        });
-        closeBtn.dataset.bound = '1';
-      }
-    }
-
-    function hideHeadNotification() {
-      const popup = document.getElementById('headPopup');
-      popup.classList.remove('show');
-    }
-
-    // ---------- Page logic ----------
-    document.addEventListener("DOMContentLoaded", () => {
-      // Labels for size/color from JSON
-      document.querySelectorAll(".size-btn").forEach(btn => {
-        try {
-          const attrs = JSON.parse(btn.dataset.attributes || "{}");
-          btn.textContent = attrs.size || "Size";
-        } catch {
-          btn.textContent = "Size";
-        }
-      });
-
-      document.querySelectorAll(".color-btn").forEach(btn => {
-        try {
-          const attrs = JSON.parse(btn.dataset.attributes || "{}");
-          btn.style.background = attrs.color || "#ddd";
-        } catch {
-          btn.style.background = "#ddd";
-        }
-      });
+    // ========== INITIALIZATION ==========
+    document.addEventListener('DOMContentLoaded', () => {
+        initializeVariants();
     });
 
-    function changeMainImage(thumbnail) {
-      const mainImage = document.getElementById("mainImage");
-      mainImage.src = thumbnail.src;
-      document.querySelectorAll(".thumbnail").forEach(img => img.classList.remove("active"));
-      thumbnail.classList.add("active");
+    function initializeVariants() {
+        // Parse all variants from hidden .variant-data elements
+        document.querySelectorAll('.variant-data').forEach(el => {
+            try {
+                const variantId = el.dataset.variantId;
+                const attrs = JSON.parse(el.dataset.attributes || '{}');
+
+                if (variantId && attrs.size && attrs.color) {
+                    productVariants.push({
+                        id: variantId,
+                        size: attrs.size,
+                        color: attrs.color
+                    });
+                }
+            } catch (e) {
+                console.error('Error parsing variant:', e);
+            }
+        });
+
+        console.log('✅ Parsed variants:', productVariants);
+
+        // Extract unique sizes and colors
+        uniqueSizes = [...new Set(productVariants.map(v => v.size))].filter(Boolean);
+        uniqueColors = [...new Set(productVariants.map(v => v.color))].filter(Boolean);
+
+        console.log('📦 Unique sizes:', uniqueSizes);
+        console.log('🎨 Unique colors:', uniqueColors);
+
+        // Build size and color buttons
+        buildSizeButtons();
+        buildColorButtons();
     }
 
+    function buildSizeButtons() {
+        const container = document.querySelector('.size-options');
+        if (!container || uniqueSizes.length === 0) return;
+
+        container.innerHTML = '';
+        uniqueSizes.forEach((size, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'size-btn' + (index === 0 ? ' active' : '');
+            btn.textContent = size;
+            btn.dataset.value = size;
+            btn.onclick = function() { selectSize(this); };
+            container.appendChild(btn);
+        });
+    }
+
+    function buildColorButtons() {
+        const container = document.querySelector('.color-options');
+        if (!container || uniqueColors.length === 0) return;
+
+        container.innerHTML = '';
+        uniqueColors.forEach((color, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'color-btn' + (index === 0 ? ' active' : '');
+            btn.style.backgroundColor = color;
+            btn.dataset.value = color;
+            btn.title = color;
+            btn.onclick = function() { selectColor(this); };
+            container.appendChild(btn);
+        });
+    }
+
+    // ========== USER INTERACTIONS ==========
     function selectSize(btn) {
-      document.querySelectorAll(".size-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
+        document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        console.log('📏 Selected size:', btn.dataset.value);
     }
 
     function selectColor(btn) {
-      document.querySelectorAll(".color-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
+        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        console.log('🎨 Selected color:', btn.dataset.value);
     }
 
     function increaseQuantity() {
-      const input = document.getElementById("quantity");
-      input.value = parseInt(input.value) + 1;
+        const input = document.getElementById('quantity');
+        input.value = parseInt(input.value) + 1;
     }
 
     function decreaseQuantity() {
-      const input = document.getElementById("quantity");
-      if (parseInt(input.value) > 1) input.value = parseInt(input.value) - 1;
+        const input = document.getElementById('quantity');
+        const val = parseInt(input.value);
+        if (val > 1) input.value = val - 1;
     }
 
+    // ========== ADD TO CART ==========
     async function addToCart(goCheckoutAfter = false) {
-      const activeBtn = document.querySelector('.size-btn.active');
-      const qty = document.getElementById('quantity').value;
+        const activeSizeBtn = document.querySelector('.size-btn.active');
+        const activeColorBtn = document.querySelector('.color-btn.active');
+        const qty = parseInt(document.getElementById('quantity').value);
 
-      if (!activeBtn) {
-        showHeadNotification(
-          "Select a size first",
-          "Please choose a size (or a valid variant) before adding to cart.", {
-          variant: "warning",
-          duration: 3200
+        // Validate size selection
+        if (!activeSizeBtn) {
+            showHeadNotification(
+                'Select a size',
+                'Please choose a size before adding to cart.',
+                { variant: 'warning', duration: 3200 }
+            );
+            return;
         }
-        );
-        return;
-      }
 
-      const variantId = activeBtn.dataset.variantId;
-      if (!variantId) {
-        showHeadNotification(
-          "Variant is not available",
-          "This product variant is missing or invalid.", {
-          variant: "error",
-          duration: 3200
+        // Validate color selection
+        if (!activeColorBtn) {
+            showHeadNotification(
+                'Select a color',
+                'Please choose a color before adding to cart.',
+                { variant: 'warning', duration: 3200 }
+            );
+            return;
         }
-        );
-        return;
-      }
 
-      // Sử dụng hàm addToCartWithUpdate từ cart-update.js
-      const success = await addToCartWithUpdate(variantId, qty);
-      if (success && goCheckoutAfter) {
-        setTimeout(() => window.location.href = "/checkout", 600);
-      }
+        // ⭐ BUILD selectedOptions object
+        const selectedOptions = {
+            size: activeSizeBtn.dataset.value,
+            color: activeColorBtn.dataset.value
+        };
+
+        console.log('🛒 Adding to cart:', {
+            productId: productId,
+            selectedOptions: selectedOptions,
+            qty: qty
+        });
+
+        // ⭐ CALL addToCartWithUpdate với productId + selectedOptions
+        try {
+            const success = await addToCartWithUpdate(productId, selectedOptions, qty);
+
+            if (success && goCheckoutAfter) {
+                setTimeout(() => {
+                    window.location.href = '/fashionshop/checkout';
+                }, 600);
+            }
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            showHeadNotification(
+                'Error',
+                'Failed to add item to cart. Please try again.',
+                { variant: 'error', duration: 3200 }
+            );
+        }
     }
-
 
     function buyNow() {
-      addToCart(true);
+        addToCart(true);
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      updateCartBadge();
-    });
-  </script>
+    // ========== HEAD NOTIFICATION ==========
+    function showHeadNotification(title, desc = '', options = {}) {
+        const popup = document.getElementById('headPopup');
+        if (!popup) return;
 
-  <script th:src="@{/js/theme-customizer.js}"></script>
-  <script th:src="@{/js/header.js}"></script>
-  <script th:src="@{/js/cart-update.js}"></script>
+        const t = document.getElementById('hpTitle');
+        const d = document.getElementById('hpDesc');
+        const closeBtn = document.getElementById('hpCloseBtn');
 
+        // Set variant
+        popup.classList.remove('success', 'warning', 'error');
+        const variant = options.variant || 'success';
+        popup.classList.add(variant);
+
+        // Set duration
+        const duration = options.duration || 2600;
+        popup.style.setProperty('--dur', duration + 'ms');
+
+        // Set text
+        t.textContent = title || 'Notice';
+        d.textContent = desc || '';
+
+        // Restart animation
+        const fill = popup.querySelector('.fill');
+        if (fill) {
+            fill.style.animation = 'none';
+            void fill.offsetWidth;
+            fill.style.animation = '';
+        }
+
+        // Show popup
+        popup.classList.add('show');
+
+        // Auto hide
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(() => {
+            popup.classList.remove('show');
+        }, duration + 80);
+
+        // Close button
+        if (closeBtn && !closeBtn.dataset.bound) {
+            closeBtn.addEventListener('click', () => {
+                clearTimeout(hideTimer);
+                popup.classList.remove('show');
+            });
+            closeBtn.dataset.bound = '1';
+        }
+    }
+
+    console.log('✅ Product detail page loaded successfully');
+</script>
 </body>
-
 </html>
