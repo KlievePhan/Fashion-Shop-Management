@@ -364,8 +364,9 @@
                                 </td>
                                 <td th:text="${log.entity}"></td>
                                 <td>
-                                    <span class="changes-preview" th:title="${log.changes}"
-                                        th:text="${#strings.abbreviate(log.changes, 50)}"></span>
+                                    <span class="changes-preview"
+                                    th:utext="${#strings.abbreviate(log.getChangesDisplay(), 100)}"
+                                    th:title="${log.changes}"></span>
                                 </td>
                                 <td th:text="${#temporals.format(log.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
                             </tr>
@@ -965,7 +966,7 @@
         function togglePasswordVisibility(inputId, iconId) {
             const input = document.getElementById(inputId);
             const icon = document.getElementById(iconId);
-            
+
             if (input.type === "password") {
                 input.type = "text";
                 icon.textContent = "🙈"; // Closed eye
@@ -980,7 +981,7 @@
             const email = document.getElementById("email").value;
             const emailError = document.getElementById("emailError");
             const userId = document.getElementById("userId").value;
-            
+
             if (email.length > 0) {
                 // Check email format first
                 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -990,7 +991,7 @@
                     emailError.style.display = "block";
                     return;
                 }
-                
+
                 // Check if email exists in database
                 fetch(`${contextPath}admin/check-email?email=${encodeURIComponent(email)}${userId ? "&id=" + userId : ""}`)
                     .then(r => r.json())
@@ -1017,7 +1018,7 @@
             const pwd = document.getElementById("password").value;
             const passwordError = document.getElementById("passwordError");
             const pattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&+=!])(?=\S+$).{8,}$/;
-            
+
             if (pwd.length > 0) {
                 if (!pattern.test(pwd)) {
                     passwordError.textContent = "Must be 8+ chars: 1 uppercase, 1 digit, 1 special (!@#$%^&*)";
@@ -1031,7 +1032,7 @@
             } else {
                 passwordError.style.display = "none";
             }
-            
+
             // Cũng validate confirm password nếu đã nhập
             validateConfirmPasswordRealtime();
         }
@@ -1040,7 +1041,7 @@
             const pwd = document.getElementById("password").value;
             const confirmPwd = document.getElementById("confirmPassword").value;
             const confirmPasswordError = document.getElementById("confirmPasswordError");
-            
+
             if (confirmPwd.length > 0) {
                 if (pwd === confirmPwd) {
                     confirmPasswordError.textContent = "Passwords match";
@@ -1061,14 +1062,14 @@
             const pwd = document.getElementById("password").value;
             const confirmPwd = document.getElementById("confirmPassword").value;
             const pattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&+=!])(?=\S+$).{8,}$/;
-            
+
             const confirmPasswordError = document.getElementById("confirmPasswordError");
-            
+
             // Clear previous errors
             if (confirmPasswordError) {
                 confirmPasswordError.textContent = "";
             }
-            
+
             // For new users, check password requirements
             if (isNew) {
                 // Check if password is entered
@@ -1076,13 +1077,13 @@
                     showNotification("Password is required!", "error");
                     return false;
                 }
-                
+
                 // Check password strength
                 if (!pattern.test(pwd)) {
                     showNotification("Password must be 8+ chars: 1 uppercase, 1 digit, 1 special (!@#$%^&*)", "error");
                     return false;
                 }
-                
+
                 // Check if confirm password matches
                 if (pwd !== confirmPwd) {
                     if (confirmPasswordError) {
@@ -1092,7 +1093,7 @@
                     return false;
                 }
             }
-            
+
             return true;
         }
     </script>
