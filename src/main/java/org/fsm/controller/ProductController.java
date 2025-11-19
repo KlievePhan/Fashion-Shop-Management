@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.fsm.dto.ProductDTO;
 import org.fsm.entity.*;
+import org.fsm.repository.ProductOptionRepository;
+import org.fsm.repository.ProductRepository;
 import org.fsm.repository.UserRepository;
 import org.fsm.service.AuditLogService;
 import org.fsm.service.ProductService;
@@ -32,6 +34,34 @@ public class ProductController {
     private final AuditLogService auditLogService;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
+    private final ProductRepository productRepository;
+    private final ProductOptionRepository productOptionRepository;
+
+    @GetMapping("/product/{id}")
+    public String getProductDetail(@PathVariable Long id, Model model) {
+        // Load product
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
+
+        // Load all active options
+        List<ProductOption> allOptions = productOptionRepository.findActiveOptionsByProductId(id);
+
+        // Tách SIZE và COLOR options
+        List<ProductOption> sizeOptions = allOptions.stream()
+                .filter(opt -> "SIZE".equalsIgnoreCase(opt.getOptionType()))
+                .collect(Collectors.toList());
+
+        List<ProductOption> colorOptions = allOptions.stream()
+                .filter(opt -> "COLOR".equalsIgnoreCase(opt.getOptionType()))
+                .collect(Collectors.toList());
+
+        // Add to model
+        model.addAttribute("product", product);
+        model.addAttribute("sizeOptions", sizeOptions);
+        model.addAttribute("colorOptions", colorOptions);
+
+        return "product-detail";
+    }
 
     @GetMapping
     public String listProducts(Model model) {
