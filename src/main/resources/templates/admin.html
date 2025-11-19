@@ -443,43 +443,56 @@
                 <input type="hidden" id="userId" name="id" />
 
                 <div class="form-group">
-                    <label>Full Name</label>
+                    <label>Full Name *</label>
                     <input type="text" id="fullName" name="fullName" required maxlength="255" class="form-control"
                         placeholder="e.g., John Doe" />
                 </div>
 
                 <div class="form-group">
-                    <label>Email</label>
+                    <label>Email *</label>
                     <input type="email" id="email" name="email" required maxlength="255" class="form-control"
-                        placeholder="e.g., john@example.com" />
-                    <small id="emailError" style="color: #dc2626; font-size: 12px"></small>
+                        placeholder="e.g., john@example.com" oninput="validateEmailRealtime()" />
+                    <small id="emailError" style="font-size: 12px; display: none;"></small>
                 </div>
 
                 <div class="form-group" id="passwordGroup">
-                    <label>Password
-                        <span id="passwordHint" style="color: #6b7280; font-size: 12px">
-                            (required for new users)
+                    <label>Password *</label>
+                    <div style="position: relative;">
+                        <input type="password" id="password" name="password" class="form-control"
+                            placeholder="Enter your password" oninput="validatePasswordRealtime()" 
+                            style="padding-right: 40px;" />
+                        <span onclick="togglePasswordVisibility('password', 'togglePasswordIcon')" 
+                            style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 18px;">
+                            <i id="togglePasswordIcon">👁️</i>
                         </span>
-                    </label>
-                    <input type="password" id="password" name="password" class="form-control"
-                        placeholder="Leave blank to keep current" />
-                    <div class="password-hint">
-                        <strong>Password requirements:</strong>
-                        <ul>
-                            <li>At least 8 characters</li>
-                            <li>At least 1 uppercase letter, 1 number, 1 special char</li>
-                        </ul>
                     </div>
+                    <small id="passwordError" style="font-size: 12px; display: none;"></small>
+                </div>
+
+                <div class="form-group" id="confirmPasswordGroup">
+                    <label>Confirm Password *</label>
+                    <div style="position: relative;">
+                        <input type="password" id="confirmPassword" name="confirmPassword" class="form-control"
+                            placeholder="Re-enter your password" oninput="validateConfirmPasswordRealtime()" 
+                            style="padding-right: 40px;" />
+                        <span onclick="togglePasswordVisibility('confirmPassword', 'toggleConfirmPasswordIcon')" 
+                            style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 18px;">
+                            <i id="toggleConfirmPasswordIcon">👁️</i>
+                        </span>
+                    </div>
+                    <small id="confirmPasswordError" style="font-size: 12px; display: none;"></small>
                 </div>
 
                 <div class="form-group" id="resetPasswordGroup" style="display: none">
-                    <label>Reset Password</label>
-                    <input type="checkbox" name="resetPassword" id="resetPassword" />
-                    <small>Check to reset password to 12345678</small>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" name="resetPassword" id="resetPassword" style="width: auto; margin: 0;" />
+                        <span>Reset Password</span>
+                    </label>
+                    <small style="margin-left: 28px;">Check to reset password to 12345678</small>
                 </div>
 
                 <div class="form-group">
-                    <label>Role</label>
+                    <label>Role *</label>
                     <select id="roleCode" name="roleCode" required class="form-control">
                         <option th:each="role : ${roles}" th:value="${role.code}" th:text="${role.name}"></option>
                     </select>
@@ -623,61 +636,61 @@
                 btn.disabled = false;
             }
         }
-        // SAVE USER
+
         // SAVE USER FUNCTION
         async function handleSaveUser(e) {
-    e.preventDefault(); // không cho submit reload trang
+            e.preventDefault(); // không cho submit reload trang
 
-    // 1. Validate
-    if (!validateUserForm()) return;
+            // 1. Validate
+            if (!validateUserForm()) return;
 
-    // 2. Lấy data từ form
-    const form = document.getElementById("userForm");
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
+            // 2. Lấy data từ form
+            const form = document.getElementById("userForm");
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
 
-    // Fix Checkbox & ID
-    const isNew = !data.id; // true = thêm mới, false = update
-    data.resetPassword = document.getElementById("resetPassword").checked;
-    if (!data.id) data.id = null;
+            // Fix Checkbox & ID
+            const isNew = !data.id; // true = thêm mới, false = update
+            data.resetPassword = document.getElementById("resetPassword").checked;
+            if (!data.id) data.id = null;
 
-    // 3. UI Feedback
-    const btn = form.querySelector('button[type="submit"]');
-    const originalText = btn.innerText;
-    btn.disabled = true;
-    btn.innerText = "Saving...";
+            // 3. UI Feedback
+            const btn = form.querySelector('button[type="submit"]');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = "Saving...";
 
-    try {
-        // 4. Gửi request AJAX
-        const res = await secureFetch(contextPath + "admin/users/save", {
-            method: "POST",
-            body: JSON.stringify(data),
-        });
+            try {
+                // 4. Gửi request AJAX
+                const res = await secureFetch(contextPath + "admin/users/save", {
+                    method: "POST",
+                    body: JSON.stringify(data),
+                });
 
-        if (res.ok) {
-            showNotification(
-                isNew ? "User created successfully" : "User updated successfully",
-                "success"
-            );
-            closeUserModal();
+                if (res.ok) {
+                    showNotification(
+                        isNew ? "User created successfully" : "User updated successfully",
+                        "success"
+                    );
+                    closeUserModal();
 
-            // 🌟 Quan trọng: đảm bảo sau reload vẫn ở tab Users
-            localStorage.setItem("adminActiveTab", "users");
+                    // 🌟 Quan trọng: đảm bảo sau reload vẫn ở tab Users
+                    localStorage.setItem("adminActiveTab", "users");
 
-            // Reload lại trang để load data mới
-            setTimeout(() => location.reload(), 800);
-        } else {
-            const text = await res.text();
-            showNotification(text || "Error saving user", "error");
+                    // Reload lại trang để load data mới
+                    setTimeout(() => location.reload(), 800);
+                } else {
+                    const text = await res.text();
+                    showNotification(text || "Error saving user", "error");
+                }
+            } catch (err) {
+                console.error(err);
+                showNotification("System error occurred", "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }
         }
-    } catch (err) {
-        console.error(err);
-        showNotification("System error occurred", "error");
-    } finally {
-        btn.disabled = false;
-        btn.innerText = originalText;
-    }
-}
 
         // UPDATE ROLE (AJAX)
         async function updateUserRole(userId, selectElement) {
@@ -756,100 +769,100 @@
         }
 
         // --- 4. Helpers & Init ---
-       document.addEventListener("DOMContentLoaded", () => {
-    const navItems = document.querySelectorAll(".nav-item");
-    const sections = document.querySelectorAll(".content-section");
-    const pageTitleEl = document.getElementById("pageTitle");
+        document.addEventListener("DOMContentLoaded", () => {
+            const navItems = document.querySelectorAll(".nav-item");
+            const sections = document.querySelectorAll(".content-section");
+            const pageTitleEl = document.getElementById("pageTitle");
 
-    // Hàm kích hoạt 1 tab + lưu vào localStorage
-    function activateTab(sectionId) {
-        // clear trạng thái cũ
-        navItems.forEach(n => n.classList.remove("active"));
-        sections.forEach(s => s.classList.remove("active"));
+            // Hàm kích hoạt 1 tab + lưu vào localStorage
+            function activateTab(sectionId) {
+                // clear trạng thái cũ
+                navItems.forEach(n => n.classList.remove("active"));
+                sections.forEach(s => s.classList.remove("active"));
 
-        // set active cho nav
-        const activeNav = document.querySelector(`.nav-item[data-section="${sectionId}"]`);
-        if (activeNav) {
-            activeNav.classList.add("active");
-            if (pageTitleEl) {
-                pageTitleEl.textContent = activeNav.textContent.trim();
+                // set active cho nav
+                const activeNav = document.querySelector(`.nav-item[data-section="${sectionId}"]`);
+                if (activeNav) {
+                    activeNav.classList.add("active");
+                    if (pageTitleEl) {
+                        pageTitleEl.textContent = activeNav.textContent.trim();
+                    }
+                }
+
+                // set active cho section
+                const activeSection = document.getElementById(sectionId);
+                if (activeSection) {
+                    activeSection.classList.add("active");
+                }
+
+                // lưu tab hiện tại
+                localStorage.setItem("adminActiveTab", sectionId);
             }
-        }
 
-        // set active cho section
-        const activeSection = document.getElementById(sectionId);
-        if (activeSection) {
-            activeSection.classList.add("active");
-        }
+            // Lấy tab đã lưu, mặc định là dashboard
+            const savedTab = localStorage.getItem("adminActiveTab") || "dashboard";
+            activateTab(savedTab);
 
-        // lưu tab hiện tại
-        localStorage.setItem("adminActiveTab", sectionId);
-    }
-
-    // Lấy tab đã lưu, mặc định là dashboard
-    const savedTab = localStorage.getItem("adminActiveTab") || "dashboard";
-    activateTab(savedTab);
-
-    // Gắn event click cho menu
-    navItems.forEach((item) => {
-        item.addEventListener("click", function (e) {
-            e.preventDefault();
-            const sectionId = this.dataset.section;
-            if (sectionId) {
-                activateTab(sectionId);
-            }
-        });
-    });
-
-    updateUserStats();
-
-    // Email check
-    const emailInput = document.getElementById("email");
-    if (emailInput) {
-        emailInput.addEventListener("blur", function () {
-            const email = this.value;
-            const id = document.getElementById("userId").value;
-            if (!email) return;
-            fetch(
-                `${contextPath}admin/check-email?email=${encodeURIComponent(
-                    email
-                )}${id ? "&id=" + id : ""}`
-            )
-                .then((r) => r.json())
-                .then((d) => {
-                    const err = document.getElementById("emailError");
-                    const btn = document.querySelector(
-                        '#userModal button[type="submit"]'
-                    );
-                    if (d.exists) {
-                        err.textContent = "Email exists";
-                        btn.disabled = true;
-                    } else {
-                        err.textContent = "";
-                        btn.disabled = false;
+            // Gắn event click cho menu
+            navItems.forEach((item) => {
+                item.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    const sectionId = this.dataset.section;
+                    if (sectionId) {
+                        activateTab(sectionId);
                     }
                 });
-        });
-    }
+            });
 
-    // Mobile dropdown toggle
-    const dropdownToggle = document.querySelector(".dropdown-toggle");
-    const dropdownMenu = document.querySelector(".dropdown-menu");
+            updateUserStats();
 
-    if (dropdownToggle && dropdownMenu) {
-        dropdownToggle.addEventListener("click", (e) => {
-            e.stopPropagation();
-            dropdownMenu.classList.toggle("show");
-        });
+            // Email check
+            const emailInput = document.getElementById("email");
+            if (emailInput) {
+                emailInput.addEventListener("blur", function () {
+                    const email = this.value;
+                    const id = document.getElementById("userId").value;
+                    if (!email) return;
+                    fetch(
+                        `${contextPath}admin/check-email?email=${encodeURIComponent(
+                            email
+                        )}${id ? "&id=" + id : ""}`
+                    )
+                        .then((r) => r.json())
+                        .then((d) => {
+                            const err = document.getElementById("emailError");
+                            const btn = document.querySelector(
+                                '#userModal button[type="submit"]'
+                            );
+                            if (d.exists) {
+                                err.textContent = "Email exists";
+                                btn.disabled = true;
+                            } else {
+                                err.textContent = "";
+                                btn.disabled = false;
+                            }
+                        });
+                });
+            }
 
-        // Close when clicking outside
-        document.addEventListener("click", (e) => {
-            if (!e.target.closest(".profile-dropdown")) {
-                dropdownMenu.classList.remove("show");
+            // Mobile dropdown toggle
+            const dropdownToggle = document.querySelector(".dropdown-toggle");
+            const dropdownMenu = document.querySelector(".dropdown-menu");
+
+            if (dropdownToggle && dropdownMenu) {
+                dropdownToggle.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    dropdownMenu.classList.toggle("show");
+                });
+
+                // Close when clicking outside
+                document.addEventListener("click", (e) => {
+                    if (!e.target.closest(".profile-dropdown")) {
+                        dropdownMenu.classList.remove("show");
+                    }
+                });
             }
         });
-    }
-});
 
         function updateUserStats() {
             const rows = document.querySelectorAll("#users tbody tr");
@@ -886,8 +899,15 @@
             document.getElementById("userForm").reset();
             document.getElementById("userId").value = "";
             document.getElementById("passwordGroup").style.display = "block";
+            document.getElementById("confirmPasswordGroup").style.display = "block";
             document.getElementById("resetPasswordGroup").style.display = "none";
             document.getElementById("password").required = true;
+            document.getElementById("confirmPassword").required = true;
+            document.getElementById("email").required = true;
+            document.getElementById("email").readOnly = false;
+            document.getElementById("email").style.backgroundColor = "#ffffff";
+            document.getElementById("emailError").textContent = "";
+            document.getElementById("confirmPasswordError").textContent = "";
             document.getElementById("userModal").style.display = "flex";
         });
 
@@ -899,12 +919,20 @@
                     document.getElementById("userId").value = u.id;
                     document.getElementById("fullName").value = u.fullName;
                     document.getElementById("email").value = u.email;
+                    document.getElementById("email").readOnly = true;
+                    document.getElementById("email").style.backgroundColor = "#f3f4f6";
+                    document.getElementById("email").required = true;
                     document.getElementById("roleCode").value = u.role.code;
                     document.getElementById("password").value = "";
-                    document.getElementById("passwordGroup").style.display = "none";
-                    document.getElementById("resetPasswordGroup").style.display =
-                        "block";
                     document.getElementById("password").required = false;
+                    document.getElementById("confirmPassword").value = "";
+                    document.getElementById("confirmPassword").required = false;
+                    document.getElementById("passwordGroup").style.display = "none";
+                    document.getElementById("confirmPasswordGroup").style.display = "none";
+                    document.getElementById("resetPasswordGroup").style.display = "block";
+                    document.getElementById("resetPassword").checked = false;
+                    document.getElementById("emailError").textContent = "";
+                    document.getElementById("confirmPasswordError").textContent = "";
                     document.getElementById("userModal").style.display = "flex";
                 })
                 .catch(() => showNotification("Error loading user", "error"));
@@ -921,7 +949,7 @@
                     document.getElementById(
                         "detailActive"
                     ).innerHTML = `<span class="badge ${u.active ? "success" : "danger"
-                    }">${u.active ? "Active" : "Inactive"}</span>`;
+                        }">${u.active ? "Active" : "Inactive"}</span>`;
                     document.getElementById("userDetailModal").style.display = "flex";
                 });
         }
@@ -933,14 +961,138 @@
             document.getElementById("userDetailModal").style.display = "none";
         }
 
+        // Toggle Password Visibility
+        function togglePasswordVisibility(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            
+            if (input.type === "password") {
+                input.type = "text";
+                icon.textContent = "🙈"; // Closed eye
+            } else {
+                input.type = "password";
+                icon.textContent = "👁️"; // Open eye
+            }
+        }
+
+        // Validate Email Real-time
+        function validateEmailRealtime() {
+            const email = document.getElementById("email").value;
+            const emailError = document.getElementById("emailError");
+            const userId = document.getElementById("userId").value;
+            
+            if (email.length > 0) {
+                // Check email format first
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(email)) {
+                    emailError.textContent = "Invalid email format";
+                    emailError.style.color = "#dc2626";
+                    emailError.style.display = "block";
+                    return;
+                }
+                
+                // Check if email exists in database
+                fetch(`${contextPath}admin/check-email?email=${encodeURIComponent(email)}${userId ? "&id=" + userId : ""}`)
+                    .then(r => r.json())
+                    .then(d => {
+                        if (d.exists) {
+                            emailError.textContent = "Email already exists";
+                            emailError.style.color = "#dc2626";
+                            emailError.style.display = "block";
+                        } else {
+                            emailError.textContent = "Email available";
+                            emailError.style.color = "#10B981";
+                            emailError.style.display = "block";
+                        }
+                    })
+                    .catch(() => {
+                        emailError.style.display = "none";
+                    });
+            } else {
+                emailError.style.display = "none";
+            }
+        }
+
+        function validatePasswordRealtime() {
+            const pwd = document.getElementById("password").value;
+            const passwordError = document.getElementById("passwordError");
+            const pattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&+=!])(?=\S+$).{8,}$/;
+            
+            if (pwd.length > 0) {
+                if (!pattern.test(pwd)) {
+                    passwordError.textContent = "Must be 8+ chars: 1 uppercase, 1 digit, 1 special (!@#$%^&*)";
+                    passwordError.style.color = "#dc2626";
+                    passwordError.style.display = "block";
+                } else {
+                    passwordError.textContent = "Strong password";
+                    passwordError.style.color = "#10B981"; // green
+                    passwordError.style.display = "block";
+                }
+            } else {
+                passwordError.style.display = "none";
+            }
+            
+            // Cũng validate confirm password nếu đã nhập
+            validateConfirmPasswordRealtime();
+        }
+
+        function validateConfirmPasswordRealtime() {
+            const pwd = document.getElementById("password").value;
+            const confirmPwd = document.getElementById("confirmPassword").value;
+            const confirmPasswordError = document.getElementById("confirmPasswordError");
+            
+            if (confirmPwd.length > 0) {
+                if (pwd === confirmPwd) {
+                    confirmPasswordError.textContent = "Passwords match";
+                    confirmPasswordError.style.color = "#10B981"; // green
+                    confirmPasswordError.style.display = "block";
+                } else {
+                    confirmPasswordError.textContent = "Passwords must match";
+                    confirmPasswordError.style.color = "#dc2626"; // red
+                    confirmPasswordError.style.display = "block";
+                }
+            } else {
+                confirmPasswordError.style.display = "none";
+            }
+        }
+
         function validateUserForm() {
             const isNew = !document.getElementById("userId").value;
             const pwd = document.getElementById("password").value;
+            const confirmPwd = document.getElementById("confirmPassword").value;
             const pattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&+=!])(?=\S+$).{8,}$/;
-            if ((isNew || pwd) && !pattern.test(pwd)) {
-                showNotification("Password too weak!", "error");
-                return false;
+            
+            const confirmPasswordError = document.getElementById("confirmPasswordError");
+            
+            // Clear previous errors
+            if (confirmPasswordError) {
+                confirmPasswordError.textContent = "";
             }
+            
+            // For new users, check password requirements
+            if (isNew) {
+                // Check if password is entered
+                if (!pwd || pwd.trim() === "") {
+                    showNotification("Password is required!", "error");
+                    return false;
+                }
+                
+                // Check password strength
+                if (!pattern.test(pwd)) {
+                    showNotification("Password must be 8+ chars: 1 uppercase, 1 digit, 1 special (!@#$%^&*)", "error");
+                    return false;
+                }
+                
+                // Check if confirm password matches
+                if (pwd !== confirmPwd) {
+                    if (confirmPasswordError) {
+                        confirmPasswordError.textContent = "Passwords must match";
+                    }
+                    showNotification("Passwords must match!", "error");
+                    return false;
+                }
+            }
+            
             return true;
         }
     </script>
