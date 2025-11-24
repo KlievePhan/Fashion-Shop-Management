@@ -67,13 +67,13 @@ public class HomeController {
     // return "admin";
     // }
 
-    @GetMapping("/shop")
-    public String shop(Model model) {
-        model.addAttribute("currentPath", "/shop");
-        List<Product> products = productRepository.findAll();
-        model.addAttribute("products", products);
-        return "shop";
-    }
+//    @GetMapping("/shop")
+//    public String shop(Model model) {
+//        model.addAttribute("currentPath", "/shop");
+//        List<Product> products = productRepository.findAll();
+//        model.addAttribute("products", products);
+//        return "shop";
+//    }
 
     @GetMapping("/about")
     public String about(Model model) {
