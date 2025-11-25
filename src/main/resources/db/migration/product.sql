@@ -1,18 +1,13 @@
-INSERT INTO brands (name, slug, created_at)
-VALUES
-    ('Nike', 'nike', NOW()),
-    ('Adidas', 'adidas', NOW()),
-    ('Puma', 'puma', NOW());
 
 -- 2️⃣ PRODUCTS
 INSERT INTO products (sku, title, description, brand_id, category_id, base_price, active, created_at, updated_at)
 VALUES
-    ('NK-AIR-001', 'Nike Air Zoom Pegasus 40', 'Giày chạy bộ hiệu năng cao của Nike.', 1, NULL, 2990000, 1, NOW(), NOW()),
-    ('NK-DUNK-002', 'Nike Dunk Low Retro', 'Sneaker cổ điển phong cách streetwear.', 1, NULL, 2590000, 1, NOW(), NOW()),
-    ('AD-ULTRA-003', 'Adidas Ultraboost 23', 'Giày chạy bộ cao cấp với công nghệ Boost.', 2, NULL, 3290000, 1, NOW(), NOW()),
-    ('AD-STAN-004', 'Adidas Stan Smith', 'Mẫu sneaker huyền thoại với thiết kế tối giản.', 2, NULL, 2190000, 1, NOW(), NOW()),
-    ('PM-RSX-005', 'Puma RS-X3 Puzzle', 'Giày thời trang hiện đại với phối màu năng động.', 3, NULL, 2890000, 1, NOW(), NOW()),
-    ('PM-SUEDE-006', 'Puma Suede Classic', 'Biểu tượng thời trang với chất liệu da lộn cổ điển.', 3, NULL, 1990000, 1, NOW(), NOW());
+    ('NK-AIR-001', 'Nike Air Zoom Pegasus 40', 'Giày chạy bộ hiệu năng cao của Nike.', 1, 3, 2990000, 1, NOW(), NOW()),
+    ('NK-DUNK-002', 'Nike Dunk Low Retro', 'Sneaker cổ điển phong cách streetwear.', 1, 3, 2590000, 1, NOW(), NOW()),
+    ('AD-ULTRA-003', 'Adidas Ultraboost 23', 'Giày chạy bộ cao cấp với công nghệ Boost.', 2, 3, 3290000, 1, NOW(), NOW()),
+    ('AD-STAN-004', 'Adidas Stan Smith', 'Mẫu sneaker huyền thoại với thiết kế tối giản.', 2, 3, 2190000, 1, NOW(), NOW()),
+    ('PM-RSX-005', 'Puma RS-X3 Puzzle', 'Giày thời trang hiện đại với phối màu năng động.', 3, 3, 2890000, 1, NOW(), NOW()),
+    ('PM-SUEDE-006', 'Puma Suede Classic', 'Biểu tượng thời trang với chất liệu da lộn cổ điển.', 3, 3, 1990000, 1, NOW(), NOW());
 
 -- 3️⃣ PRODUCT VARIANTS
 INSERT INTO product_variants (product_id, sku, attribute_json, price, stock, created_at, updated_at)
