@@ -246,7 +246,7 @@ public class ProductService {
     public List<ProductImage> getImagesByProductId(Long productId) {
         return productImageRepository.findByProductIdOrderByOrdersAsc(productId);
     }
-    
+
     /**
      * Search products by SKU or title
      */
