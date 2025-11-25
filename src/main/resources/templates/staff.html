@@ -115,11 +115,6 @@
                 </div>
             </div>
             <div class="header-right">
-                <div class="search-bar">
-                    <input type="text" placeholder="Search products, orders..." id="searchInput">
-                    <i class="search-icon">🔍</i>
-                </div>
-
                 <div class="user-profile">
                     <div class="avatar">S</div>
                     <div class="user-info">
@@ -174,17 +169,15 @@
             </div>
         </section>
 
-        <!-- Products Section -->
         <section id="products" class="content-section">
             <div class="section-header">
                 <h2>Products Management</h2>
                 <div class="filter-group">
-                    <select class="filter-select" id="productCategoryFilter">
-                        <option value="all">All Categories</option>
-                        <option value="man">Man</option>
-                        <option value="woman">Woman</option>
-                        <option value="unisex">Unisex</option>
-                    </select>
+                    <input type="text"
+                           class="filter-select"
+                           id="productSearchInput"
+                           placeholder="Search by SKU or Title..."
+                           style="width: 300px;">
                 </div>
                 <button class="btn btn-primary" id="addProductBtn">+ Add Product</button>
             </div>
@@ -193,52 +186,52 @@
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
-                            <tr>
-                                <th style="display: none;">ID</th>
-                                <th>SKU</th>
-                                <th>Image</th>
-                                <th>Title</th>
-                                <th>Category</th>
-                                <th>Brand</th>
-                                <th>Price</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
+                        <tr>
+                            <th style="display: none;">ID</th>
+                            <th>SKU</th>
+                            <th>Image</th>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Brand</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
                         </thead>
                         <tbody id="productsTableBody">
-                            <tr th:each="product : ${products}">
-                                <td style="display: none;" th:text="${product.id}"></td>
-                                <td th:text="${product.sku}"></td>
-                                <td>
-                                    <img th:src="${product.primaryImageUrl}" alt="Product"
-                                        style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
-                                </td>
-                                <td th:text="${product.title}"></td>
-                                <td th:text="${product.category != null ? product.category.name : 'N/A'}"></td>
-                                <td th:text="${product.brand != null ? product.brand.name : 'N/A'}"></td>
-                                <td th:text="'$' + ${product.basePrice}"></td>
-                                <td>
-                                    <span class="badge" th:classappend="${product.active ? 'success' : 'danger'}"
-                                        th:text="${product.active ? 'Active' : 'Inactive'}"></span>
-                                </td>
-                                <td>
-                                    <div class="action-btns">
-                                        <button type="button" class="btn btn-secondary"
+                        <tr th:each="product : ${products}">
+                            <td style="display: none;" th:text="${product.id}"></td>
+                            <td th:text="${product.sku}"></td>
+                            <td>
+                                <img th:src="${product.primaryImageUrl}" alt="Product"
+                                     style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                            </td>
+                            <td th:text="${product.title}"></td>
+                            <td th:text="${product.category != null ? product.category.name : 'N/A'}"></td>
+                            <td th:text="${product.brand != null ? product.brand.name : 'N/A'}"></td>
+                            <td th:text="'$' + ${product.basePrice}"></td>
+                            <td>
+                            <span class="badge" th:classappend="${product.active ? 'success' : 'danger'}"
+                                  th:text="${product.active ? 'Active' : 'Inactive'}"></span>
+                            </td>
+                            <td>
+                                <div class="action-btns">
+                                    <button type="button" class="btn btn-secondary"
                                             th:onclick="'editProduct(\'' + ${product.id} + '\')'">
-                                            Edit
-                                        </button>
-                                        <button type="button" class="btn btn-sm toggle-active-btn"
+                                        Edit
+                                    </button>
+                                    <button type="button" class="btn btn-sm toggle-active-btn"
                                             th:classappend="${product.active ? 'btn-warning' : 'btn-success'}"
                                             th:data-id="${product.id}" th:data-active="${product.active}">
-                                            <span th:text="${product.active ? 'Deactivate' : 'Activate'}"></span>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-danger delete-product-btn"
+                                        <span th:text="${product.active ? 'Deactivate' : 'Activate'}"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-danger delete-product-btn"
                                             th:data-id="${product.id}" th:data-title="${product.title}">
-                                            Delete
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                                        Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
@@ -685,6 +678,24 @@
                     btn.textContent = 'Delete';
                 });
         };
+
+        // Product Search Functionality
+        document.getElementById('productSearchInput')?.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            const tableBody = document.getElementById('productsTableBody');
+            const rows = tableBody.querySelectorAll('tr');
+
+            rows.forEach(row => {
+                const sku = row.cells[1]?.textContent.toLowerCase() || '';
+                const title = row.cells[3]?.textContent.toLowerCase() || '';
+
+                if (sku.includes(searchTerm) || title.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
 
         // Product Modal & Variants
         window.closeProductModal = function () { toggleModal('productModal', false); };

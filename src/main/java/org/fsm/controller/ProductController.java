@@ -105,6 +105,41 @@ public class ProductController {
         return ResponseEntity.ok(dtos);
     }
 
+    // Add this method to your ProductController.java
+
+    /**
+     * Search products by SKU or Title
+     */
+    @GetMapping("/search")
+    @ResponseBody
+    public ResponseEntity<List<ProductDTO>> searchProducts(@RequestParam String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            // Return all products if search is empty
+            List<Product> products = productService.getAllProducts();
+            List<ProductDTO> dtos = products.stream()
+                    .map(this::convertToDTO)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(dtos);
+        }
+
+        // Search by title first
+        List<Product> products = productService
+                .searchProducts(keyword,
+                        org.springframework.data.domain.PageRequest.of(0, 1000))
+                .getContent();
+
+        // Also search by SKU
+        productService.getProductBySku(keyword).ifPresent(products::add);
+
+        // Remove duplicates and convert to DTO
+        List<ProductDTO> dtos = products.stream()
+                .distinct()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(dtos);
+    }
+
     /**
      * Create or Update product with images and variants
      */

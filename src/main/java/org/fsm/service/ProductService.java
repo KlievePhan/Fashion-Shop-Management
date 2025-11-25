@@ -246,6 +246,29 @@ public class ProductService {
     public List<ProductImage> getImagesByProductId(Long productId) {
         return productImageRepository.findByProductIdOrderByOrdersAsc(productId);
     }
+    
+    /**
+     * Search products by SKU or title
+     */
+    public Page<Product> searchProductsBySkuOrTitle(String keyword, Pageable pageable) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return productRepository.findAll(pageable);
+        }
+        return productRepository.searchBySkuOrTitle(keyword.trim(), pageable);
+    }
+
+    /**
+     * Search products by SKU or title (returns List for simpler usage)
+     */
+    public List<Product> searchProductsBySkuOrTitle(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return productRepository.findAll();
+        }
+        return productRepository.searchBySkuOrTitle(
+                keyword.trim(),
+                org.springframework.data.domain.PageRequest.of(0, 1000)
+        ).getContent();
+    }
 
     /**
      * Add variant to existing product
