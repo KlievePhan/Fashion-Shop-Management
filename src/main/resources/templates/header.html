@@ -77,13 +77,13 @@
         </div>
       </div>
 
-      <!-- WISHLIST -->
-      <a th:href="@{/wishlist/wishlist}" class="cart-link">
+      <!-- WISHLIST (Fixed) -->
+      <a th:href="@{/wishlist/wishlist}" class="cart-link wishlist-link">
         <svg class="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="black"
              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20.8 4.6c-1.6-1.4-4-1.4-5.6 0l-.8.8-.8-.8c-1.6-1.4-4-1.4-5.6 0-1.6 1.4-1.6 3.8 0 5.2l6.4 6.4 6.4-6.4c1.6-1.4 1.6-3.8 0-5.2z"></path>
         </svg>
-        <span class="badge wishlist-badge" th:text="${wishListItemCount ?: 0}"></span>
+        <span class="badge wishlist-badge" id="wishlist-count" data-count="0"></span>
       </a>
       <!-- CART -->
       <a th:href="@{/cart/cart}" class="cart-link">
@@ -130,6 +130,39 @@
   document.addEventListener('click', () => {
     document.querySelectorAll('.user-dropdown').forEach(d => d.classList.remove('active'));
   });
+
+  function updateWishlistCount() {
+    fetch('/wishlist/count')
+            .then(response => response.json())
+            .then(data => {
+              const badge = document.getElementById('wishlist-count');
+              if (!badge) return;
+
+              const newCount = data.count || 0;
+
+              // Always set text and data attribute
+              badge.textContent = newCount > 0 ? newCount : '';
+              badge.dataset.count = newCount;
+
+              // Force display flex if count > 0
+              if (newCount > 0) {
+                badge.style.display = 'flex';
+                badge.classList.add('updated');
+                setTimeout(() => badge.classList.remove('updated'), 400);
+              } else {
+                badge.style.display = 'none';
+              }
+            })
+            .catch(err => {
+              console.error('Failed to load wishlist count', err);
+            });
+  }
+
+  // Run on load
+  document.addEventListener('DOMContentLoaded', updateWishlistCount);
+
+  // Make global
+  window.updateWishlistCount = updateWishlistCount;
 </script>
 
 </html>
