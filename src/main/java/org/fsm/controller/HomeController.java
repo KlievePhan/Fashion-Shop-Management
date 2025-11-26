@@ -41,8 +41,11 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(Model model) {
-        model.addAttribute("currentPath", "/");
-        List<Product> products = productRepository.findAll();
+       model.addAttribute("currentPath", "/");
+
+        // Chỉ lấy 3 sản phẩm active mới nhất
+        List<Product> products = productRepository.findTop3ByActiveTrueOrderByCreatedAtDesc();
+
         model.addAttribute("products", products);
         return "home";
     }

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="icon" th:href="@{/images/store.png}" type="image/x-icon">
+
+  <!-- CSS links using Thymeleaf -->
+  <link rel="stylesheet" th:href="@{/css/header.css}">
+  <link rel="stylesheet" th:href="@{/css/footer.css}">
+  <link rel="stylesheet" th:href="@{/css/fixed_button.css}">
+  <link rel="stylesheet" th:href="@{/css/promo_bar.css}">
+  <link rel="stylesheet" th:href="@{/css/home.css}">
+  <link rel="stylesheet" th:href="@{/css/theme-customizer.css}">
+  <link rel="stylesheet" th:href="@{/css/blog.css}">
+  <title>Document</title>
+</head>
+
+<body>
+  <!-- HEADER using Thymeleaf fragment -->
+  <div th:insert="~{header}">
+  </div>
+
+  <!-- PROMO BAR -->
+  <div class="promo-bar">Get 15% off on your first order</div>
+
+  <!-- BLOG PAGE -->
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-content">
+      <h1>Fashion Blog</h1>
+      <p>Discover the Latest Trends & Timeless Style</p>
+      <a href="#blog" class="hero-btn">Explore Articles</a>
+    </div>
+  </div>
+
+  <!-- Featured Post -->
+  <div class="blog-section" style="padding-bottom: 40px;">
+    <div class="featured-post">
+      <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&h=600&fit=crop" alt="Featured"
+        class="featured-img">
+      <div class="featured-content">
+        <span class="blog-category">FEATURED</span>
+        <h2>Summer Collection 2024: Vibrant Colors & Light Fabrics</h2>
+        <p>This season brings a fresh wave of energy with bold colors, flowing silhouettes, and sustainable materials.
+          Discover how to style the hottest trends and create your perfect summer wardrobe that's both chic and
+          eco-conscious.</p>
+        <a href="#" class="read-more">Read Full Article <i class="bi bi-arrow-right"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Blog Grid -->
+  <div class="blog-section" id="blog">
+    <h2 class="section-title">Latest Articles</h2>
+    <div class="blog-grid">
+
+      <div class="blog-card">
+        <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&h=400&fit=crop" alt="Blog 1"
+          class="blog-card-img">
+        <div class="blog-card-content">
+          <span class="blog-category">STYLE TIPS</span>
+          <h3 class="blog-card-title">10 Must-Have Pieces for Your Capsule Wardrobe</h3>
+          <p class="blog-card-excerpt">Build a versatile wardrobe with these essential pieces that mix and match
+            effortlessly for any occasion.</p>
+          <div class="blog-meta">
+            <span><i class="bi bi-calendar3"></i> Nov 20, 2024</span>
+            <span><i class="bi bi-clock"></i> 5 min read</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="blog-card">
+        <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&h=400&fit=crop" alt="Blog 2"
+          class="blog-card-img">
+        <div class="blog-card-content">
+          <span class="blog-category">TRENDS</span>
+          <h3 class="blog-card-title">Sustainable Fashion: The Future is Green</h3>
+          <p class="blog-card-excerpt">Explore how eco-friendly brands are revolutionizing the fashion industry with
+            innovative materials and ethical practices.</p>
+          <div class="blog-meta">
+            <span><i class="bi bi-calendar3"></i> Nov 18, 2024</span>
+            <span><i class="bi bi-clock"></i> 7 min read</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="blog-card">
+        <img src="https://tse1.mm.bing.net/th/id/OIP.kPXZdLpnB8gmDfrdSHg1cgHaHa?rs=1&pid=ImgDetMain&o=7&rm=3"
+          alt="Blog 3" class="blog-card-img">
+        <div class="blog-card-content">
+          <span class="blog-category">ACCESSORIES</span>
+          <h3 class="blog-card-title">Accessorize Like a Pro: Complete Your Look</h3>
+          <p class="blog-card-excerpt">Learn the art of accessorizing with jewelry, bags, and shoes that elevate your
+            outfit from ordinary to extraordinary.</p>
+          <div class="blog-meta">
+            <span><i class="bi bi-calendar3"></i> Nov 15, 2024</span>
+            <span><i class="bi bi-clock"></i> 4 min read</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="blog-card">
+        <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&h=400&fit=crop" alt="Blog 4"
+          class="blog-card-img">
+        <div class="blog-card-content">
+          <span class="blog-category">INSPIRATION</span>
+          <h3 class="blog-card-title">Street Style: Fashion Inspiration from Around the World</h3>
+          <p class="blog-card-excerpt">Get inspired by the most stylish street looks from fashion capitals like Paris,
+            Tokyo, and New York.</p>
+          <div class="blog-meta">
+            <span><i class="bi bi-calendar3"></i> Nov 12, 2024</span>
+            <span><i class="bi bi-clock"></i> 6 min read</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="blog-card">
+        <img src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=600&h=400&fit=crop" alt="Blog 5"
+          class="blog-card-img">
+        <div class="blog-card-content">
+          <span class="blog-category">SEASONAL</span>
+          <h3 class="blog-card-title">Winter Elegance: Cozy Yet Chic Outfits</h3>
+          <p class="blog-card-excerpt">Stay warm and stylish this winter with layering techniques and cozy pieces that
+            don't compromise on fashion.</p>
+          <div class="blog-meta">
+            <span><i class="bi bi-calendar3"></i> Nov 10, 2024</span>
+            <span><i class="bi bi-clock"></i> 5 min read</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="blog-card">
+        <img src="https://images.unsplash.com/photo-1492707892479-7bc8d5a4ee93?w=600&h=400&fit=crop" alt="Blog 6"
+          class="blog-card-img">
+        <div class="blog-card-content">
+          <span class="blog-category">BEAUTY</span>
+          <h3 class="blog-card-title">Fashion & Beauty: The Perfect Pairing</h3>
+          <p class="blog-card-excerpt">Discover how to coordinate your makeup and hairstyle with your outfit for a
+            cohesive, polished look.</p>
+          <div class="blog-meta">
+            <span><i class="bi bi-calendar3"></i> Nov 8, 2024</span>
+            <span><i class="bi bi-clock"></i> 4 min read</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Newsletter Section -->
+  <div class="newsletter">
+    <h3>Stay in Style</h3>
+    <p>Subscribe to our newsletter for the latest fashion tips and exclusive offers</p>
+    <form class="newsletter-form">
+      <input type="email" class="newsletter-input" placeholder="Enter your email address" required>
+      <button type="submit" class="newsletter-btn">Subscribe</button>
+    </form>
+  </div>
+
+
+
+
+
+
+
+  <!-- FOOTER using Thymeleaf fragment -->
+  <div th:replace="~{footer :: footer}"></div>
+
+  <!-- BUY NOW, CUSTOMIZE BUTTONS -->
+  <!-- Buy Now -->
+
+  <a th:href="@{/shop}" class="buy-now-btn">
+    <i class="bi bi-cart-fill"></i> Buy Now
+  </a>
+
+
+  <!-- Customize -->
+  <a href="#" class="customize-btn">
+    <i class="bi bi-sliders"></i>
+    <span>Customize</span>
+  </a>
+
+  <!-- JS links using Thymeleaf -->
+  <script th:src="@{/js/index.js}"></script>
+  <script th:src="@{/js/header.js}"></script>
+  <script th:src="@{/js/theme-customizer.js}"></script>
+  <script th:src="@{/js/blog.js}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
