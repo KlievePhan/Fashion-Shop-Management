@@ -4,11 +4,9 @@ import org.fsm.entity.Cart;
 import org.fsm.entity.CartItem;
 import org.fsm.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,34 +15,52 @@ import java.util.Optional;
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
     /**
-     * Find all cart items by cart ID
-     */
-    List<CartItem> findByCartId(Long cartId);
-
-    /**
-     * Find all cart items by cart
+     * Tìm tất cả items trong cart
      */
     List<CartItem> findByCart(Cart cart);
 
     /**
-     * Find cart item by cart, product and selected options JSON
-     * (để check xem item này đã có trong cart chưa)
+     * ⭐ SIMPLE VERSION: Exact string match
      */
+    @Query("SELECT ci FROM CartItem ci " +
+            "WHERE ci.cart.id = :cartId " +
+            "AND ci.product.id = :productId " +
+            "AND ci.selectedOptionsJson = :optionsJson")
     Optional<CartItem> findByCartAndProductAndSelectedOptionsJson(
-            Cart cart,
-            Product product,
-            String selectedOptionsJson);
+            @Param("cartId") Long cartId,
+            @Param("productId") Long productId,
+            @Param("optionsJson") String optionsJson
+    );
 
     /**
-     * Delete all cart items by cart
+     * ⭐ ALTERNATIVE: Exact match (nếu JSON đã được normalized đúng)
      */
-    @Modifying
-    @Transactional
-    @Query("DELETE FROM CartItem ci WHERE ci.cart = :cart")
-    void deleteByCart(@Param("cart") Cart cart);
+    @Query("SELECT ci FROM CartItem ci " +
+            "WHERE ci.cart = :cart " +
+            "AND ci.product = :product " +
+            "AND ci.selectedOptionsJson = :optionsJson")
+    Optional<CartItem> findExactMatch(
+            @Param("cart") Cart cart,
+            @Param("product") Product product,
+            @Param("optionsJson") String optionsJson
+    );
 
     /**
-     * Count cart items by cart
+     * ⭐ DEBUG: Tìm tất cả items của product trong cart
+     */
+    @Query("SELECT ci FROM CartItem ci WHERE ci.cart = :cart AND ci.product = :product")
+    List<CartItem> findByCartAndProduct(
+            @Param("cart") Cart cart,
+            @Param("product") Product product
+    );
+
+    /**
+     * Xóa tất cả items trong cart
+     */
+    void deleteByCart(Cart cart);
+
+    /**
+     * Đếm số items trong cart
      */
     long countByCart(Cart cart);
 }

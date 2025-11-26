@@ -545,8 +545,93 @@
         }
     }
 
-    function buyNow() {
-        addToCart(true);
+    // ========== FIX BUY NOW FUNCTION trong product-detail.html ==========
+    // Thay thế function buyNow() cũ bằng version này:
+
+    async function buyNow() {
+        const activeSizeBtn = document.querySelector('.size-btn.active');
+        const activeColorBtn = document.querySelector('.color-btn.active');
+        const qty = parseInt(document.getElementById('quantity').value);
+
+        // Validate size selection
+        if (!activeSizeBtn) {
+            showHeadNotification(
+                'Select a size',
+                'Please choose a size before continuing.',
+                { variant: 'warning', duration: 3200 }
+            );
+            return;
+        }
+
+        // Validate color selection
+        if (!activeColorBtn) {
+            showHeadNotification(
+                'Select a color',
+                'Please choose a color before continuing.',
+                { variant: 'warning', duration: 3200 }
+            );
+            return;
+        }
+
+        // ⭐ BUILD selectedOptions object
+        const selectedOptions = {
+            size: activeSizeBtn.dataset.value,
+            color: activeColorBtn.dataset.value
+        };
+
+        console.log('🛒 Buy Now - Adding to cart:', {
+            productId,
+            selectedOptions,
+            qty
+        });
+
+        try {
+            // Add to cart first
+            const response = await fetch('/fashionshop/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    productId: productId,
+                    selectedOptions: selectedOptions,
+                    qty: qty
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                console.log('✅ Added to cart, redirecting to checkout...');
+
+                // Show quick notification
+                showHeadNotification(
+                    'Processing...',
+                    'Redirecting to checkout',
+                    { variant: 'success', duration: 1000 }
+                );
+
+                // Redirect to checkout after short delay
+                setTimeout(() => {
+                    window.location.href = '/fashionshop/checkout';
+                }, 600);
+
+            } else {
+                console.error('❌ Add to cart failed:', data.message);
+                showHeadNotification(
+                    'Failed to add',
+                    data.message || 'Could not add product to cart.',
+                    { variant: 'error', duration: 3500 }
+                );
+            }
+        } catch (error) {
+            console.error('❌ Error in buyNow:', error);
+            showHeadNotification(
+                'Error',
+                'Failed to process. Please try again.',
+                { variant: 'error', duration: 3500 }
+            );
+        }
     }
 
     // ========== HEAD NOTIFICATION ==========

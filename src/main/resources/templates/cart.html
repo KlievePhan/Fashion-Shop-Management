@@ -359,7 +359,13 @@
 
                         <div class="quantity-control">
                             <button class="quantity-btn" onclick="updateQuantityOnServer(this, -1)">−</button>
-                            <input type="number" class="quantity-input" th:value="${item.qty}" min="1" readonly>
+                            <input type="number"
+                                   class="quantity-input"
+                                   th:value="${item.qty}"
+                                   min="1"
+                                   th:data-item-id="${item.id}"
+                                   onblur="handleQuantityInputBlur(this)"
+                                   onkeypress="handleQuantityInputEnter(event, this)">
                             <button class="quantity-btn" onclick="updateQuantityOnServer(this, 1)">+</button>
                         </div>
 
@@ -396,7 +402,9 @@
                     <span>Total:</span>
                     <span th:text="'$' + ${#numbers.formatDecimal(total, 1, 2)}"></span>
                 </div>
-                <button class="checkout-btn">Proceed to Checkout</button>
+                <button class="checkout-btn" onclick="window.location.href='/fashionshop/checkout'">
+                    Proceed to Checkout
+                </button>
                 <a th:href="@{/shop}" class="continue-shopping">Continue Shopping</a>
             </div>
         </div>
@@ -415,26 +423,125 @@
 <script th:src="@{/js/theme-customizer.js}"></script>
 
 <script>
-    // ⭐ FIXED: Parse selectedOptionsJson
-    document.addEventListener("DOMContentLoaded", () => {
-        document.querySelectorAll(".variant-attributes").forEach(el => {
-            try {
-                const attrs = JSON.parse(el.dataset.attributes || "{}");
-                let html = '';
+    // ========== XỬ LÝ NHẬP TRỰC TIẾP SỐ LƯỢNG ==========
 
-                if (attrs.size) {
-                    html += '<strong>Size:</strong> ' + attrs.size;
-                }
-                if (attrs.color) {
-                    if (html) html += ' <span class="ms-3"></span> ';
-                    html += '<strong>Color:</strong> <span style="display:inline-block;width:16px;height:16px;background:' + attrs.color + ';border:1px solid #ddd;border-radius:50%;vertical-align:middle;margin-right:4px;"></span>' + attrs.color;
-                }
+    /**
+     * Xử lý khi người dùng rời khỏi ô input (blur)
+     */
+    function handleQuantityInputBlur(input) {
+        const newQty = parseInt(input.value);
+        const itemId = input.dataset.itemId;
 
-                el.innerHTML = html || 'No options selected';
-            } catch (e) {
-                console.warn("Failed to parse options:", e);
-                el.innerHTML = 'Invalid options';
-            }
+        // Validate
+        if (isNaN(newQty) || newQty < 1) {
+            input.value = 1;
+            return;
+        }
+
+        // Lấy giá trị cũ từ attribute
+        const oldQty = parseInt(input.defaultValue);
+
+        // Nếu không thay đổi thì không cần update
+        if (newQty === oldQty) {
+            return;
+        }
+
+        // Update lên server
+        updateQuantityDirectly(itemId, newQty, input);
+    }
+
+    /**
+     * Xử lý khi người dùng nhấn Enter trong ô input
+     */
+    function handleQuantityInputEnter(event, input) {
+        if (event.key === 'Enter') {
+            input.blur(); // Trigger blur event
+        }
+    }
+
+    /**
+     * Gửi request update số lượng trực tiếp
+     */
+    function updateQuantityDirectly(itemId, newQty, input) {
+        const cartItem = input.closest('.cart-item');
+        const buttons = cartItem.querySelectorAll('.quantity-btn');
+
+        // Disable controls
+        input.disabled = true;
+        buttons.forEach(btn => btn.disabled = true);
+
+        fetch('/fashionshop/cart/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `itemId=${itemId}&qty=${newQty}`
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update defaultValue để tracking
+                    input.defaultValue = newQty;
+
+                    // Update line total
+                    const lineTotalDiv = cartItem.querySelector('.item-line-total');
+                    if (lineTotalDiv) {
+                        const priceSpan = lineTotalDiv.querySelector('span');
+                        if (priceSpan) {
+                            priceSpan.textContent = '$' + data.itemTotal.toFixed(2);
+                        }
+                    }
+
+                    // Update cart summary
+                    updateCartSummaryDOM(data);
+
+                    // Update badge
+                    if (typeof window.refreshCartBadge === 'function') {
+                        window.refreshCartBadge();
+                    }
+                    updateCartBadge();
+
+                    // Show notification
+                    if (typeof showHeadNotification === 'function') {
+                        showHeadNotification('Cart updated!', `Quantity changed to ${newQty}`, { variant: 'success', duration: 2000 });
+                    } else {
+                        showNotification('Cart updated!', 'success');
+                    }
+
+                } else {
+                    throw new Error(data.message || 'Failed to update quantity');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+
+                // Revert to old value
+                input.value = input.defaultValue;
+
+                const message = error.message || 'An error occurred';
+                if (typeof showHeadNotification === 'function') {
+                    showHeadNotification('Error', message, { variant: 'error', duration: 3200 });
+                } else {
+                    showNotification(message, 'error');
+                }
+            })
+            .finally(() => {
+                // Re-enable controls
+                input.disabled = false;
+                buttons.forEach(btn => btn.disabled = false);
+            });
+    }
+
+    // ========== VALIDATE INPUT KHI ĐANG NHẬP ==========
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.quantity-input').forEach(input => {
+            input.addEventListener('input', function() {
+                // Chỉ cho phép số nguyên dương
+                this.value = this.value.replace(/[^0-9]/g, '');
+
+                // Giới hạn tối đa (ví dụ 999)
+                if (parseInt(this.value) > 999) {
+                    this.value = 999;
+                }
+            });
         });
     });
 </script>
