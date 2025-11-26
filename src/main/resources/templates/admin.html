@@ -56,10 +56,6 @@
                         <span class="status-value" id="headerTotalUsers">0</span>
                     </div>
                 </div>
-                <div class="search-bar">
-                    <input type="text" placeholder="Search users, logs..." id="searchInput" />
-                    <i class="search-icon">🔍</i>
-                </div>
                 <div class="notifications">
                     <button class="notification-btn" id="notificationBtn">
                         <i class="bell-icon">🔔</i>
@@ -125,7 +121,6 @@
                     </div>
                 </div>
             </div>
-            <!-- giữ lại 2 card demo cũ nếu muốn -->
             <div class="dashboard-grid">
                 <div class="card">
                     <h3>Recent Orders</h3>
@@ -190,7 +185,13 @@
         <section id="users" class="content-section">
             <div class="section-header">
                 <h2>Users Management</h2>
-                <button class="btn btn-primary" id="addUserBtn">+ Add User</button>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <div class="search-bar" style="margin: 0;">
+                        <input type="text" placeholder="Search users by name, email..." id="userSearchInput" />
+                        <i class="search-icon">🔍</i>
+                    </div>
+                    <button class="btn btn-primary" id="addUserBtn">+ Add User</button>
+                </div>
             </div>
             <div class="card">
                 <div class="table-container">
@@ -205,7 +206,7 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="userTableBody">
                             <tr th:each="user : ${users}" th:data-role="${user.role.code}"
                                 th:data-active="${user.active}">
                                 <td th:text="${user.id}"></td>
@@ -336,6 +337,7 @@
                         <option value="User">User</option>
                     </select>
                     <input type="date" class="filter-select" id="auditDate" />
+                    <button class="btn btn-secondary" onclick="clearAuditFilters()">Clear Filters</button>
                 </div>
             </div>
             <div class="card">
@@ -353,7 +355,10 @@
                             </tr>
                         </thead>
                         <tbody id="auditLogTable">
-                            <tr th:each="log : ${auditLogs}">
+                            <tr th:each="log : ${auditLogs}" 
+                                th:data-action="${log.action}"
+                                th:data-entity="${log.entity}"
+                                th:data-date="${#temporals.format(log.createdAt, 'yyyy-MM-dd')}">
                                 <td th:text="${log.id}"></td>
                                 <td th:text="${log.actor != null ? log.actor.fullName : 'System'}"></td>
                                 <td th:text="${log.actorRole}"></td>
@@ -580,10 +585,8 @@
                     const span = btn.querySelector("span") || btn;
                     const actionBtnsContainer = btn.closest(".action-btns");
 
-                    // 1. Cập nhật data-active attribute
                     tr.setAttribute("data-active", isDeactivating ? "false" : "true");
 
-                    // 2. Cập nhật badge status
                     const statusBadge = tr.querySelector("td:nth-last-child(2) .badge");
                     if (statusBadge) {
                         statusBadge.className = isDeactivating
@@ -592,7 +595,6 @@
                         statusBadge.innerText = isDeactivating ? "Inactive" : "Active";
                     }
 
-                    // 3. Cập nhật nút Activate/Deactivate
                     if (isDeactivating) {
                         span.innerText = "Activate";
                         btn.className = "btn btn-sm btn-success";
@@ -601,13 +603,11 @@
                         btn.className = "btn btn-sm btn-danger";
                     }
 
-                    // 4. Xử lý nút Delete (★ PHẦN QUAN TRỌNG ★)
                     const existingDeleteBtn =
                         actionBtnsContainer.querySelector(".btn-delete");
                     const userRole = tr.getAttribute("data-role");
 
                     if (isDeactivating && userRole !== "ROLE_ADMIN") {
-                        // User vừa bị deactivate → Hiển thị nút Delete
                         if (!existingDeleteBtn) {
                             const deleteBtn = document.createElement("button");
                             deleteBtn.className = "btn btn-sm btn-danger btn-delete";
@@ -618,13 +618,11 @@
                             actionBtnsContainer.appendChild(deleteBtn);
                         }
                     } else {
-                        // User vừa được activate → Ẩn nút Delete
                         if (existingDeleteBtn) {
                             existingDeleteBtn.remove();
                         }
                     }
 
-                    // 5. Cập nhật thống kê
                     updateUserStats();
                 } else {
                     showNotification(await res.text(), "error");
@@ -640,29 +638,24 @@
 
         // SAVE USER FUNCTION
         async function handleSaveUser(e) {
-            e.preventDefault(); // không cho submit reload trang
+            e.preventDefault();
 
-            // 1. Validate
             if (!validateUserForm()) return;
 
-            // 2. Lấy data từ form
             const form = document.getElementById("userForm");
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
 
-            // Fix Checkbox & ID
-            const isNew = !data.id; // true = thêm mới, false = update
+            const isNew = !data.id;
             data.resetPassword = document.getElementById("resetPassword").checked;
             if (!data.id) data.id = null;
 
-            // 3. UI Feedback
             const btn = form.querySelector('button[type="submit"]');
             const originalText = btn.innerText;
             btn.disabled = true;
             btn.innerText = "Saving...";
 
             try {
-                // 4. Gửi request AJAX
                 const res = await secureFetch(contextPath + "admin/users/save", {
                     method: "POST",
                     body: JSON.stringify(data),
@@ -675,10 +668,7 @@
                     );
                     closeUserModal();
 
-                    // 🌟 Quan trọng: đảm bảo sau reload vẫn ở tab Users
                     localStorage.setItem("adminActiveTab", "users");
-
-                    // Reload lại trang để load data mới
                     setTimeout(() => location.reload(), 800);
                 } else {
                     const text = await res.text();
@@ -717,7 +707,6 @@
                     showNotification(successMsg, "success");
                     selectElement.setAttribute("data-original-value", newRoleCode);
 
-                    // Cập nhật data-role để stats chính xác
                     selectElement.closest("tr").setAttribute("data-role", newRoleCode);
                     updateUserStats();
                 } else {
@@ -747,7 +736,6 @@
                 if (res.ok) {
                     showNotification('User deleted successfully', 'success');
 
-                    // Xóa row khỏi bảng với hiệu ứng fade out
                     const tr = btn.closest('tr');
                     tr.style.transition = 'opacity 0.3s ease';
                     tr.style.opacity = '0';
@@ -769,19 +757,70 @@
             }
         }
 
+        // USER SEARCH FUNCTION
+        function filterUsers() {
+            const searchInput = document.getElementById('userSearchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#userTableBody tr');
+
+            rows.forEach(row => {
+                const name = row.cells[1].textContent.toLowerCase();
+                const email = row.cells[2].textContent.toLowerCase();
+                
+                if (name.includes(searchInput) || email.includes(searchInput)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // AUDIT LOG FILTER FUNCTION
+        function filterAuditLog() {
+            const actionFilter = document.getElementById('auditAction').value;
+            const entityFilter = document.getElementById('auditEntity').value;
+            const dateFilter = document.getElementById('auditDate').value;
+            const rows = document.querySelectorAll('#auditLogTable tr');
+
+            rows.forEach(row => {
+                const action = row.getAttribute('data-action');
+                const entity = row.getAttribute('data-entity');
+                const date = row.getAttribute('data-date');
+
+                let showRow = true;
+
+                if (actionFilter !== 'all' && action !== actionFilter) {
+                    showRow = false;
+                }
+
+                if (entityFilter !== 'all' && entity !== entityFilter) {
+                    showRow = false;
+                }
+
+                if (dateFilter && date !== dateFilter) {
+                    showRow = false;
+                }
+
+                row.style.display = showRow ? '' : 'none';
+            });
+        }
+
+        function clearAuditFilters() {
+            document.getElementById('auditAction').value = 'all';
+            document.getElementById('auditEntity').value = 'all';
+            document.getElementById('auditDate').value = '';
+            filterAuditLog();
+        }
+
         // --- 4. Helpers & Init ---
         document.addEventListener("DOMContentLoaded", () => {
             const navItems = document.querySelectorAll(".nav-item");
             const sections = document.querySelectorAll(".content-section");
             const pageTitleEl = document.getElementById("pageTitle");
 
-            // Hàm kích hoạt 1 tab + lưu vào localStorage
             function activateTab(sectionId) {
-                // clear trạng thái cũ
                 navItems.forEach(n => n.classList.remove("active"));
                 sections.forEach(s => s.classList.remove("active"));
 
-                // set active cho nav
                 const activeNav = document.querySelector(`.nav-item[data-section="${sectionId}"]`);
                 if (activeNav) {
                     activeNav.classList.add("active");
@@ -790,21 +829,17 @@
                     }
                 }
 
-                // set active cho section
                 const activeSection = document.getElementById(sectionId);
                 if (activeSection) {
                     activeSection.classList.add("active");
                 }
 
-                // lưu tab hiện tại
                 localStorage.setItem("adminActiveTab", sectionId);
             }
 
-            // Lấy tab đã lưu, mặc định là dashboard
             const savedTab = localStorage.getItem("adminActiveTab") || "dashboard";
             activateTab(savedTab);
 
-            // Gắn event click cho menu
             navItems.forEach((item) => {
                 item.addEventListener("click", function (e) {
                     e.preventDefault();
@@ -817,7 +852,17 @@
 
             updateUserStats();
 
-            // Email check
+            // User search event listener
+            const userSearchInput = document.getElementById('userSearchInput');
+            if (userSearchInput) {
+                userSearchInput.addEventListener('input', filterUsers);
+            }
+
+            // Audit log filter event listeners
+            document.getElementById('auditAction')?.addEventListener('change', filterAuditLog);
+            document.getElementById('auditEntity')?.addEventListener('change', filterAuditLog);
+            document.getElementById('auditDate')?.addEventListener('change', filterAuditLog);
+
             const emailInput = document.getElementById("email");
             if (emailInput) {
                 emailInput.addEventListener("blur", function () {
@@ -846,7 +891,6 @@
                 });
             }
 
-            // Mobile dropdown toggle
             const dropdownToggle = document.querySelector(".dropdown-toggle");
             const dropdownMenu = document.querySelector(".dropdown-menu");
 
@@ -856,7 +900,6 @@
                     dropdownMenu.classList.toggle("show");
                 });
 
-                // Close when clicking outside
                 document.addEventListener("click", (e) => {
                     if (!e.target.closest(".profile-dropdown")) {
                         dropdownMenu.classList.remove("show");
@@ -866,13 +909,15 @@
         });
 
         function updateUserStats() {
-            const rows = document.querySelectorAll("#users tbody tr");
+            const rows = document.querySelectorAll("#userTableBody tr");
             let active = 0,
                 inactive = 0,
                 admins = 0,
                 staff = 0;
 
             rows.forEach((r) => {
+                if (r.style.display === 'none') return; // Skip hidden rows
+                
                 const isActive = r.getAttribute("data-active") === "true";
                 const roleCode = r.getAttribute("data-role");
 
@@ -894,7 +939,6 @@
             set("headerTotalUsers", rows.length);
         }
 
-        // Modal Helpers
         document.getElementById("addUserBtn")?.addEventListener("click", () => {
             document.getElementById("userModalTitle").textContent = "Add User";
             document.getElementById("userForm").reset();
@@ -962,28 +1006,25 @@
             document.getElementById("userDetailModal").style.display = "none";
         }
 
-        // Toggle Password Visibility
         function togglePasswordVisibility(inputId, iconId) {
             const input = document.getElementById(inputId);
             const icon = document.getElementById(iconId);
 
             if (input.type === "password") {
                 input.type = "text";
-                icon.textContent = "🙈"; // Closed eye
+                icon.textContent = "🙈";
             } else {
                 input.type = "password";
-                icon.textContent = "👁️"; // Open eye
+                icon.textContent = "👁️";
             }
         }
 
-        // Validate Email Real-time
         function validateEmailRealtime() {
             const email = document.getElementById("email").value;
             const emailError = document.getElementById("emailError");
             const userId = document.getElementById("userId").value;
 
             if (email.length > 0) {
-                // Check email format first
                 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailPattern.test(email)) {
                     emailError.textContent = "Invalid email format";
@@ -992,7 +1033,6 @@
                     return;
                 }
 
-                // Check if email exists in database
                 fetch(`${contextPath}admin/check-email?email=${encodeURIComponent(email)}${userId ? "&id=" + userId : ""}`)
                     .then(r => r.json())
                     .then(d => {
@@ -1026,14 +1066,13 @@
                     passwordError.style.display = "block";
                 } else {
                     passwordError.textContent = "Strong password";
-                    passwordError.style.color = "#10B981"; // green
+                    passwordError.style.color = "#10B981";
                     passwordError.style.display = "block";
                 }
             } else {
                 passwordError.style.display = "none";
             }
 
-            // Cũng validate confirm password nếu đã nhập
             validateConfirmPasswordRealtime();
         }
 
@@ -1045,11 +1084,11 @@
             if (confirmPwd.length > 0) {
                 if (pwd === confirmPwd) {
                     confirmPasswordError.textContent = "Passwords match";
-                    confirmPasswordError.style.color = "#10B981"; // green
+                    confirmPasswordError.style.color = "#10B981";
                     confirmPasswordError.style.display = "block";
                 } else {
                     confirmPasswordError.textContent = "Passwords must match";
-                    confirmPasswordError.style.color = "#dc2626"; // red
+                    confirmPasswordError.style.color = "#dc2626";
                     confirmPasswordError.style.display = "block";
                 }
             } else {
@@ -1065,26 +1104,21 @@
 
             const confirmPasswordError = document.getElementById("confirmPasswordError");
 
-            // Clear previous errors
             if (confirmPasswordError) {
                 confirmPasswordError.textContent = "";
             }
 
-            // For new users, check password requirements
             if (isNew) {
-                // Check if password is entered
                 if (!pwd || pwd.trim() === "") {
                     showNotification("Password is required!", "error");
                     return false;
                 }
 
-                // Check password strength
                 if (!pattern.test(pwd)) {
                     showNotification("Password must be 8+ chars: 1 uppercase, 1 digit, 1 special (!@#$%^&*)", "error");
                     return false;
                 }
 
-                // Check if confirm password matches
                 if (pwd !== confirmPwd) {
                     if (confirmPasswordError) {
                         confirmPasswordError.textContent = "Passwords must match";
