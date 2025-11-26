@@ -346,6 +346,9 @@
                     <button class="buy-now-btn" onclick="buyNow()">
                         <i class="bi bi-bag-check"></i> Buy Now
                     </button>
+                    <button class="wishlist-btn" onclick="addToWishList()" style="padding:15px; background:#f5f5f5; border:2px solid #ddd; border-radius:4px; cursor:pointer;">
+                        <i class="bi bi-heart"></i> Add to Wishlist
+                    </button>
                 </div>
 
                 <div class="product-meta" style="border-top:1px solid var(--border-color);padding-top:20px;">
@@ -377,6 +380,11 @@
 <script th:src="@{/js/theme-customizer.js}"></script>
 <script th:src="@{/js/header.js}"></script>
 
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const contextPath = /*[[@{/}]]*/ '';
+    /*]]>*/
+</script>
 <script th:inline="javascript">
     // ========== GLOBAL STATE ==========
     let productVariants = [];
@@ -587,6 +595,62 @@
                 popup.classList.remove('show');
             });
             closeBtn.dataset.bound = '1';
+        }
+    }
+
+    async function addToWishList() {
+        const activeSizeBtn = document.querySelector('.size-btn.active');
+        const activeColorBtn = document.querySelector('.color-btn.active');
+
+        // Optional validation - can add without options
+        const selectedOptions = {};
+        if (activeSizeBtn) selectedOptions.size = activeSizeBtn.dataset.value;
+        if (activeColorBtn) selectedOptions.color = activeColorBtn.dataset.value;
+
+        console.log('❤️ Adding to wishlist:', {
+            productId: productId,
+            selectedOptions: selectedOptions
+        });
+
+        try {
+            // ✅ Use contextPath variable (defined earlier in your HTML)
+            const response = await fetch(contextPath + 'wishlist/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    productId: productId,
+                    selectedOptions: selectedOptions
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showHeadNotification(
+                    'Added to wishlist',
+                    'Product added successfully.',
+                    { variant: 'success', duration: 2600 }
+                );
+                // Update header badge if needed
+                if (typeof updateWishlistBadge === 'function') {
+                    updateWishlistBadge();
+                }
+            } else {
+                showHeadNotification(
+                    'Error',
+                    data.message || 'Failed to add to wishlist.',
+                    { variant: 'error', duration: 3200 }
+                );
+            }
+        } catch (error) {
+            console.error('Error adding to wishlist:', error);
+            showHeadNotification(
+                'Error',
+                'Failed to add to wishlist. Please try again.',
+                { variant: 'error', duration: 3200 }
+            );
         }
     }
 
