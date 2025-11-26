@@ -20,6 +20,8 @@
         th:classappend="${currentPath != null && currentPath.contains('/shop')} ? 'active' : ''">Shop</a>
       <a th:href="@{/about}"
         th:classappend="${currentPath != null && currentPath.contains('/about')} ? 'active' : ''">About</a>
+        <a th:href="@{/blog}"
+        th:classappend="${currentPath != null && currentPath.contains('/blog')} ? 'active' : ''">Blog</a>
       <a th:href="@{/careers}"
         th:classappend="${currentPath != null && currentPath.contains('/careers')} ? 'active' : ''">Careers</a>
       <a th:href="@{/faqs}"

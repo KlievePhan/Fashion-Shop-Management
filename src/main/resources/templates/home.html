@@ -35,7 +35,6 @@
       position: relative;
       z-index: 2;
     }
-
   </style>
 </head>
 
@@ -56,7 +55,8 @@
         Discover timeless fashion for Men, Women, and Kids – crafted for
         comfort, designed for confidence.
       </p>
-      <button class="explore-btn">EXPLORE THE COLLECTION</button>
+      <button class="explore-btn"><a th:href="@{/shop}"
+        th:classappend="${currentPath != null && currentPath.contains('/shop')} ? 'active' : ''">EXPLORE THE COLLECTION</a></button>
     </div>
   </section>
 
@@ -82,21 +82,17 @@
       <div class="product-card" th:each="p : ${products}">
         <div class="product-image">
           <img th:src="${p.primaryImageUrl}" th:alt="${p.title}" />
-          <a class="product-link-overlay"
-             th:href="@{'/product/' + ${p.id}}"
-             title="Xem chi tiết"></a>
+          <a class="product-link-overlay" th:href="@{'/product/' + ${p.id}}" title="Xem chi tiết"></a>
           <div class="product-actions">
             <button class="action-btn" title="Add to Cart" th:onclick="'addToCart(' + ${p.id} + ')'">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                   stroke="currentColor" stroke-width="2">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
                 <line x1="3" y1="6" x2="21" y2="6"></line>
                 <path d="M16 10a4 4 0 0 1-8 0"></path>
               </svg>
             </button>
             <button class="action-btn" title="Quick View" th:onclick="'showQuickView(' + ${p.id} + ')'">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                   stroke="currentColor" stroke-width="2">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>
               </svg>
@@ -108,27 +104,20 @@
           <p class="product-category" th:text="${p.category != null ? p.category.name : 'Uncategorized'}"></p>
 
           <div class="product-price">
-            <span class="price-current" th:text="${#numbers.formatDecimal(p.basePrice, 0, 'COMMA', 2, 'POINT')} + ' ₫'">Giá</span>
+            <span class="price-current"
+              th:text="${#numbers.formatDecimal(p.basePrice, 0, 'COMMA', 2, 'POINT')} + ' ₫'">Giá</span>
           </div>
           <div class="product-sizes" th:if="${p.variants != null}">
-            <button class="size-btn"
-                    th:each="v, iter : ${p.variants}"
-                    th:text="'Size'"
-            th:data-attributes="${v.attributeJson}"
-            th:classappend="${iter.index == 0} ? ' active' : ''">
+            <button class="size-btn" th:each="v, iter : ${p.variants}" th:text="'Size'"
+              th:data-attributes="${v.attributeJson}" th:classappend="${iter.index == 0} ? ' active' : ''">
             </button>
           </div>
 
           <div class="product-colors" th:if="${p.variants != null}">
-            <div class="color-option"
-                 th:each="v, iter : ${p.variants}"
-                 th:data-attributes="${v.attributeJson}"
-                 th:classappend="${iter.index == 0} ? ' active' : ''">
+            <div class="color-option" th:each="v, iter : ${p.variants}" th:data-attributes="${v.attributeJson}"
+              th:classappend="${iter.index == 0} ? ' active' : ''">
             </div>
           </div>
-
-
-
         </div>
       </div>
     </div>

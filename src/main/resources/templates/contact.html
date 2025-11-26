@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,195 +21,203 @@
 </head>
 
 <body>
-<div th:replace="~{header :: header}"></div>
+    <div th:replace="~{header :: header}"></div>
 
-<div class="promo-bar">Get 15% off on your first order</div>
+    <div class="promo-bar">Get 15% off on your first order</div>
 
-<!-- Hero Section -->
-<section class="contact-hero">
-    <div class="container text-center">
-        <h1 class="hero-title">Contact Us</h1>
-        <p class="hero-description">
-            Have a question about your order, sizing, shipping, or just want to say<br>
-            hello? Our team at Velora is always happy to hear from you.
-        </p>
-    </div>
-</section>
+    <!-- Hero Section -->
+    <section class="contact-hero">
+        <div class="container text-center">
+            <h1 class="hero-title">Contact Us</h1>
+            <p class="hero-description">
+                Have a question about your order, sizing, shipping, or just want to say<br>
+                hello? Our team at Velora is always happy to hear from you.
+            </p>
+        </div>
+    </section>
 
-<!-- Contact Form & Info Section -->
-<section class="contact-content">
-    <div class="container">
-        <div class="contact-grid">
-            <!-- Contact Form -->
-            <div class="contact-form-wrapper">
-                <h2 class="form-title">Send Us a Message</h2>
-
-                <!-- Success / Error messages -->
-                <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
-                <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
-
+    <!-- Contact Form & Info Section -->
+    <section class="contact-content">
+        <div class="container">
+            <div class="contact-grid">
                 <!-- Contact Form -->
-                <form class="contact-form" th:action="@{/contact}" method="post" th:object="${contactMessage}">
-                    <div class="form-group mb-3">
-                        <input type="text" class="form-input form-control" th:field="*{fullName}" placeholder="Full Name *" required>
-                        <div class="text-danger" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
-                    </div>
+                <div class="contact-form-wrapper">
+                    <h2 class="form-title">Send Us a Message</h2>
 
-                    <div class="form-group mb-3">
-                        <input type="email" class="form-input form-control" th:field="*{email}" placeholder="Email *" required>
-                        <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
-                    </div>
+                    <!-- Success / Error messages -->
+                    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+                    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
-                    <div class="form-group mb-3">
-                        <input type="text" class="form-input form-control" th:field="*{subject}" placeholder="Subject (optional)">
-                        <div class="text-danger" th:if="${#fields.hasErrors('subject')}" th:errors="*{subject}"></div>
-                    </div>
+                    <!-- Contact Form -->
+                    <form class="contact-form" th:action="@{/contact}" method="post" th:object="${contactMessage}">
+                        <div class="form-group mb-3">
+                            <input type="text" class="form-input form-control" th:field="*{fullName}"
+                                placeholder="Full Name *" required>
+                            <div class="text-danger" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}">
+                            </div>
+                        </div>
 
-                    <div class="form-group mb-4">
-                        <textarea class="form-textarea form-control" th:field="*{message}" placeholder="Your message *" rows="6" required></textarea>
-                        <div class="text-danger" th:if="${#fields.hasErrors('message')}" th:errors="*{message}"></div>
-                    </div>
+                        <div class="form-group mb-3">
+                            <input type="email" class="form-input form-control" th:field="*{email}"
+                                placeholder="Email *" required>
+                            <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                        </div>
 
-                    <div class="text-center">
-                        <button type="submit" class="form-button btn btn-danger px-4 py-2">SEND</button>
-                    </div>
-                </form>
-            </div>
+                        <div class="form-group mb-3">
+                            <input type="text" class="form-input form-control" th:field="*{subject}"
+                                placeholder="Subject (optional)">
+                            <div class="text-danger" th:if="${#fields.hasErrors('subject')}" th:errors="*{subject}">
+                            </div>
+                        </div>
 
-            <!-- Contact Information -->
-            <div class="contact-info-wrapper">
-                <!-- Email -->
-                <div class="info-card">
-                    <div class="info-icon email-icon">
-                        <i class="bi bi-envelope-fill text-danger fs-3"></i>
-                    </div>
-                    <div class="info-content">
-                        <h3 class="info-title">Email</h3>
-                        <p class="info-text">contact@info.com</p>
-                    </div>
+                        <div class="form-group mb-4">
+                            <textarea class="form-textarea form-control" th:field="*{message}"
+                                placeholder="Your message *" rows="6" required></textarea>
+                            <div class="text-danger" th:if="${#fields.hasErrors('message')}" th:errors="*{message}">
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="form-button btn btn-danger px-4 py-2">SEND</button>
+                        </div>
+                    </form>
                 </div>
 
-                <!-- Phone -->
-                <div class="info-card">
-                    <div class="info-icon phone-icon">
-                        <i class="bi bi-telephone-fill text-danger fs-3"></i>
+                <!-- Contact Information -->
+                <div class="contact-info-wrapper">
+                    <!-- Email -->
+                    <div class="info-card">
+                        <div class="info-icon email-icon">
+                            <i class="bi bi-envelope-fill text-danger fs-3"></i>
+                        </div>
+                        <div class="info-content">
+                            <h3 class="info-title">Email</h3>
+                            <p class="info-text">contact@info.com</p>
+                        </div>
                     </div>
-                    <div class="info-content">
-                        <h3 class="info-title">Phone</h3>
-                        <p class="info-text">929-242-6888</p>
-                    </div>
-                </div>
 
-                <!-- Address -->
-                <div class="info-card">
-                    <div class="info-icon address-icon">
-                        <i class="bi bi-geo-alt-fill text-danger fs-3"></i>
+                    <!-- Phone -->
+                    <div class="info-card">
+                        <div class="info-icon phone-icon">
+                            <i class="bi bi-telephone-fill text-danger fs-3"></i>
+                        </div>
+                        <div class="info-content">
+                            <h3 class="info-title">Phone</h3>
+                            <p class="info-text">929-242-6888</p>
+                        </div>
                     </div>
-                    <div class="info-content">
-                        <h3 class="info-title">Address</h3>
-                        <p class="info-text">123 Fifth Avenue, New York, NY 10160</p>
-                    </div>
-                </div>
 
-                <!-- Social Media -->
-                <div class="info-card">
-                    <div class="info-icon social-icon">
-                        <i class="bi bi-heart-fill text-danger fs-3"></i>
+                    <!-- Address -->
+                    <div class="info-card">
+                        <div class="info-icon address-icon">
+                            <i class="bi bi-geo-alt-fill text-danger fs-3"></i>
+                        </div>
+                        <div class="info-content">
+                            <h3 class="info-title">Address</h3>
+                            <p class="info-text">123 Fifth Avenue, New York, NY 10160</p>
+                        </div>
                     </div>
-                    <div class="info-content">
-                        <h3 class="info-title">Follow Us</h3>
-                        <div class="social-links">
-                            <a href="#" class="social-link"><i class="bi bi-instagram"></i></a>
-                            <a href="#" class="social-link"><i class="bi bi-facebook"></i></a>
-                            <a href="#" class="social-link"><i class="bi bi-linkedin"></i></a>
-                            <a href="#" class="social-link"><i class="bi bi-twitter-x"></i></a>
+
+                    <!-- Social Media -->
+                    <div class="info-card">
+                        <div class="info-icon social-icon">
+                            <i class="bi bi-heart-fill text-danger fs-3"></i>
+                        </div>
+                        <div class="info-content">
+                            <h3 class="info-title">Follow Us</h3>
+                            <div class="social-links">
+                                <a href="#" class="social-link"><i class="bi bi-instagram"></i></a>
+                                <a href="#" class="social-link"><i class="bi bi-facebook"></i></a>
+                                <a href="#" class="social-link"><i class="bi bi-linkedin"></i></a>
+                                <a href="#" class="social-link"><i class="bi bi-twitter-x"></i></a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Support Topics Section -->
-<section class="support-topics">
-    <div class="container text-center">
-        <h2 class="support-title">Explore Our Support Topics</h2>
-        <p class="support-description">
-            From returns and shipping to sizing and payments, we've got<br>
-            answers to all your most common questions.
-        </p>
+    <!-- Support Topics Section -->
+    <section class="support-topics">
+        <div class="container text-center">
+            <h2 class="support-title">Explore Our Support Topics</h2>
+            <p class="support-description">
+                From returns and shipping to sizing and payments, we've got<br>
+                answers to all your most common questions.
+            </p>
 
-        <div class="topics-grid">
-            <div class="topic-card">
-                <h3 class="topic-title">Returns & Exchanges</h3>
-                <ul class="topic-links">
-                    <li><a href="#">Returns & Exchanges</a></li>
-                    <li><a href="#">How to Start a Return</a></li>
-                    <li><a href="#">Check Return Status</a></li>
-                </ul>
-            </div>
+            <div class="topics-grid">
+                <div class="topic-card">
+                    <h3 class="topic-title">Returns & Exchanges</h3>
+                    <ul class="topic-links">
+                        <li><a th:href="@{/faqs#return-policy}">Returns & Exchanges</a></li>
+                        <li><a th:href="@{/faqs#start-return}">How to Start a Return</a></li>
+                        <li><a th:href="@{/faqs#check-return-status}">Check Return Status</a></li>
+                    </ul>
+                </div>
 
-            <div class="topic-card">
-                <h3 class="topic-title">Ordering & Payment</h3>
-                <ul class="topic-links">
-                    <li><a href="#">Modify or Cancel an Order</a></li>
-                    <li><a href="#">Pre-order Items</a></li>
-                    <li><a href="#">Payment Methods</a></li>
-                </ul>
-            </div>
+                <div class="topic-card">
+                    <h3 class="topic-title">Ordering & Payment</h3>
+                    <ul class="topic-links">
+                        <li><a th:href="@{/faqs#modify-order}">Modify or Cancel an Order</a></li>
+                        <li><a th:href="@{/faqs#pre-order}">Pre-order Items</a></li>
+                        <li><a th:href="@{/faqs#payment-methods}">Payment Methods</a></li>
+                    </ul>
+                </div>
 
-            <div class="topic-card">
-                <h3 class="topic-title">Shipping & Delivery</h3>
-                <ul class="topic-links">
-                    <li><a href="#">Shipping Options & Costs</a></li>
-                    <li><a href="#">Estimated Delivery Times</a></li>
-                    <li><a href="#">Track Your Order</a></li>
-                </ul>
-            </div>
+                <div class="topic-card">
+                    <h3 class="topic-title">Shipping & Delivery</h3>
+                    <ul class="topic-links">
+                        <li><a th:href="@{/faqs#shipping-options}">Shipping Options & Costs</a></li>
+                        <li><a th:href="@{/faqs#delivery-times}">Estimated Delivery Times</a></li>
+                        <li><a th:href="@{/faqs#track-order}">Track Your Order</a></li>
+                    </ul>
+                </div>
 
-            <div class="topic-card">
-                <h3 class="topic-title">Product Information</h3>
-                <ul class="topic-links">
-                    <li><a href="#">Materials & Fabrics</a></li>
-                    <li><a href="#">Care Instructions</a></li>
-                    <li><a href="#">Availability & Restocks</a></li>
-                </ul>
-            </div>
+                <div class="topic-card">
+                    <h3 class="topic-title">Product Information</h3>
+                    <ul class="topic-links">
+                        <li><a th:href="@{/faqs#materials}">Materials & Fabrics</a></li>
+                        <li><a th:href="@{/faqs#care-instructions}">Care Instructions</a></li>
+                        <li><a th:href="@{/faqs#availability}">Availability & Restocks</a></li>
+                    </ul>
+                </div>
 
-            <div class="topic-card">
-                <h3 class="topic-title">Account & Privacy</h3>
-                <ul class="topic-links">
-                    <li><a href="#">Create or Manage Your Account</a></li>
-                    <li><a href="#">Password Reset Help</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
-                </ul>
-            </div>
+                <div class="topic-card">
+                    <h3 class="topic-title">Account & Privacy</h3>
+                    <ul class="topic-links">
+                        <li><a th:href="@{/faqs#manage-account}">Create or Manage Your Account</a></li>
+                        <li><a th:href="@{/faqs#password-reset}">Password Reset Help</a></li>
+                        <li><a th:href="@{/faqs#privacy-policy}">Privacy Policy</a></li>
+                    </ul>
+                </div>
 
-            <div class="topic-card">
-                <h3 class="topic-title">Sizing & Fit</h3>
-                <ul class="topic-links">
-                    <li><a href="#">Size Guide</a></li>
-                    <li><a href="#">Fit Tips & Recommendations</a></li>
-                    <li><a href="#">Product Measurements</a></li>
-                </ul>
+                <div class="topic-card">
+                    <h3 class="topic-title">Sizing & Fit</h3>
+                    <ul class="topic-links">
+                        <li><a th:href="@{/faqs#size-guide}">Size Guide</a></li>
+                        <li><a th:href="@{/faqs#fit-tips}">Fit Tips & Recommendations</a></li>
+                        <li><a th:href="@{/faqs#product-measurements}">Product Measurements</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<div th:replace="~{footer :: footer}"></div>
+    <div th:replace="~{footer :: footer}"></div>
 
-<!-- Floating Buttons -->
-<a th:href="@{/shop}" class="buy-now-btn">
-    <i class="bi bi-cart-fill"></i> Buy Now
-</a>
+    <!-- Floating Buttons -->
+    <a th:href="@{/shop}" class="buy-now-btn">
+        <i class="bi bi-cart-fill"></i> Buy Now
+    </a>
 
-<a href="#" class="customize-btn">
-    <i class="bi bi-sliders"></i> Customize
-</a>
+    <a href="#" class="customize-btn">
+        <i class="bi bi-sliders"></i> Customize
+    </a>
 
-<script th:src="@{/js/header.js}"></script>
-<script th:src="@{/js/theme-customizer.js}"></script>
+    <script th:src="@{/js/header.js}"></script>
+    <script th:src="@{/js/theme-customizer.js}"></script>
 </body>
+
 </html>

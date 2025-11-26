@@ -37,6 +37,302 @@
   visibility: visible;
 }
 
+/* ===== SHOP PAGE FILTER SIDEBAR DARK MODE ===== */
+
+/* Filter Sidebar Container */
+body.dark-mode .filter-sidebar {
+  background: #2d2d2d;
+  border-color: #374151;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Filter Section */
+body.dark-mode .filter-section {
+  border-bottom-color: #374151;
+}
+
+/* Filter Title */
+body.dark-mode .filter-title {
+  color: #e5e7eb;
+  font-weight: 700;
+}
+
+/* Filter Options */
+body.dark-mode .filter-option {
+  transition: all 0.2s ease;
+}
+
+body.dark-mode .filter-option:hover {
+  background: rgba(220, 38, 38, 0.1);
+  padding-left: 8px;
+  border-radius: 6px;
+  margin-left: -8px;
+  margin-right: -8px;
+  padding-right: 8px;
+}
+
+body.dark-mode .filter-option label {
+  color: #9ca3af;
+}
+
+body.dark-mode .filter-option:hover label {
+  color: #e5e7eb;
+}
+
+/* Checkboxes */
+body.dark-mode .filter-option input[type="checkbox"] {
+  accent-color: #dc2626;
+  cursor: pointer;
+  border: 2px solid #4b5563;
+  border-radius: 4px;
+}
+
+body.dark-mode .filter-option input[type="checkbox"]:checked {
+  background-color: #dc2626;
+  border-color: #dc2626;
+}
+
+/* Search Input */
+body.dark-mode .filter-section input[type="text"].form-control {
+  background: #374151;
+  border: 1px solid #4b5563;
+  color: #e5e7eb;
+  padding: 10px 12px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .filter-section input[type="text"].form-control::placeholder {
+  color: #6b7280;
+}
+
+body.dark-mode .filter-section input[type="text"].form-control:focus {
+  border-color: #dc2626;
+  background: #374151;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+  outline: none;
+}
+
+/* Price Range Inputs */
+body.dark-mode .price-inputs input {
+  background: #374151;
+  border-color: #4b5563;
+  color: #e5e7eb;
+  padding: 10px 12px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .price-inputs input::placeholder {
+  color: #6b7280;
+}
+
+body.dark-mode .price-inputs input:focus {
+  border-color: #dc2626;
+  background: #374151;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+  outline: none;
+}
+
+body.dark-mode .price-inputs span {
+  color: #9ca3af;
+}
+
+/* Apply Price Button */
+body.dark-mode .filter-section button {
+  background: #dc2626;
+  color: white;
+  border: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+body.dark-mode .filter-section button:hover {
+  background: #b91c1c;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.5);
+  transform: translateY(-2px);
+}
+
+body.dark-mode .filter-section button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+/* Clear Filters Button */
+body.dark-mode .clear-filters-btn {
+  background: #374151;
+  border: 2px solid #4b5563;
+  color: #e5e7eb;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .clear-filters-btn:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: white;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.5);
+  transform: translateY(-2px);
+}
+
+body.dark-mode .clear-filters-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+body.dark-mode .clear-filters-btn i {
+  color: inherit;
+}
+
+/* Filter Sidebar Header (if you add it) */
+body.dark-mode .filter-sidebar h3 {
+  color: #e5e7eb;
+  border-bottom: 2px solid #374151;
+  padding-bottom: 15px;
+  margin-bottom: 25px;
+}
+
+/* Scrollbar for Filter Sidebar */
+body.dark-mode .filter-sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+body.dark-mode .filter-sidebar::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
+body.dark-mode .filter-sidebar::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 4px;
+}
+
+body.dark-mode .filter-sidebar::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Pagination Dark Mode Enhancement */
+body.dark-mode .pagination-container {
+  border-top: 1px solid #374151;
+  padding-top: 40px;
+  margin-top: 40px;
+}
+
+body.dark-mode .page-link {
+  background: #374151;
+  border-color: #4b5563;
+  color: #9ca3af;
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .page-link:hover {
+  background: #dc2626;
+  color: white;
+  border-color: #dc2626;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+}
+
+body.dark-mode .page-item.active .page-link {
+  background: #dc2626;
+  color: white;
+  border-color: #dc2626;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+}
+
+body.dark-mode .page-item.disabled .page-link {
+  background: #2d2d2d;
+  border-color: #374151;
+  color: #4b5563;
+  opacity: 0.6;
+}
+
+/* Page Size Selector */
+body.dark-mode .page-size-selector {
+  color: #9ca3af;
+}
+
+body.dark-mode .page-size-selector select {
+  background: #374151;
+  border-color: #4b5563;
+  color: #e5e7eb;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .page-size-selector select:hover {
+  border-color: #dc2626;
+}
+
+body.dark-mode .page-size-selector select:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+  outline: none;
+}
+
+body.dark-mode .page-size-selector select option {
+  background: #374151;
+  color: #e5e7eb;
+}
+
+/* Empty State */
+body.dark-mode .bi-box-seam {
+  color: #4b5563 !important;
+}
+
+body.dark-mode .btn-dark {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: white;
+}
+
+body.dark-mode .btn-dark:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.5);
+}
+
+/* Smooth Transitions */
+.filter-sidebar,
+.filter-section,
+.filter-option,
+.filter-option label,
+.clear-filters-btn,
+.page-link,
+.page-size-selector select,
+.filter-section input,
+.filter-section button {
+  transition: all 0.3s ease;
+}
+
+/* Responsive Dark Mode Enhancements */
+@media (max-width: 992px) {
+  body.dark-mode .filter-sidebar {
+    border-radius: 12px;
+    margin-bottom: 30px;
+  }
+}
+
+/* Add subtle glow effect on focus */
+body.dark-mode .filter-option input[type="checkbox"]:focus {
+  outline: 2px solid rgba(220, 38, 38, 0.5);
+  outline-offset: 2px;
+}
+
+/* Better visual feedback for selected filters */
+body.dark-mode .filter-option input[type="checkbox"]:checked + label {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+/* Add icon styling if you have icons in filter titles */
+body.dark-mode .filter-title i {
+  color: #dc2626;
+  margin-right: 8px;
+}
 /* Header */
 .customizer-header {
   padding: 25px;
