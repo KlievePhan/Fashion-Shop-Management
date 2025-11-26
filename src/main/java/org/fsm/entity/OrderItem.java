@@ -18,11 +18,14 @@ public class OrderItem {
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_variant_id")
-    private ProductVariant productVariant;
+    @JoinColumn(name = "product_id")
+    private Product product;
 
     @Column(name = "product_title", nullable = false, length = 255)
     private String productTitle;
+
+    @Column(name = "selected_options", columnDefinition = "JSON")
+    private String selectedOptions;
 
     @Column(name = "unit_price", nullable = false, precision = 12, scale = 2)
     private BigDecimal unitPrice;

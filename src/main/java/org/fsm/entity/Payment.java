@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "payments", uniqueConstraints = @UniqueConstraint(columnNames = "vnp_txnref"))
+@Table(name = "payments")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Payment {
 
@@ -18,8 +18,8 @@ public class Payment {
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    @Column(name = "vnp_txnref", length = 100, unique = true)
-    private String vnpTxnRef;
+    @Column(name = "vnp_txnref", unique = true, length = 100)
+    private String vnpTxnref;
 
     @Column(name = "vnp_trans_date", length = 50)
     private String vnpTransDate;
@@ -37,22 +37,28 @@ public class Payment {
     private String method = "VNPAY";
 
     @Column(length = 50)
-    private String status = "INIT";
+    private String status = "INIT"; // INIT, SUCCESS, FAILED, REFUNDED
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "raw_request", columnDefinition = "TEXT")
     private String rawRequest;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "raw_response", columnDefinition = "TEXT")
     private String rawResponse;
 
     @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
 
     @PreUpdate
-    public void preUpdate() {
+    protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
 }
