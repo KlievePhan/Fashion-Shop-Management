@@ -7,7 +7,7 @@
     <title>Shopping Cart - Fashion Shop</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600&display.swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&display=swap" rel="stylesheet"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="icon" th:href="@{/images/store.png}" type="image/x-icon">
     <link rel="stylesheet" th:href="@{/css/header.css}">
@@ -19,40 +19,41 @@
     <style>
         :root {
             /* Light Mode Defaults */
-            --body-bg: #fafafa;
+            --body-bg: #f8f9fa;
             --container-bg: white;
-            --text-color: #333;
-            --text-secondary: #666;
-            --border-color: #eee;
-            --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            --text-color: #1a1a1a;
+            --text-secondary: #6c757d;
+            --border-color: #e9ecef;
+            --box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
             --price-color: #000;
-            --highlight-color: #e74c3c;
+            --highlight-color: #dc3545;
             --primary-button-bg: #000;
             --primary-button-text: white;
             --primary-button-hover: #333;
-            --secondary-button-bg: white;
-            --secondary-button-border: #ddd;
-            --secondary-button-hover: #f5f5f5;
+            --secondary-button-bg: #f8f9fa;
+            --secondary-button-border: #dee2e6;
+            --secondary-button-hover: #e9ecef;
+            --success-color: #28a745;
         }
 
         .dark-mode {
-            --body-bg: #121212;
-            --container-bg: #1e1e1e;
-            --text-color: #e0e0e0;
-            --text-secondary: #aaaaaa;
-            --border-color: #333333;
-            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --body-bg: #0d1117;
+            --container-bg: #161b22;
+            --text-color: #e6edf3;
+            --text-secondary: #8b949e;
+            --border-color: #30363d;
+            --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
             --price-color: #ffffff;
-            --highlight-color: #ff6b6b;
-            --primary-button-bg: #bb86fc;
-            --primary-button-text: #121212;
-            --primary-button-hover: #9f6ee6;
-            --secondary-button-bg: #2d2d2d;
-            --secondary-button-border: #444444;
-            --secondary-button-hover: #3a3a3a;
+            --highlight-color: #f85149;
+            --primary-button-bg: #58a6ff;
+            --primary-button-text: #0d1117;
+            --primary-button-hover: #79c0ff;
+            --secondary-button-bg: #21262d;
+            --secondary-button-border: #30363d;
+            --secondary-button-hover: #30363d;
+            --success-color: #3fb950;
         }
 
-        /* ... (Toàn bộ các style CSS khác của bạn giữ nguyên) ... */
         body {
             font-family: 'Lato', sans-serif;
             background-color: var(--body-bg);
@@ -61,101 +62,150 @@
         }
 
         .cart-container {
-            padding: 40px 0;
-            min-height: 60vh;
+            padding: 50px 0;
+            min-height: 70vh;
         }
 
         .cart-header {
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
         }
 
         .cart-header h1 {
-            font-size: 32px;
-            font-weight: 600;
+            font-size: 36px;
+            font-weight: 700;
             color: var(--text-color);
+            margin: 0;
         }
 
-        .cart-items-section,
-        .cart-summary {
+        .cart-items-count {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        .cart-items-section {
             background: var(--container-bg);
-            border-radius: 8px;
-            padding: 30px;
+            border-radius: 12px;
+            padding: 0;
             margin-bottom: 30px;
             box-shadow: var(--box-shadow);
+            overflow: hidden;
             transition: background-color 0.3s, box-shadow 0.3s;
         }
 
         .cart-summary {
-            margin-bottom: 0;
+            background: var(--container-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 100px;
+            transition: background-color 0.3s, box-shadow 0.3s;
         }
 
         .cart-item {
-            display: flex;
-            gap: 20px;
-            padding: 20px;
+            display: grid;
+            grid-template-columns: 140px 1fr auto;
+            gap: 24px;
+            padding: 28px;
             border-bottom: 1px solid var(--border-color);
-            align-items: flex-start;
-            transition: border-color 0.3s;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        .cart-item:hover {
+            background-color: var(--secondary-button-bg);
         }
 
         .cart-item:last-child {
             border-bottom: none;
         }
 
-        .item-image {
-            width: 120px;
-            height: 120px;
-            object-fit: cover;
-            border-radius: 8px;
-            background-color: var(--secondary-button-hover);
+        .item-image-wrapper {
+            width: 140px;
+            height: 140px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--secondary-button-bg);
             flex-shrink: 0;
         }
 
+        .item-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .item-image:hover {
+            transform: scale(1.05);
+        }
+
+        .item-content {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
         .item-title {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
             color: var(--text-color);
-            margin-bottom: 8px;
+            margin: 0;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .item-variant {
             font-size: 14px;
             color: var(--text-secondary);
-            margin-bottom: 10px;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
         }
 
-        .item-variant strong {
-            color: var(--text-color);
+        .variant-tag {
+            background: var(--secondary-button-bg);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 13px;
         }
 
-        .item-price {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--price-color);
-            margin-bottom: 15px;
+        .item-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 4px;
         }
 
         .quantity-control {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            width: fit-content;
+            gap: 0;
+            background: var(--secondary-button-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         .quantity-btn {
-            width: 30px;
-            height: 30px;
-            border: 1px solid var(--secondary-button-border);
-            background: var(--secondary-button-bg);
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: transparent;
             color: var(--text-color);
             cursor: pointer;
-            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
-            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+            font-size: 18px;
+            font-weight: 600;
+            transition: background-color 0.2s;
         }
 
         .quantity-btn:hover:not(:disabled) {
@@ -163,18 +213,23 @@
         }
 
         .quantity-btn:disabled {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: not-allowed;
         }
 
         .quantity-input {
             width: 50px;
             text-align: center;
-            border: 1px solid var(--secondary-button-border);
-            background: var(--container-bg);
+            border: none;
+            background: transparent;
             color: var(--text-color);
-            border-radius: 4px;
-            padding: 5px;
+            font-weight: 600;
+            font-size: 15px;
+            padding: 8px 4px;
+        }
+
+        .quantity-input:focus {
+            outline: none;
         }
 
         .remove-btn {
@@ -183,134 +238,197 @@
             font-size: 14px;
             border: none;
             background: none;
-            text-decoration: none;
-            transition: color 0.3s;
+            padding: 6px 12px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.2s;
         }
 
         .remove-btn:hover {
-            text-decoration: underline;
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+
+        .item-price-section {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .item-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--price-color);
+            letter-spacing: -0.5px;
+        }
+
+        .item-unit-price {
+            font-size: 13px;
+            color: var(--text-secondary);
         }
 
         .cart-summary h5 {
+            font-size: 20px;
+            font-weight: 700;
             color: var(--text-color);
+            margin-bottom: 24px;
         }
 
         .summary-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
             font-size: 15px;
+            align-items: center;
         }
 
         .summary-row span:first-child {
             color: var(--text-secondary);
+            font-weight: 500;
         }
 
         .summary-row span:last-child {
-            color: var(--price-color);
-        }
-
-        .summary-row.total {
-            border-top: 2px solid var(--border-color);
-            padding-top: 15px;
-            font-size: 18px;
+            color: var(--text-color);
             font-weight: 600;
         }
 
+        .summary-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 20px 0;
+        }
+
+        .summary-row.total {
+            padding-top: 20px;
+            border-top: 2px solid var(--border-color);
+            font-size: 20px;
+            font-weight: 700;
+        }
+
         .summary-row.total span {
-            color: var(--price-color) !important;
+            color: var(--price-color);
         }
 
         .checkout-btn {
             width: 100%;
-            padding: 15px;
+            padding: 16px;
             background-color: var(--primary-button-bg);
             color: var(--primary-button-text);
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 20px;
-            transition: background-color 0.3s ease;
+            margin-top: 24px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .checkout-btn:hover {
             background-color: var(--primary-button-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
-        .continue-shopping,
-        .empty-cart .btn-dark {
+        .continue-shopping {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             background-color: var(--secondary-button-bg);
             color: var(--text-color);
-            border: 1px solid var(--secondary-button-border);
-            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
             font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 12px;
             text-align: center;
             display: block;
             text-decoration: none;
-            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+            transition: all 0.2s;
         }
 
-        .continue-shopping:hover,
-        .empty-cart .btn-dark:hover {
+        .continue-shopping:hover {
             background-color: var(--secondary-button-hover);
+            border-color: var(--text-secondary);
             color: var(--text-color);
         }
 
         .empty-cart {
             text-align: center;
-            padding: 60px 20px;
+            padding: 80px 20px;
         }
 
         .empty-cart i {
-            font-size: 60px;
+            font-size: 80px;
             color: var(--border-color);
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+        }
+
+        .empty-cart h3 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 12px;
         }
 
         .empty-cart p {
-            font-size: 18px;
+            font-size: 16px;
             color: var(--text-secondary);
-            margin-bottom: 30px;
+            margin-bottom: 32px;
         }
 
         .empty-cart .btn-dark {
             width: 250px;
             margin: 0 auto;
+            padding: 14px;
             background-color: var(--primary-button-bg);
             color: var(--primary-button-text);
             border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .empty-cart .btn-dark:hover {
             background-color: var(--primary-button-hover);
         }
 
-        .item-line-total {
-            text-align: right;
-            min-width: 120px;
-            color: var(--price-color);
-            font-weight: 600;
-            font-size: 16px;
+        @media (max-width: 992px) {
+            .cart-summary {
+                position: static;
+                margin-top: 30px;
+            }
         }
 
         @media (max-width: 768px) {
-            .cart-item {
-                flex-direction: column;
+            .cart-header h1 {
+                font-size: 28px;
             }
 
-            .item-image {
+            .cart-item {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .item-image-wrapper {
                 width: 100%;
                 height: 250px;
             }
 
-            .cart-summary {
-                margin-top: 20px;
+            .item-price-section {
+                text-align: left;
+                align-items: flex-start;
+            }
+
+            .item-actions {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
             }
         }
     </style>
@@ -323,13 +441,17 @@
 <main class="container cart-container">
     <div class="cart-header">
         <h1>Shopping Cart</h1>
+        <div class="cart-items-count" th:if="${cartItems != null && !cartItems.isEmpty()}">
+            <span th:text="${#lists.size(cartItems)} + ' item(s)'"></span>
+        </div>
     </div>
 
     <!-- Empty Cart -->
     <div th:if="${cartItems == null || cartItems.isEmpty()}" class="cart-items-section empty-cart">
-        <i class="bi bi-bag-x"></i>
-        <p>Your cart is empty</p>
-        <a th:href="@{/shop}" class="btn btn-dark">Continue Shopping</a>
+        <i class="bi bi-cart-x"></i>
+        <h3>Your cart is empty</h3>
+        <p>Looks like you haven't added anything to your cart yet</p>
+        <a th:href="@{/shop}" class="btn btn-dark">Start Shopping</a>
     </div>
 
     <!-- Cart Items -->
@@ -337,46 +459,47 @@
         <div class="col-lg-8">
             <div class="cart-items-section">
                 <div th:each="item : ${cartItems}" class="cart-item">
-                    <!-- ⭐ FIXED: product thay vì productVariant -->
-                    <img th:src="${item.product.primaryImageUrl}"
-                         alt="Product"
-                         class="item-image">
+                    <div class="item-image-wrapper">
+                        <img th:src="${item.product.primaryImageUrl}"
+                             alt="Product"
+                             class="item-image">
+                    </div>
 
-                    <div class="item-details">
-                        <!-- ⭐ FIXED -->
+                    <div class="item-content">
                         <h4 class="item-title" th:text="${item.product.title}"></h4>
 
                         <div class="item-variant">
-                            <!-- ⭐ FIXED: selectedOptionsJson -->
                             <span class="variant-attributes"
                                   th:data-attributes="${item.selectedOptionsJson}"></span>
                         </div>
 
-                        <div class="item-price">
-                            <!-- ⭐ FIXED: unitPrice -->
-                            <span th:text="'$' + ${#numbers.formatDecimal(item.unitPrice, 1, 2)}"></span>
-                        </div>
+                        <div class="item-actions">
+                            <div class="quantity-control">
+                                <button class="quantity-btn" onclick="updateQuantityOnServer(this, -1)">−</button>
+                                <input type="number"
+                                       class="quantity-input"
+                                       th:value="${item.qty}"
+                                       min="1"
+                                       th:data-item-id="${item.id}"
+                                       onblur="handleQuantityInputBlur(this)"
+                                       onkeypress="handleQuantityInputEnter(event, this)">
+                                <button class="quantity-btn" onclick="updateQuantityOnServer(this, 1)">+</button>
+                            </div>
 
-                        <div class="quantity-control">
-                            <button class="quantity-btn" onclick="updateQuantityOnServer(this, -1)">−</button>
-                            <input type="number"
-                                   class="quantity-input"
-                                   th:value="${item.qty}"
-                                   min="1"
-                                   th:data-item-id="${item.id}"
-                                   onblur="handleQuantityInputBlur(this)"
-                                   onkeypress="handleQuantityInputEnter(event, this)">
-                            <button class="quantity-btn" onclick="updateQuantityOnServer(this, 1)">+</button>
+                            <button class="remove-btn" th:onclick="'removeFromCartOnServer(' + ${item.id} + ')'">
+                                <i class="bi bi-trash"></i>
+                                <span>Remove</span>
+                            </button>
                         </div>
-
-                        <button class="remove-btn" th:onclick="'removeFromCartOnServer(' + ${item.id} + ')'">
-                            <i class="bi bi-trash"></i> Remove
-                        </button>
                     </div>
 
-                    <div class="item-line-total">
-                        <!-- ⭐ FIXED: lineTotal -->
-                        <span th:text="'$' + ${#numbers.formatDecimal(item.lineTotal, 1, 2)}"></span>
+                    <div class="item-price-section">
+                        <div class="item-price">
+                            <span th:text="'$' + ${#numbers.formatDecimal(item.lineTotal, 1, 2)}"></span>
+                        </div>
+                        <div class="item-unit-price">
+                            <span th:text="'$' + ${#numbers.formatDecimal(item.unitPrice, 1, 2)} + ' each'"></span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -385,23 +508,26 @@
         <!-- Cart Summary -->
         <div class="col-lg-4">
             <div class="cart-summary">
-                <h5 style="font-weight: 600; margin-bottom: 20px;">Order Summary</h5>
+                <h5>Order Summary</h5>
+
                 <div class="summary-row">
-                    <span>Subtotal:</span>
+                    <span>Subtotal</span>
                     <span th:text="'$' + ${#numbers.formatDecimal(subtotal, 1, 2)}"></span>
                 </div>
                 <div class="summary-row">
-                    <span>Shipping:</span>
+                    <span>Shipping</span>
                     <span th:text="'$' + ${#numbers.formatDecimal(shipping, 1, 2)}"></span>
                 </div>
                 <div class="summary-row">
-                    <span>Tax:</span>
+                    <span>Tax</span>
                     <span th:text="'$' + ${#numbers.formatDecimal(tax, 1, 2)}"></span>
                 </div>
+
                 <div class="summary-row total">
-                    <span>Total:</span>
+                    <span>Total</span>
                     <span th:text="'$' + ${#numbers.formatDecimal(total, 1, 2)}"></span>
                 </div>
+
                 <button class="checkout-btn" onclick="window.location.href='/fashionshop/checkout'">
                     Proceed to Checkout
                 </button>
@@ -423,50 +549,52 @@
 <script th:src="@{/js/theme-customizer.js}"></script>
 
 <script>
-    // ========== XỬ LÝ NHẬP TRỰC TIẾP SỐ LƯỢNG ==========
+    // ========== XỬ LÝ HIỂN THỊ VARIANT ==========
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.variant-attributes').forEach(span => {
+            const jsonStr = span.dataset.attributes;
+            if (jsonStr) {
+                try {
+                    const attrs = JSON.parse(jsonStr);
+                    const tags = Object.entries(attrs)
+                        .map(([key, value]) => `<span class="variant-tag"><strong>${key}:</strong> ${value}</span>`)
+                        .join('');
+                    span.innerHTML = tags;
+                } catch (e) {
+                    console.error('Error parsing attributes:', e);
+                }
+            }
+        });
+    });
 
-    /**
-     * Xử lý khi người dùng rời khỏi ô input (blur)
-     */
+    // ========== XỬ LÝ NHẬP TRỰC TIẾP SỐ LƯỢNG ==========
     function handleQuantityInputBlur(input) {
         const newQty = parseInt(input.value);
         const itemId = input.dataset.itemId;
 
-        // Validate
         if (isNaN(newQty) || newQty < 1) {
             input.value = 1;
             return;
         }
 
-        // Lấy giá trị cũ từ attribute
         const oldQty = parseInt(input.defaultValue);
-
-        // Nếu không thay đổi thì không cần update
         if (newQty === oldQty) {
             return;
         }
 
-        // Update lên server
         updateQuantityDirectly(itemId, newQty, input);
     }
 
-    /**
-     * Xử lý khi người dùng nhấn Enter trong ô input
-     */
     function handleQuantityInputEnter(event, input) {
         if (event.key === 'Enter') {
-            input.blur(); // Trigger blur event
+            input.blur();
         }
     }
 
-    /**
-     * Gửi request update số lượng trực tiếp
-     */
     function updateQuantityDirectly(itemId, newQty, input) {
         const cartItem = input.closest('.cart-item');
         const buttons = cartItem.querySelectorAll('.quantity-btn');
 
-        // Disable controls
         input.disabled = true;
         buttons.forEach(btn => btn.disabled = true);
 
@@ -478,28 +606,20 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Update defaultValue để tracking
                     input.defaultValue = newQty;
 
-                    // Update line total
-                    const lineTotalDiv = cartItem.querySelector('.item-line-total');
-                    if (lineTotalDiv) {
-                        const priceSpan = lineTotalDiv.querySelector('span');
-                        if (priceSpan) {
-                            priceSpan.textContent = '$' + data.itemTotal.toFixed(2);
-                        }
+                    const priceSection = cartItem.querySelector('.item-price-section .item-price span');
+                    if (priceSection) {
+                        priceSection.textContent = '$' + data.itemTotal.toFixed(2);
                     }
 
-                    // Update cart summary
                     updateCartSummaryDOM(data);
 
-                    // Update badge
                     if (typeof window.refreshCartBadge === 'function') {
                         window.refreshCartBadge();
                     }
                     updateCartBadge();
 
-                    // Show notification
                     if (typeof showHeadNotification === 'function') {
                         showHeadNotification('Cart updated!', `Quantity changed to ${newQty}`, { variant: 'success', duration: 2000 });
                     } else {
@@ -512,8 +632,6 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-
-                // Revert to old value
                 input.value = input.defaultValue;
 
                 const message = error.message || 'An error occurred';
@@ -524,20 +642,16 @@
                 }
             })
             .finally(() => {
-                // Re-enable controls
                 input.disabled = false;
                 buttons.forEach(btn => btn.disabled = false);
             });
     }
 
-    // ========== VALIDATE INPUT KHI ĐANG NHẬP ==========
+    // ========== VALIDATE INPUT ==========
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.quantity-input').forEach(input => {
             input.addEventListener('input', function() {
-                // Chỉ cho phép số nguyên dương
                 this.value = this.value.replace(/[^0-9]/g, '');
-
-                // Giới hạn tối đa (ví dụ 999)
                 if (parseInt(this.value) > 999) {
                     this.value = 999;
                 }
@@ -547,3 +661,4 @@
 </script>
 
 </body>
+</html>
