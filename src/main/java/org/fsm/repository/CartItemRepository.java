@@ -14,9 +14,6 @@ import java.util.Optional;
 @Repository
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
-    /**
-     * Tìm tất cả items trong cart
-     */
     List<CartItem> findByCart(Cart cart);
 
     /**
@@ -33,7 +30,7 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
     );
 
     /**
-     * ⭐ ALTERNATIVE: Exact match (nếu JSON đã được normalized đúng)
+     * ⭐ ALTERNATIVE: Exact match
      */
     @Query("SELECT ci FROM CartItem ci " +
             "WHERE ci.cart = :cart " +
@@ -45,22 +42,13 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
             @Param("optionsJson") String optionsJson
     );
 
-    /**
-     * ⭐ DEBUG: Tìm tất cả items của product trong cart
-     */
+
     @Query("SELECT ci FROM CartItem ci WHERE ci.cart = :cart AND ci.product = :product")
     List<CartItem> findByCartAndProduct(
             @Param("cart") Cart cart,
             @Param("product") Product product
     );
 
-    /**
-     * Xóa tất cả items trong cart
-     */
     void deleteByCart(Cart cart);
-
-    /**
-     * Đếm số items trong cart
-     */
     long countByCart(Cart cart);
 }
