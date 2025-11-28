@@ -2,167 +2,189 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-  <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
 
 <body>
-  <header class="header">
+<header class="header">
     <div class="icon-store">
-      <a href="/fashionshop" class="logo">
-        <img th:src="@{/images/store.png}" alt="Logo" class="logo-img" />
-        <span class="logo-text">Fashion Shop</span>
-      </a>
+        <a href="/fashionshop" class="logo">
+            <img th:src="@{/images/store.png}" alt="Logo" class="logo-img" />
+            <span class="logo-text">Fashion Shop</span>
+        </a>
     </div>
 
     <nav class="link-home">
-      <a href="/fashionshop" th:classappend="${currentPath == '/'} ? 'active' : ''">Home</a>
-      <a th:href="@{/shop}"
-        th:classappend="${currentPath != null && currentPath.contains('/shop')} ? 'active' : ''">Shop</a>
-      <a th:href="@{/about}"
-        th:classappend="${currentPath != null && currentPath.contains('/about')} ? 'active' : ''">About</a>
+        <a href="/fashionshop" th:classappend="${currentPath == '/'} ? 'active' : ''">Home</a>
+        <a th:href="@{/shop}"
+           th:classappend="${currentPath != null && currentPath.contains('/shop')} ? 'active' : ''">Shop</a>
+        <a th:href="@{/about}"
+           th:classappend="${currentPath != null && currentPath.contains('/about')} ? 'active' : ''">About</a>
         <a th:href="@{/blog}"
-        th:classappend="${currentPath != null && currentPath.contains('/blog')} ? 'active' : ''">Blog</a>
-      <a th:href="@{/careers}"
-        th:classappend="${currentPath != null && currentPath.contains('/careers')} ? 'active' : ''">Careers</a>
-      <a th:href="@{/faqs}"
-        th:classappend="${currentPath != null && currentPath.contains('/faqs')} ? 'active' : ''">FAQ's</a>
-      <a th:href="@{/contact}"
-        th:classappend="${currentPath != null && currentPath.contains('/contact')} ? 'active' : ''">Contact</a>
+           th:classappend="${currentPath != null && currentPath.contains('/blog')} ? 'active' : ''">Blog</a>
+        <a th:href="@{/careers}"
+           th:classappend="${currentPath != null && currentPath.contains('/careers')} ? 'active' : ''">Careers</a>
+        <a th:href="@{/faqs}"
+           th:classappend="${currentPath != null && currentPath.contains('/faqs')} ? 'active' : ''">FAQ's</a>
+        <a th:href="@{/contact}"
+           th:classappend="${currentPath != null && currentPath.contains('/contact')} ? 'active' : ''">Contact</a>
     </nav>
 
     <!-- ===== USER & CART ===== -->
     <div class="user-cart">
 
-      <!-- ANONYMOUS USER -->
-      <div class="user-dropdown" th:unless="${isAuthenticated}">
-        <svg width="28" height="28" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"
-          stroke-linejoin="round" class="user-icon">
-          <circle cx="12" cy="8" r="4"></circle>
-          <path d="M4 22c0-4 4-6 8-6s8 2 8 6"></path>
-        </svg>
+        <!-- ANONYMOUS USER -->
+        <div class="user-dropdown" th:unless="${isAuthenticated}">
+            <svg width="28" height="28" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"
+                 stroke-linejoin="round" class="user-icon">
+                <circle cx="12" cy="8" r="4"></circle>
+                <path d="M4 22c0-4 4-6 8-6s8 2 8 6"></path>
+            </svg>
 
-        <div class="dropdown-menu">
-          <a th:href="@{/login}">Login</a>
-          <a th:href="@{/signup}">Register</a>
+            <div class="dropdown-menu">
+                <a th:href="@{/login}">Login</a>
+                <a th:href="@{/signup}">Register</a>
+            </div>
         </div>
-      </div>
 
-      <!-- AUTHENTICATED USER -->
-      <div class="user-dropdown" th:if="${isAuthenticated}">
-        <svg width="28" height="28" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"
-          stroke-linejoin="round" class="user-icon">
-          <circle cx="12" cy="8" r="4"></circle>
-          <path d="M4 22c0-4 4-6 8-6s8 2 8 6"></path>
-        </svg>
+        <!-- AUTHENTICATED USER -->
+        <div class="user-dropdown" th:if="${isAuthenticated}">
+            <svg width="28" height="28" fill="none" stroke="black" stroke-width="2" stroke-linecap="round"
+                 stroke-linejoin="round" class="user-icon">
+                <circle cx="12" cy="8" r="4"></circle>
+                <path d="M4 22c0-4 4-6 8-6s8 2 8 6"></path>
+            </svg>
 
-        <div class="dropdown-menu">
-          <div class="user-info">
-            <strong th:text="${currentUserFullName ?: currentUserEmail}">User</strong>
-            <small th:text="${currentUserEmail}">email</small>
-          </div>
+            <div class="dropdown-menu">
+                <div class="user-info">
+                    <strong th:text="${currentUserFullName ?: currentUserEmail}">User</strong>
+                    <small th:text="${currentUserEmail}">email</small>
+                </div>
 
-          <!-- Complete Profile -->
-          <a th:href="@{/profile/setup}" th:if="${currentUser != null && !currentUser.profileCompleted}"
-            class="dropdown-link">
-            Complete Profile
-          </a>
+                <!-- Complete Profile -->
+                <a th:href="@{/profile/setup}" th:if="${currentUser != null && !currentUser.profileCompleted}"
+                   class="dropdown-link">
+                    <i class="bi bi-person-fill-check"></i>
+                    Complete Profile
+                </a>
 
-          <!-- My Profile -->
-          <a th:href="@{/profile/view}" class="dropdown-link">My Profile</a>
+                <!-- My Profile -->
+                <a th:href="@{/profile/view}" class="dropdown-link">
+                    <i class="bi bi-person-circle"></i>
+                    My Profile
+                </a>
 
-          <!-- Logout -->
-          <form th:action="@{/logout}" method="post" style="margin:0;">
-            <button type="submit" class="logout-btn">Logout</button>
-          </form>
+                <!-- ⭐ My Orders (link to existing order-history page) -->
+                <a th:href="@{/orders}" class="dropdown-link">
+                    <i class="bi bi-box-seam"></i>
+                    My Orders
+                </a>
+
+                <!-- ⭐ Track Order (public tracking page) -->
+                <a th:href="@{/orders/track}" class="dropdown-link">
+                    <i class="bi bi-geo-alt"></i>
+                    Track Order
+                </a>
+
+                <!-- Divider -->
+                <div class="dropdown-divider"></div>
+
+                <!-- Logout -->
+                <form th:action="@{/logout}" method="post" style="margin:0;">
+                    <button type="submit" class="logout-btn">
+                        <i class="bi bi-box-arrow-right"></i>
+                        Logout
+                    </button>
+                </form>
+            </div>
         </div>
-      </div>
 
-      <!-- WISHLIST (Fixed) -->
-      <a th:href="@{/wishlist/wishlist}" class="cart-link wishlist-link">
-        <svg class="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="black"
-             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20.8 4.6c-1.6-1.4-4-1.4-5.6 0l-.8.8-.8-.8c-1.6-1.4-4-1.4-5.6 0-1.6 1.4-1.6 3.8 0 5.2l6.4 6.4 6.4-6.4c1.6-1.4 1.6-3.8 0-5.2z"></path>
-        </svg>
-        <span class="badge wishlist-badge" id="wishlist-count" data-count="0"></span>
-      </a>
-      <!-- CART -->
-      <a th:href="@{/cart/cart}" class="cart-link">
-        <svg class="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="black"
-          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 14h20l-2 12H8L6 14z"></path>
-          <path d="M10 14l4-6 4 6"></path>
-        </svg>
-        <span class="badge" th:text="${cartItemCount ?: 0}"></span>
-      </a>
+        <!-- WISHLIST -->
+        <a th:href="@{/wishlist/wishlist}" class="cart-link wishlist-link">
+            <svg class="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="black"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.8 4.6c-1.6-1.4-4-1.4-5.6 0l-.8.8-.8-.8c-1.6-1.4-4-1.4-5.6 0-1.6 1.4-1.6 3.8 0 5.2l6.4 6.4 6.4-6.4c1.6-1.4 1.6-3.8 0-5.2z"></path>
+            </svg>
+            <span class="badge wishlist-badge" id="wishlist-count" data-count="0"></span>
+        </a>
+
+        <!-- CART -->
+        <a th:href="@{/cart/cart}" class="cart-link">
+            <svg class="cart-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="black"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 14h20l-2 12H8L6 14z"></path>
+                <path d="M10 14l4-6 4 6"></path>
+            </svg>
+            <span class="badge cart-badge" th:text="${cartItemCount ?: 0}"></span>
+        </a>
     </div>
-  </header>
+</header>
 </body>
 
 <script>
-  let hoverTimeout;
+    let hoverTimeout;
 
-  document.querySelectorAll('.user-dropdown').forEach(dropdown => {
-    const menu = dropdown.querySelector('.dropdown-menu');
+    document.querySelectorAll('.user-dropdown').forEach(dropdown => {
+        const menu = dropdown.querySelector('.dropdown-menu');
 
-    const show = () => {
-      clearTimeout(hoverTimeout);
-      document.querySelectorAll('.user-dropdown').forEach(d => {
-        if (d !== dropdown) d.classList.remove('active');
-      });
-      dropdown.classList.add('active');
-    };
+        const show = () => {
+            clearTimeout(hoverTimeout);
+            document.querySelectorAll('.user-dropdown').forEach(d => {
+                if (d !== dropdown) d.classList.remove('active');
+            });
+            dropdown.classList.add('active');
+        };
 
-    const hide = () => {
-      hoverTimeout = setTimeout(() => {
-        dropdown.classList.remove('active');
-      }, 300);
-    };
+        const hide = () => {
+            hoverTimeout = setTimeout(() => {
+                dropdown.classList.remove('active');
+            }, 300);
+        };
 
-    dropdown.addEventListener('click', (e) => {
-      e.stopPropagation();
-      dropdown.classList.contains('active') ? hide() : show();
+        dropdown.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdown.classList.contains('active') ? hide() : show();
+        });
+
+        dropdown.addEventListener('mouseenter', show);
+        dropdown.addEventListener('mouseleave', hide);
     });
 
-    dropdown.addEventListener('mouseenter', show);
-    dropdown.addEventListener('mouseleave', hide);
-  });
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.user-dropdown').forEach(d => d.classList.remove('active'));
+    });
 
-  document.addEventListener('click', () => {
-    document.querySelectorAll('.user-dropdown').forEach(d => d.classList.remove('active'));
-  });
-
-  function updateWishlistCount() {
-    fetch('/wishlist/count')
+    // ========== UPDATE WISHLIST COUNT ==========
+    function updateWishlistCount() {
+        fetch('/fashionshop/wishlist/count')
             .then(response => response.json())
             .then(data => {
-              const badge = document.getElementById('wishlist-count');
-              if (!badge) return;
+                const badge = document.getElementById('wishlist-count');
+                if (!badge) return;
 
-              const newCount = data.count || 0;
+                const newCount = data.count || 0;
 
-              // Always set text and data attribute
-              badge.textContent = newCount > 0 ? newCount : '';
-              badge.dataset.count = newCount;
+                badge.textContent = newCount > 0 ? newCount : '';
+                badge.dataset.count = newCount;
 
-              // Force display flex if count > 0
-              if (newCount > 0) {
-                badge.style.display = 'flex';
-                badge.classList.add('updated');
-                setTimeout(() => badge.classList.remove('updated'), 400);
-              } else {
-                badge.style.display = 'none';
-              }
+                if (newCount > 0) {
+                    badge.style.display = 'flex';
+                    badge.classList.add('updated');
+                    setTimeout(() => badge.classList.remove('updated'), 400);
+                } else {
+                    badge.style.display = 'none';
+                }
             })
             .catch(err => {
-              console.error('Failed to load wishlist count', err);
+                console.error('Failed to load wishlist count', err);
             });
-  }
+    }
 
-  // Run on load
-  document.addEventListener('DOMContentLoaded', updateWishlistCount);
+    // Run on load
+    document.addEventListener('DOMContentLoaded', updateWishlistCount);
 
-  // Make global
-  window.updateWishlistCount = updateWishlistCount;
+    // Make global
+    window.updateWishlistCount = updateWishlistCount;
 </script>
 
 </html>
