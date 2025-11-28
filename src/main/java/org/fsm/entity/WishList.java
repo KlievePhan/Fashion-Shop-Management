@@ -38,6 +38,9 @@ public class WishList {
     @Column(name = "added_at", updatable = false)
     private LocalDateTime addedAt = LocalDateTime.now();
 
+    @Column(name = "selected_options_json", columnDefinition = "TEXT")
+    private String selectedOptionsJson;
+
     @PrePersist
     protected void onCreate() {
         this.addedAt = LocalDateTime.now();

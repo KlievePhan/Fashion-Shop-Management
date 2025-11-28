@@ -1,23 +1,26 @@
 package org.fsm.repository;
 
+import org.fsm.entity.Product;
 import org.fsm.entity.User;
 import org.fsm.entity.WishList;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
+@Repository
 public interface WishListRepository extends JpaRepository<WishList, Long> {
-    boolean existsByUserIdAndProductIdAndProductVariantId(
-            Long userId, Long productId, Long productVariantId);
-
-    void deleteByUserIdAndProductIdAndProductVariantId(
-            Long userId, Long productId, Long productVariantId);
 
     List<WishList> findByUserIdOrderByAddedAtDesc(Long userId);
 
-    Optional<WishList> findByUserIdAndProductIdAndProductVariantId(
-            Long userId, Long productId, Long productVariantId);
+    long countByUser(User user);
 
-    int countByUser(User user);
+    /**
+     * ⭐ NEW: Check if item exists with exact same options
+     */
+    boolean existsByUserAndProductAndSelectedOptionsJson(
+            User user,
+            Product product,
+            String selectedOptionsJson
+    );
 }

@@ -18,7 +18,6 @@
 
     <style>
         :root {
-            /* Light Mode Defaults */
             --body-bg: #fafafa;
             --container-bg: white;
             --text-color: #333;
@@ -129,18 +128,41 @@
             margin-bottom: 15px;
         }
 
+        .item-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .add-to-cart-btn {
+            padding: 8px 16px;
+            background-color: var(--primary-button-bg);
+            color: var(--primary-button-text);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: var(--primary-button-hover);
+        }
+
         .remove-btn {
+            padding: 8px 16px;
             color: var(--highlight-color);
             cursor: pointer;
             font-size: 14px;
-            border: none;
-            background: none;
-            text-decoration: none;
-            transition: color 0.3s;
+            border: 1px solid var(--highlight-color);
+            background: transparent;
+            border-radius: 4px;
+            transition: all 0.3s;
         }
 
         .remove-btn:hover {
-            text-decoration: underline;
+            background-color: var(--highlight-color);
+            color: white;
         }
 
         .continue-shopping,
@@ -195,6 +217,71 @@
             background-color: var(--primary-button-hover);
         }
 
+        /* Head Popup */
+        .head-popup {
+            --dur: 2600ms;
+            position: fixed;
+            top: 16px;
+            left: 50%;
+            transform: translate(-50%, -24px);
+            width: min(980px, 92vw);
+            background: linear-gradient(135deg, #ffffff 0%, #f6f9ff 100%);
+            color: #0f172a;
+            border-radius: 16px;
+            padding: 18px 22px 16px;
+            z-index: 10050;
+            box-shadow: 0 16px 48px rgba(15, 23, 42, 0.18);
+            border: 1px solid #e8eefc;
+            display: none;
+            opacity: 0;
+            transition: opacity .28s ease, transform .28s ease;
+        }
+        .head-popup.show {
+            display: block;
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+        .head-popup .texts .title {
+            font-size: 18px;
+            font-weight: 800;
+        }
+        .head-popup .texts .desc {
+            font-size: 14px;
+            color: #334155;
+            margin-top: 4px;
+        }
+        .head-popup::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            pointer-events: none;
+            box-shadow: inset 4px 0 0 0 var(--accent);
+        }
+        .head-popup .progress {
+            height: 4px;
+            background: #e9eefb;
+            border-radius: 99px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+        .head-popup .progress .fill {
+            width: 100%;
+            height: 100%;
+            background: var(--accent);
+            transform: translateX(-100%);
+        }
+        .head-popup.show .progress .fill {
+            animation: lineFill var(--dur) linear forwards;
+        }
+        @keyframes lineFill {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0%); }
+        }
+        .head-popup.success { --accent: #10b981; }
+        .head-popup.warning { --accent: #facc15; }
+        .head-popup.error { --accent: #dc2626; }
+
         @media (max-width: 768px) {
             .wishlist-item {
                 flex-direction: column;
@@ -226,7 +313,7 @@
 
     <!-- Wishlist Items -->
     <div th:if="${wishListItems != null && !wishListItems.isEmpty()}" class="wishlist-items-section">
-        <div th:each="item : ${wishListItems}" class="wishlist-item">
+        <div th:each="item : ${wishListItems}" class="wishlist-item" th:data-item-id="${item.id}">
             <img th:src="${item.product.primaryImageUrl}"
                  alt="Product"
                  class="item-image">
@@ -234,20 +321,26 @@
             <div class="item-details" style="flex:1">
                 <h4 class="item-title" th:text="${item.product.title}"></h4>
 
-                <div class="item-variant" th:if="${item.productVariant != null}">
+                <div class="item-variant">
                     <span class="variant-attributes"
-                          th:data-attributes="${item.productVariant.attributeJson}"></span>
+                          th:data-options="${item.selectedOptionsJson}"></span>
                 </div>
 
                 <div class="item-price">
-                    <span th:text="'$' + ${ (item.productVariant != null ? item.productVariant.price : item.product.basePrice) != null
-                        ? #numbers.formatDecimal((item.productVariant != null ? item.productVariant.price : item.product.basePrice), 1, 2)
-                        : 'N/A' }">Price</span>
+                    <span th:text="'$' + ${#numbers.formatDecimal(item.product.basePrice, 1, 2)}">Price</span>
                 </div>
 
-                <button class="remove-btn" th:onclick="'removeFromWishListOnServer(' + ${item.id} + ')'">
-                    <i class="bi bi-trash"></i> Remove
-                </button>
+                <div class="item-actions">
+                    <button class="add-to-cart-btn"
+                            th:data-product-id="${item.product.id}"
+                            th:data-options="${item.selectedOptionsJson}"
+                            onclick="addWishlistItemToCart(this)">
+                        <i class="bi bi-cart-plus"></i> Add to Cart
+                    </button>
+                    <button class="remove-btn" th:onclick="'removeFromWishListOnServer(' + ${item.id} + ')'">
+                        <i class="bi bi-trash"></i> Remove
+                    </button>
+                </div>
             </div>
         </div>
         <a th:href="@{/shop}" class="continue-shopping">Continue Shopping</a>
@@ -256,11 +349,21 @@
 
 <div th:replace="~{footer :: footer}"></div>
 
+<!-- Head Popup -->
+<div class="head-popup success" id="headPopup" role="status" aria-live="polite">
+    <div class="texts">
+        <div class="title" id="hpTitle">Notice</div>
+        <div class="desc" id="hpDesc">Description</div>
+    </div>
+    <div class="progress"><div class="fill"></div></div>
+</div>
+
 <a href="#" class="customize-btn">
     <i class="bi bi-sliders"></i> Customize
 </a>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/cart-update.js}"></script>
 <script th:src="@{/js/header.js}"></script>
 <script th:src="@{/js/theme-customizer.js}"></script>
 <script th:inline="javascript">
@@ -269,11 +372,13 @@
     /*]]>*/
 </script>
 <script>
+    let hideTimer = null;
+
     // Parse variant attributes
     document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(".variant-attributes").forEach(el => {
             try {
-                const attrs = JSON.parse(el.dataset.attributes || "{}");
+                const attrs = JSON.parse(el.dataset.options || "{}");
                 let html = '';
 
                 if (attrs.size) {
@@ -292,6 +397,40 @@
         });
     });
 
+    // ⭐ NEW: Add wishlist item to cart
+    async function addWishlistItemToCart(button) {
+        const productId = button.dataset.productId;
+        const optionsJson = button.dataset.options;
+
+        try {
+            const selectedOptions = JSON.parse(optionsJson);
+
+            console.log('🛒 Adding wishlist item to cart:', {
+                productId,
+                selectedOptions,
+                qty: 1
+            });
+
+            // Use the same function from cart-update.js
+            const success = await addToCartWithUpdate(productId, selectedOptions, 1);
+
+            if (success) {
+                showHeadNotification(
+                    'Added to cart',
+                    'Item moved to your cart successfully.',
+                    { variant: 'success', duration: 2600 }
+                );
+            }
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            showHeadNotification(
+                'Error',
+                'Failed to add item to cart.',
+                { variant: 'error', duration: 3200 }
+            );
+        }
+    }
+
     // Remove from wishlist
     function removeFromWishListOnServer(itemId) {
         fetch(contextPath + `wishlist/delete/${itemId}`, {
@@ -304,8 +443,16 @@
             .then(data => {
                 if (data.success) {
                     // Remove item from DOM
-                    const itemElement = document.querySelector(`[onclick="removeFromWishListOnServer(${itemId})"]`).closest('.wishlist-item');
-                    itemElement.remove();
+                    const itemElement = document.querySelector(`[data-item-id="${itemId}"]`);
+                    if (itemElement) {
+                        itemElement.remove();
+                    }
+
+                    showHeadNotification(
+                        'Removed',
+                        'Item removed from wishlist.',
+                        { variant: 'success', duration: 2600 }
+                    );
 
                     // Check if empty
                     const itemsSection = document.querySelector('.wishlist-items-section');
@@ -314,34 +461,70 @@
                         <div class="empty-wishlist">
                             <i class="bi bi-heart"></i>
                             <p>Your wishlist is empty</p>
-                            <a href="fashionshop/shop" class="btn btn-dark">Continue Shopping</a>
+                            <a href="${contextPath}shop" class="btn btn-dark">Continue Shopping</a>
                         </div>
                     `;
                     }
 
-                    // Update header badge if needed
-                    updateHeaderWishListCount();
+                    // Update header badge
+                    if (typeof updateWishlistBadge === 'function') {
+                        updateWishlistBadge();
+                    }
                 } else {
-                    alert(data.message || 'Failed to remove item');
+                    showHeadNotification(
+                        'Error',
+                        data.message || 'Failed to remove item',
+                        { variant: 'error', duration: 3200 }
+                    );
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred while removing the item');
+                showHeadNotification(
+                    'Error',
+                    'An error occurred while removing the item',
+                    { variant: 'error', duration: 3200 }
+                );
             });
     }
 
-    // Function to update wishlist count in header (if implemented)
-    function updateHeaderWishListCount() {
-        fetch('/wishlist/count')
-            .then(response => response.json())
-            .then(data => {
-                const badge = document.querySelector('.wishlist-badge');
-                if (badge) {
-                    badge.textContent = data.count;
-                    badge.style.display = data.count > 0 ? 'block' : 'none';
-                }
-            });
+    // Head notification
+    function showHeadNotification(title, desc = '', options = {}) {
+        const popup = document.getElementById('headPopup');
+        if (!popup) return;
+
+        const t = document.getElementById('hpTitle');
+        const d = document.getElementById('hpDesc');
+
+        // Set variant
+        popup.classList.remove('success', 'warning', 'error');
+        const variant = options.variant || 'success';
+        popup.classList.add(variant);
+
+        // Set duration
+        const duration = options.duration || 2600;
+        popup.style.setProperty('--dur', duration + 'ms');
+
+        // Set text
+        t.textContent = title || 'Notice';
+        d.textContent = desc || '';
+
+        // Restart animation
+        const fill = popup.querySelector('.fill');
+        if (fill) {
+            fill.style.animation = 'none';
+            void fill.offsetWidth;
+            fill.style.animation = '';
+        }
+
+        // Show popup
+        popup.classList.add('show');
+
+        // Auto hide
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(() => {
+            popup.classList.remove('show');
+        }, duration + 80);
     }
 </script>
 
