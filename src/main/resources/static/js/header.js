@@ -1,4 +1,4 @@
-// header.js - Xử lý dropdown, active link và cart badge
+// header.js - FIXED VERSION - XÓA HẾT CODE CŨ VÀ DÙNG CÁI NÀY
 
 // ========== USER DROPDOWN ==========
 document.addEventListener("click", function (e) {
@@ -26,11 +26,7 @@ function highlightActiveLink() {
   });
 }
 
-// ========== CART BADGE UPDATE ==========
-/**
- * Hàm CHÍNH để cập nhật cart badge.
- * Sẽ được gọi bởi cart-update.js sau mỗi hành động.
- */
+// ========== 1. CART BADGE UPDATE (GIỮ NGUYÊN) ==========
 function refreshCartBadge() {
   fetch('/fashionshop/cart/count', {
     method: 'GET',
@@ -39,7 +35,7 @@ function refreshCartBadge() {
   })
     .then(response => response.json())
     .then(data => {
-      const badge = document.querySelector('.cart-link .badge');
+      const badge = document.querySelector('.cart-badge'); // ⭐ Tìm theo CLASS
       if (badge) {
         const count = data.count || 0;
         badge.textContent = count;
@@ -52,19 +48,80 @@ function refreshCartBadge() {
 
         // Show/hide
         badge.style.display = (count > 0) ? 'flex' : 'none';
+
+        console.log('✅ Cart badge updated:', count);
       }
     })
     .catch(error => {
-      console.error('Error refreshing cart badge:', error);
+      console.error('❌ Error refreshing cart badge:', error);
     });
 }
 
-// Export to window cho file cart-update.js sử dụng
-window.refreshCartBadge = refreshCartBadge;
+// ========== 2. WISHLIST BADGE UPDATE (FIXED) ==========
+function updateWishlistCount() {
+  console.log('🔥 updateWishlistCount() called from header.js');
 
-// ========== DOM READY ==========
+  fetch('/fashionshop/wishlist/count', {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin'
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      // ⭐ TÌM THEO ID (vì header.html dùng id="wishlist-count")
+      const badge = document.getElementById('wishlist-count');
+
+      if (!badge) {
+        console.error('❌ #wishlist-count element NOT FOUND!');
+        return;
+      }
+
+      const count = data.count || 0;
+
+      console.log('📊 Wishlist count from API:', count);
+
+      // Update text
+      badge.textContent = count > 0 ? count : '';
+      badge.dataset.count = count;
+
+      // Animate
+      if (count > 0) {
+        badge.style.display = 'flex';
+        badge.style.transform = 'scale(1.3)';
+        setTimeout(() => {
+          badge.style.transform = 'scale(1)';
+        }, 200);
+      } else {
+        badge.style.display = 'none';
+      }
+
+      console.log('✅ Wishlist badge updated:', count);
+    })
+    .catch(error => {
+      console.error('❌ Error updating wishlist badge:', error);
+    });
+}
+
+// ========== 3. DOM READY - INIT BOTH BADGES ==========
 document.addEventListener("DOMContentLoaded", function () {
+  console.log('🚀 header.js loaded');
+
   highlightActiveLink();
-  refreshCartBadge(); // Tải số lượng giỏ hàng ban đầu khi vào trang
-  console.log('✅ header.js loaded - refreshCartBadge() is available.');
+
+  // Update both badges
+  refreshCartBadge();
+  updateWishlistCount();
+
+  console.log('✅ Both badge functions initialized');
 });
+
+// ========== 4. EXPORT TO GLOBAL ==========
+window.refreshCartBadge = refreshCartBadge;
+window.updateWishlistCount = updateWishlistCount;
+
+console.log('✅ header.js fully loaded');
