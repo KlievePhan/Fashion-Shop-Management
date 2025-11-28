@@ -50,18 +50,18 @@ public class CartService {
         System.out.println("🔍 DEBUG - Looking for existing item:");
         System.out.println("   Cart ID: " + cart.getId());
         System.out.println("   Product ID: " + productId);
-        System.out.println("   Options JSON: " + optionsJson);
+        System.out.println("   Options JSON: [" + optionsJson + "]");
 
         // 5. ⭐ DEBUG: List all existing items for this product
         cartItemRepository.findByCartAndProduct(cart, product).forEach(item -> {
-            System.out.println("   Existing item: ID=" + item.getId() +
+            System.out.println("   📦 Existing item: ID=" + item.getId() +
                     ", JSON=[" + item.getSelectedOptionsJson() + "]" +
-                    ", Length=" + item.getSelectedOptionsJson().length());
+                    ", QTY=" + item.getQty());
         });
 
-        // 6. Kiểm tra xem item với options này đã có trong cart chưa
+        // 6. ⭐ FIX: Truyền entity objects thay vì IDs
         CartItem existingItem = cartItemRepository
-                .findByCartAndProductAndSelectedOptionsJson(cart.getId(), product.getId(), optionsJson)
+                .findByCartAndProductAndSelectedOptionsJson(cart, product, optionsJson)
                 .orElse(null);
 
         if (existingItem != null) {
