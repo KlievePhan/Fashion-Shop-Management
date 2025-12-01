@@ -134,7 +134,8 @@
             position: absolute;
             top: 15px;
             right: 15px;
-            z-index: 10; /* Cao hơn overlay */
+            z-index: 10;
+            /* Cao hơn overlay */
             display: flex;
             gap: 8px;
             pointer-events: auto;
@@ -262,253 +263,252 @@
 </head>
 
 <body>
-<div th:insert="~{header}"></div>
-<div class="promo-bar">Get 15% off on your first order</div>
+    <div th:insert="~{header}"></div>
+    <div class="promo-bar">Get 15% off on your first order</div>
 
-<div class="container mt-5">
-    <!-- Shop Header -->
-    <div class="shop-header">
-        <h1 class="shop-title">Shop</h1>
-        <div class="shop-controls">
-            <p class="results-count">
-                <span th:text="${totalItems}">0</span> results
-            </p>
-            <div class="sort-wrapper">
-                <select class="sort-select" id="sortSelect" onchange="applyFilters()">
-                    <option value="latest" th:selected="${currentSort == 'latest'}">Sort by latest</option>
-                    <option value="popularity" th:selected="${currentSort == 'popularity'}">Sort by popularity</option>
-                    <option value="rating" th:selected="${currentSort == 'rating'}">Sort by rating</option>
-                    <option value="price-low" th:selected="${currentSort == 'price-low'}">Price: Low to High</option>
-                    <option value="price-high" th:selected="${currentSort == 'price-high'}">Price: High to Low</option>
-                </select>
-            </div>
-        </div>
-    </div>
-
-    <!-- Shop Layout (Sidebar + Products) -->
-    <div class="shop-layout">
-        <!-- Filter Sidebar -->
-        <aside class="filter-sidebar">
-            <h3 style="font-size:20px;font-weight:700;margin-bottom:25px;">Filters</h3>
-
-            <!-- Search -->
-            <div class="filter-section">
-                <div class="filter-title">Search</div>
-                <input type="text" id="searchInput" placeholder="Search products..."
-                       class="form-control"
-                       th:value="${currentSearch}"
-                       style="border-radius:6px;">
-            </div>
-
-            <!-- Category Filter -->
-            <div class="filter-section">
-                <div class="filter-title">Categories</div>
-                <div th:each="category : ${categories}" class="filter-option">
-                    <input type="checkbox" th:id="'cat-' + ${category.id}"
-                           th:value="${category.id}"
-                           class="category-filter"
-                           th:checked="${currentCategoryId != null && currentCategoryId == category.id}">
-                    <label th:for="'cat-' + ${category.id}" th:text="${category.name}">Category</label>
-                </div>
-            </div>
-
-            <!-- Brand Filter -->
-            <div class="filter-section">
-                <div class="filter-title">Brands</div>
-                <div th:each="brand : ${brands}" class="filter-option">
-                    <input type="checkbox" th:id="'brand-' + ${brand.id}"
-                           th:value="${brand.id}"
-                           class="brand-filter"
-                           th:checked="${currentBrandId != null && currentBrandId == brand.id}">
-                    <label th:for="'brand-' + ${brand.id}" th:text="${brand.name}">Brand</label>
-                </div>
-            </div>
-
-            <!-- Price Range -->
-            <div class="filter-section">
-                <div class="filter-title">Price Range</div>
-                <div class="price-inputs">
-                    <input type="number" id="minPrice" placeholder="Min"
-                           th:value="${currentMinPrice}"
-                           class="form-control">
-                    <span>-</span>
-                    <input type="number" id="maxPrice" placeholder="Max"
-                           th:value="${currentMaxPrice}"
-                           class="form-control">
-                </div>
-                <button onclick="applyFilters()"
-                        style="width:100%;margin-top:10px;padding:8px;background:#000;color:#fff;border:none;border-radius:6px;cursor:pointer;">
-                    Apply
-                </button>
-            </div>
-
-            <!-- Clear Filters -->
-            <button class="clear-filters-btn" onclick="clearFilters()">
-                <i class="bi bi-x-circle"></i> Clear All Filters
-            </button>
-        </aside>
-
-        <!-- Products Grid -->
-        <div>
-            <div class="products-grid" th:if="${products != null && !products.isEmpty()}">
-                <div class="product-card" th:each="p : ${products}"
-                     th:attr="data-price=${p.basePrice}, data-date=${p.createdAt}">
-                    <div class="product-image">
-                        <img th:src="${p.primaryImageUrl}" th:alt="${p.title}" />
-                        <a class="product-link-overlay" th:href="@{'/product/' + ${p.id}}"></a>
-                        <div class="product-actions">
-                            <button class="action-btn" title="Add to Cart" data-action="add" th:data-id="${p.id}">
-                                <i class="bi bi-bag-plus"></i>
-                            </button>
-                            <button class="action-btn" title="Quick View" data-action="quick" th:data-id="${p.id}">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="product-info">
-                        <h3 class="product-title" th:text="${p.title}">Product</h3>
-                        <p class="product-category" th:text="${p.category?.name ?: 'Uncategorized'}">Category</p>
-                        <div class="product-price">
-                            <span class="price-current" th:text="${#numbers.formatDecimal(p.basePrice,0,'COMMA',2,'POINT')} + ' $'">0 $</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Empty State -->
-            <div th:if="${products == null || products.isEmpty()}"
-                 style="text-align:center;padding:60px 20px;">
-                <i class="bi bi-box-seam" style="font-size:60px;color:#ddd;"></i>
-                <p style="font-size:18px;color:#666;margin-top:20px;">No products found</p>
-                <button onclick="clearFilters()" class="btn btn-dark mt-3">Clear Filters</button>
-            </div>
-
-            <!-- Pagination -->
-            <div class="pagination-container" th:if="${totalPages > 1}">
-                <ul class="pagination">
-                    <!-- Previous -->
-                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                        <a class="page-link" th:href="@{/shop(page=${currentPage - 1}, size=${pageSize}, sort=${currentSort}, search=${currentSearch}, categoryId=${currentCategoryId}, brandId=${currentBrandId}, minPrice=${currentMinPrice}, maxPrice=${currentMaxPrice})}">
-                            <i class="bi bi-chevron-left"></i>
-                        </a>
-                    </li>
-
-                    <!-- Page Numbers -->
-                    <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                        th:if="${i >= currentPage - 2 && i <= currentPage + 2}"
-                        th:classappend="${i == currentPage} ? 'active'">
-                        <a class="page-link"
-                           th:href="@{/shop(page=${i}, size=${pageSize}, sort=${currentSort}, search=${currentSearch}, categoryId=${currentCategoryId}, brandId=${currentBrandId}, minPrice=${currentMinPrice}, maxPrice=${currentMaxPrice})}"
-                           th:text="${i + 1}">1</a>
-                    </li>
-
-                    <!-- Next -->
-                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                        <a class="page-link" th:href="@{/shop(page=${currentPage + 1}, size=${pageSize}, sort=${currentSort}, search=${currentSearch}, categoryId=${currentCategoryId}, brandId=${currentBrandId}, minPrice=${currentMinPrice}, maxPrice=${currentMaxPrice})}">
-                            <i class="bi bi-chevron-right"></i>
-                        </a>
-                    </li>
-                </ul>
-
-                <!-- Page Size Selector -->
-                <div class="page-size-selector">
-                    <span>Show:</span>
-                    <select onchange="changePageSize(this.value)">
-                        <option value="12" th:selected="${pageSize == 12}">12</option>
-                        <option value="24" th:selected="${pageSize == 24}">24</option>
-                        <option value="48" th:selected="${pageSize == 48}">48</option>
+    <div class="container mt-5">
+        <!-- Shop Header -->
+        <div class="shop-header">
+            <h1 class="shop-title">Shop</h1>
+            <div class="shop-controls">
+                <p class="results-count">
+                    <span th:text="${totalItems}">0</span> results
+                </p>
+                <div class="sort-wrapper">
+                    <select class="sort-select" id="sortSelect" onchange="applyFilters()">
+                        <option value="latest" th:selected="${currentSort == 'latest'}">Sort by latest</option>
+                        <option value="popularity" th:selected="${currentSort == 'popularity'}">Sort by popularity
+                        </option>
+                        <option value="rating" th:selected="${currentSort == 'rating'}">Sort by rating</option>
+                        <option value="price-low" th:selected="${currentSort == 'price-low'}">Price: Low to High
+                        </option>
+                        <option value="price-high" th:selected="${currentSort == 'price-high'}">Price: High to Low
+                        </option>
                     </select>
                 </div>
             </div>
         </div>
+
+        <!-- Shop Layout (Sidebar + Products) -->
+        <div class="shop-layout">
+            <!-- Filter Sidebar -->
+            <aside class="filter-sidebar">
+                <h3 style="font-size:20px;font-weight:700;margin-bottom:25px;">Filters</h3>
+
+                <!-- Search -->
+                <div class="filter-section">
+                    <div class="filter-title">Search</div>
+                    <input type="text" id="searchInput" placeholder="Search products..." class="form-control"
+                        th:value="${currentSearch}" style="border-radius:6px;">
+                </div>
+
+                <!-- Category Filter -->
+                <div class="filter-section">
+                    <div class="filter-title">Categories</div>
+                    <div th:each="category : ${categories}" class="filter-option">
+                        <input type="checkbox" th:id="'cat-' + ${category.id}" th:value="${category.id}"
+                            class="category-filter"
+                            th:checked="${currentCategoryId != null && currentCategoryId == category.id}">
+                        <label th:for="'cat-' + ${category.id}" th:text="${category.name}">Category</label>
+                    </div>
+                </div>
+
+                <!-- Brand Filter -->
+                <div class="filter-section">
+                    <div class="filter-title">Brands</div>
+                    <div th:each="brand : ${brands}" class="filter-option">
+                        <input type="checkbox" th:id="'brand-' + ${brand.id}" th:value="${brand.id}"
+                            class="brand-filter" th:checked="${currentBrandId != null && currentBrandId == brand.id}">
+                        <label th:for="'brand-' + ${brand.id}" th:text="${brand.name}">Brand</label>
+                    </div>
+                </div>
+
+                <!-- Price Range -->
+                <div class="filter-section">
+                    <div class="filter-title">Price Range</div>
+                    <div class="price-inputs">
+                        <input type="number" id="minPrice" placeholder="Min" th:value="${currentMinPrice}"
+                            class="form-control">
+                        <span>-</span>
+                        <input type="number" id="maxPrice" placeholder="Max" th:value="${currentMaxPrice}"
+                            class="form-control">
+                    </div>
+                    <button onclick="applyFilters()"
+                        style="width:100%;margin-top:10px;padding:8px;background:#000;color:#fff;border:none;border-radius:6px;cursor:pointer;">
+                        Apply
+                    </button>
+                </div>
+
+                <!-- Clear Filters -->
+                <button class="clear-filters-btn" onclick="clearFilters()">
+                    <i class="bi bi-x-circle"></i> Clear All Filters
+                </button>
+            </aside>
+
+            <!-- Products Grid -->
+            <div>
+                <div class="products-grid" th:if="${products != null && !products.isEmpty()}">
+                    <div class="product-card" th:each="p : ${products}"
+                        th:attr="data-price=${p.basePrice}, data-date=${p.createdAt}">
+                        <div class="product-image">
+                            <img th:src="${p.primaryImageUrl}" th:alt="${p.title}" />
+                            <a class="product-link-overlay" th:href="@{'/product/' + ${p.id}}"></a>
+                            <div class="product-actions">
+                                <button class="action-btn" title="Add to Cart" data-action="add" th:data-id="${p.id}">
+                                    <i class="bi bi-bag-plus"></i>
+                                </button>
+                                <button class="action-btn" title="Quick View" data-action="quick" th:data-id="${p.id}">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="product-info">
+                            <h3 class="product-title" th:text="${p.title}">Product</h3>
+                            <p class="product-category" th:text="${p.category?.name ?: 'Uncategorized'}">Category</p>
+                            <div class="product-price">
+                                <span class="price-current"
+                                    th:text="${#numbers.formatDecimal(p.basePrice,0,'COMMA',2,'POINT')} + ' $'">0
+                                    $</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div th:if="${products == null || products.isEmpty()}" style="text-align:center;padding:60px 20px;">
+                    <i class="bi bi-box-seam" style="font-size:60px;color:#ddd;"></i>
+                    <p style="font-size:18px;color:#666;margin-top:20px;">No products found</p>
+                    <button onclick="clearFilters()" class="btn btn-dark mt-3">Clear Filters</button>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination-container" th:if="${totalPages > 1}">
+                    <ul class="pagination">
+                        <!-- Previous -->
+                        <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                            <a class="page-link"
+                                th:href="@{/shop(page=${currentPage - 1}, size=${pageSize}, sort=${currentSort}, search=${currentSearch}, categoryId=${currentCategoryId}, brandId=${currentBrandId}, minPrice=${currentMinPrice}, maxPrice=${currentMaxPrice})}">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+
+                        <!-- Page Numbers -->
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                            th:if="${i >= currentPage - 2 && i <= currentPage + 2}"
+                            th:classappend="${i == currentPage} ? 'active'">
+                            <a class="page-link"
+                                th:href="@{/shop(page=${i}, size=${pageSize}, sort=${currentSort}, search=${currentSearch}, categoryId=${currentCategoryId}, brandId=${currentBrandId}, minPrice=${currentMinPrice}, maxPrice=${currentMaxPrice})}"
+                                th:text="${i + 1}">1</a>
+                        </li>
+
+                        <!-- Next -->
+                        <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                            <a class="page-link"
+                                th:href="@{/shop(page=${currentPage + 1}, size=${pageSize}, sort=${currentSort}, search=${currentSearch}, categoryId=${currentCategoryId}, brandId=${currentBrandId}, minPrice=${currentMinPrice}, maxPrice=${currentMaxPrice})}">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- Page Size Selector -->
+                    <div class="page-size-selector">
+                        <span>Show:</span>
+                        <select onchange="changePageSize(this.value)">
+                            <option value="12" th:selected="${pageSize == 12}">12</option>
+                            <option value="24" th:selected="${pageSize == 24}">24</option>
+                            <option value="48" th:selected="${pageSize == 48}">48</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
 
-<div th:replace="~{footer :: footer}"></div>
+    <div th:replace="~{footer :: footer}"></div>
 
-<script th:src="@{/js/cart-update.js}"></script>
-<script th:src="@{/js/shop.js}"></script>
-<script th:src="@{/js/header.js}"></script>
-<script th:src="@{/js/theme-customizer.js}"></script>
+    <script th:src="@{/js/cart-update.js}"></script>
+    <script th:src="@{/js/shop.js}"></script>
+    <script th:src="@{/js/header.js}"></script>
+    <script th:src="@{/js/theme-customizer.js}"></script>
 
-<!-- Filter & Pagination Logic -->
-<script>
-    // Debounced Search
-    let searchTimeout;
-    document.getElementById('searchInput')?.addEventListener('input', (e) => {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            applyFilters();
-        }, 500); // Wait 500ms after user stops typing
-    });
-
-    // Apply Filters
-    function applyFilters() {
-        const params = new URLSearchParams();
-
-        // Search
-        const search = document.getElementById('searchInput')?.value;
-        if (search) params.set('search', search);
-
-        // Category (single selection)
-        const selectedCategory = document.querySelector('.category-filter:checked');
-        if (selectedCategory) params.set('categoryId', selectedCategory.value);
-
-        // Brand (single selection)
-        const selectedBrand = document.querySelector('.brand-filter:checked');
-        if (selectedBrand) params.set('brandId', selectedBrand.value);
-
-        // Price Range
-        const minPrice = document.getElementById('minPrice')?.value;
-        const maxPrice = document.getElementById('maxPrice')?.value;
-        if (minPrice) params.set('minPrice', minPrice);
-        if (maxPrice) params.set('maxPrice', maxPrice);
-
-        // Sort
-        const sort = document.getElementById('sortSelect')?.value;
-        if (sort) params.set('sort', sort);
-
-        // Redirect
-        window.location.href = '/fashionshop/shop?' + params.toString();
-    }
-
-    // Clear All Filters
-    function clearFilters() {
-        window.location.href = '/fashionshop/shop';
-    }
-
-    // Change Page Size
-    function changePageSize(size) {
-        const url = new URL(window.location.href);
-        url.searchParams.set('size', size);
-        url.searchParams.set('page', '0'); // Reset to first page
-        window.location.href = url.toString();
-    }
-
-    // Single checkbox selection for category/brand
-    document.querySelectorAll('.category-filter').forEach(cb => {
-        cb.addEventListener('change', function() {
-            if (this.checked) {
-                document.querySelectorAll('.category-filter').forEach(other => {
-                    if (other !== this) other.checked = false;
-                });
-            }
-            applyFilters();
+    <!-- Filter & Pagination Logic -->
+    <script>
+        // Debounced Search
+        let searchTimeout;
+        document.getElementById('searchInput')?.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                applyFilters();
+            }, 500); // Wait 500ms after user stops typing
         });
-    });
 
-    document.querySelectorAll('.brand-filter').forEach(cb => {
-        cb.addEventListener('change', function() {
-            if (this.checked) {
-                document.querySelectorAll('.brand-filter').forEach(other => {
-                    if (other !== this) other.checked = false;
-                });
-            }
-            applyFilters();
+        // Apply Filters
+        function applyFilters() {
+            const params = new URLSearchParams();
+
+            // Search
+            const search = document.getElementById('searchInput')?.value;
+            if (search) params.set('search', search);
+
+            // Category (single selection)
+            const selectedCategory = document.querySelector('.category-filter:checked');
+            if (selectedCategory) params.set('categoryId', selectedCategory.value);
+
+            // Brand (single selection)
+            const selectedBrand = document.querySelector('.brand-filter:checked');
+            if (selectedBrand) params.set('brandId', selectedBrand.value);
+
+            // Price Range
+            const minPrice = document.getElementById('minPrice')?.value;
+            const maxPrice = document.getElementById('maxPrice')?.value;
+            if (minPrice) params.set('minPrice', minPrice);
+            if (maxPrice) params.set('maxPrice', maxPrice);
+
+            // Sort
+            const sort = document.getElementById('sortSelect')?.value;
+            if (sort) params.set('sort', sort);
+
+            // Redirect
+            window.location.href = '/fashionshop/shop?' + params.toString();
+        }
+
+        // Clear All Filters
+        function clearFilters() {
+            window.location.href = '/fashionshop/shop';
+        }
+
+        // Change Page Size
+        function changePageSize(size) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('size', size);
+            url.searchParams.set('page', '0'); // Reset to first page
+            window.location.href = url.toString();
+        }
+
+        // Single checkbox selection for category/brand
+        document.querySelectorAll('.category-filter').forEach(cb => {
+            cb.addEventListener('change', function () {
+                if (this.checked) {
+                    document.querySelectorAll('.category-filter').forEach(other => {
+                        if (other !== this) other.checked = false;
+                    });
+                }
+                applyFilters();
+            });
         });
-    });
-</script>
+
+        document.querySelectorAll('.brand-filter').forEach(cb => {
+            cb.addEventListener('change', function () {
+                if (this.checked) {
+                    document.querySelectorAll('.brand-filter').forEach(other => {
+                        if (other !== this) other.checked = false;
+                    });
+                }
+                applyFilters();
+            });
+        });
+    </script>
 </body>
 
 </html>

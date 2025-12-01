@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -21,6 +22,7 @@
             --border-color: #eee;
             --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
+
         .dark-mode {
             --body-bg: #121212;
             --container-bg: #1e1e1e;
@@ -28,15 +30,18 @@
             --border-color: #333333;
             --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
+
         body {
             font-family: 'Lato', sans-serif;
             background-color: var(--body-bg);
             color: var(--text-color);
             transition: background-color 0.3s, color 0.3s;
         }
+
         .product-detail-container {
             padding: 40px 0;
         }
+
         .main-image {
             width: 100%;
             height: 500px;
@@ -44,36 +49,45 @@
             border-radius: 8px;
             background-color: #f5f5f5;
         }
+
         .product-title {
             font-size: 32px;
             font-weight: 600;
             margin-bottom: 10px;
         }
+
         .product-price {
             font-size: 28px;
             font-weight: 600;
             color: #000;
             margin-bottom: 10px;
         }
+
         .product-description {
             color: #666;
             line-height: 1.6;
             margin-bottom: 25px;
         }
+
         .product-options {
             margin-bottom: 25px;
         }
+
         .option-label {
             font-weight: 600;
             margin-bottom: 10px;
             display: block;
         }
-        .size-options, .color-options {
+
+        .size-options,
+        .color-options {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
         }
-        .size-btn, .color-btn {
+
+        .size-btn,
+        .color-btn {
             padding: 10px 15px;
             border: 2px solid #ddd;
             background: white;
@@ -82,29 +96,35 @@
             transition: all 0.3s ease;
             font-size: 14px;
         }
+
         .size-btn:hover {
             border-color: #000;
         }
+
         .size-btn.active {
             border-color: #000;
             background-color: #000;
             color: #fff;
         }
+
         .color-btn {
             width: 40px;
             height: 40px;
             padding: 0;
             border-radius: 50%;
         }
+
         .color-btn.active {
             box-shadow: 0 0 0 3px #000;
         }
+
         .quantity-section {
             display: flex;
             gap: 15px;
             align-items: center;
             margin-bottom: 25px;
         }
+
         .quantity-input {
             display: flex;
             align-items: center;
@@ -112,6 +132,7 @@
             border-radius: 4px;
             width: 120px;
         }
+
         .quantity-input button {
             background: none;
             border: none;
@@ -119,18 +140,22 @@
             cursor: pointer;
             font-size: 18px;
         }
+
         .quantity-input input {
             border: none;
             width: 40px;
             text-align: center;
             font-size: 16px;
         }
+
         .action-buttons {
             display: flex;
             gap: 15px;
             margin-bottom: 25px;
         }
-        .add-to-cart-btn, .buy-now-btn {
+
+        .add-to-cart-btn,
+        .buy-now-btn {
             flex: 1;
             padding: 15px;
             font-size: 16px;
@@ -140,19 +165,23 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
+
         .add-to-cart-btn {
             background-color: #f5f5f5;
             border: 2px solid #000;
             color: #000;
         }
+
         .add-to-cart-btn:hover {
             background-color: #000;
             color: #fff;
         }
+
         .buy-now-btn {
             background-color: #000;
             color: #fff;
         }
+
         .buy-now-btn:hover {
             background-color: #333;
         }
@@ -177,26 +206,31 @@
             transition: opacity .28s ease, transform .28s ease;
             font-family: "Lato", sans-serif;
         }
+
         .head-popup.show {
             display: block;
             opacity: 1;
             transform: translate(-50%, 0);
         }
+
         .head-popup .row-flex {
             display: grid;
             grid-template-columns: 1fr auto;
             align-items: center;
             gap: 10px 16px;
         }
+
         .head-popup .texts .title {
             font-size: 18px;
             font-weight: 800;
         }
+
         .head-popup .texts .desc {
             font-size: 14px;
             color: #334155;
             margin-top: 4px;
         }
+
         .head-popup::before {
             content: "";
             position: absolute;
@@ -205,6 +239,7 @@
             pointer-events: none;
             box-shadow: inset 4px 0 0 0 var(--accent);
         }
+
         .head-popup .progress {
             height: 4px;
             background: #e9eefb;
@@ -212,22 +247,40 @@
             overflow: hidden;
             margin-top: 12px;
         }
+
         .head-popup .progress .fill {
             width: 100%;
             height: 100%;
             background: var(--accent);
             transform: translateX(-100%);
         }
+
         .head-popup.show .progress .fill {
             animation: lineFill var(--dur) linear forwards;
         }
+
         @keyframes lineFill {
-            from { transform: translateX(-100%); }
-            to { transform: translateX(0%); }
+            from {
+                transform: translateX(-100%);
+            }
+
+            to {
+                transform: translateX(0%);
+            }
         }
-        .head-popup.success { --accent: #10b981; }
-        .head-popup.warning { --accent: #facc15; }
-        .head-popup.error { --accent: #dc2626; }
+
+        .head-popup.success {
+            --accent: #10b981;
+        }
+
+        .head-popup.warning {
+            --accent: #facc15;
+        }
+
+        .head-popup.error {
+            --accent: #dc2626;
+        }
+
         .head-popup .hp-close {
             position: absolute;
             top: 10px;
@@ -246,30 +299,50 @@
 
         /* Dark Mode */
         body.dark-mode .product-title,
-        body.dark-mode .product-price { color: #e5e7eb; }
-        body.dark-mode .product-description { color: #a1a1a1; }
-        body.dark-mode .size-btn, body.dark-mode .color-btn {
+        body.dark-mode .product-price {
+            color: #e5e7eb;
+        }
+
+        body.dark-mode .product-description {
+            color: #a1a1a1;
+        }
+
+        body.dark-mode .size-btn,
+        body.dark-mode .color-btn {
             border: 2px solid #4b5563;
             background: #374151;
             color: #e5e7eb;
         }
-        body.dark-mode .size-btn:hover { border-color: #dc2626; }
+
+        body.dark-mode .size-btn:hover {
+            border-color: #dc2626;
+        }
+
         body.dark-mode .size-btn.active {
             border-color: #dc2626;
             background-color: #dc2626;
             color: #fff;
         }
-        body.dark-mode .color-btn.active { box-shadow: 0 0 0 3px #dc2626; }
+
+        body.dark-mode .color-btn.active {
+            box-shadow: 0 0 0 3px #dc2626;
+        }
+
         body.dark-mode .add-to-cart-btn {
             background-color: #374151;
             border: 2px solid #dc2626;
             color: #dc2626;
         }
+
         body.dark-mode .add-to-cart-btn:hover {
             background-color: #dc2626;
             color: #fff;
         }
-        body.dark-mode .buy-now-btn { background-color: #dc2626; }
+
+        body.dark-mode .buy-now-btn {
+            background-color: #dc2626;
+        }
+
         body.dark-mode .head-popup {
             background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
             color: #e5e7eb;
@@ -279,467 +352,595 @@
 </head>
 
 <body>
-<div th:insert="~{header}"></div>
+    <div th:insert="~{header}"></div>
 
-<div class="container mt-4">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/" style="text-decoration:none;">Home</a></li>
-            <li class="breadcrumb-item"><a th:href="@{/shop}" style="text-decoration:none;">Shop</a></li>
-            <li class="breadcrumb-item active" th:text="${product.category != null ? product.category.name : 'Products'}"></li>
-            <li class="breadcrumb-item active" th:text="${product.title}"></li>
-        </ol>
-    </nav>
-</div>
+    <div class="container mt-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/" style="text-decoration:none;">Home</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/shop}" style="text-decoration:none;">Shop</a></li>
+                <li class="breadcrumb-item active"
+                    th:text="${product.category != null ? product.category.name : 'Products'}"></li>
+                <li class="breadcrumb-item active" th:text="${product.title}"></li>
+            </ol>
+        </nav>
+    </div>
 
-<main class="container product-detail-container">
-    <div class="row">
-        <div class="col-md-6">
-            <img id="mainImage" th:src="${product.primaryImageUrl}" th:alt="${product.title}" class="main-image" />
-        </div>
+    <main class="container product-detail-container">
+        <div class="row">
+            <div class="col-md-6">
+                <img id="mainImage" th:src="${product.primaryImageUrl}" th:alt="${product.title}" class="main-image" />
+            </div>
 
-        <div class="col-md-6">
-            <div class="product-details-section">
-                <p class="text-muted" th:text="${product.category != null ? product.category.name : 'Uncategorized'}"></p>
-                <h1 class="product-title" th:text="${product.title}"></h1>
-                <div class="product-price" th:text="'$' + ${#numbers.formatDecimal(product.basePrice, 1, 2)}"></div>
-                <p class="product-description" th:text="${product.description ?: 'High-quality product'}"></p>
+            <div class="col-md-6">
+                <div class="product-details-section">
+                    <p class="text-muted"
+                        th:text="${product.category != null ? product.category.name : 'Uncategorized'}"></p>
+                    <h1 class="product-title" th:text="${product.title}"></h1>
+                    <div class="product-price" th:text="'$' + ${#numbers.formatDecimal(product.basePrice, 1, 2)}"></div>
+                    <p class="product-description" th:text="${product.description ?: 'High-quality product'}"></p>
 
-                <!-- Hidden variant data for JS -->
-                <div style="display:none;">
-                    <div th:each="v : ${product.variants}"
-                         class="variant-data"
-                         th:data-variant-id="${v.id}"
-                         th:data-attributes="${v.attributeJson}">
+                    <!-- Hidden variant data for JS -->
+                    <div style="display:none;">
+                        <div th:each="v : ${product.variants}" class="variant-data" th:data-variant-id="${v.id}"
+                            th:data-attributes="${v.attributeJson}">
+                        </div>
                     </div>
-                </div>
 
-                <!-- Size Selection -->
-                <div class="product-options" th:if="${product.variants != null and product.variants.size() > 0}">
-                    <label class="option-label">Select Size:</label>
-                    <div class="size-options">
-                        <!-- Will be populated by JavaScript -->
+                    <!-- Size Selection -->
+                    <div class="product-options" th:if="${product.variants != null and product.variants.size() > 0}">
+                        <label class="option-label">Select Size:</label>
+                        <div class="size-options">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
                     </div>
-                </div>
 
-                <!-- Color Selection -->
-                <div class="product-options" th:if="${product.variants != null and product.variants.size() > 0}">
-                    <label class="option-label">Select Color:</label>
-                    <div class="color-options">
-                        <!-- Will be populated by JavaScript -->
+                    <!-- Color Selection -->
+                    <div class="product-options" th:if="${product.variants != null and product.variants.size() > 0}">
+                        <label class="option-label">Select Color:</label>
+                        <div class="color-options">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
                     </div>
-                </div>
 
-                <div class="quantity-section">
-                    <label style="font-weight:600;">Quantity:</label>
-                    <div class="quantity-input">
-                        <button onclick="decreaseQuantity()">−</button>
-                        <input type="number" id="quantity" value="1" min="1" readonly />
-                        <button onclick="increaseQuantity()">+</button>
+                    <div class="quantity-section">
+                        <label style="font-weight:600;">Quantity:</label>
+                        <div class="quantity-input">
+                            <button onclick="decreaseQuantity()">−</button>
+                            <input type="number" id="quantity" value="1" min="1" readonly />
+                            <button onclick="increaseQuantity()">+</button>
+                        </div>
                     </div>
-                </div>
 
-                <div class="action-buttons">
-                    <button class="add-to-cart-btn" onclick="addToCart()">
-                        <i class="bi bi-cart-plus"></i> Add to Cart
-                    </button>
-                    <button class="buy-now-btn" onclick="buyNow()">
-                        <i class="bi bi-bag-check"></i> Buy Now
-                    </button>
-                    <button class="wishlist-btn" onclick="addToWishList()" style="padding:15px; background:#f5f5f5; border:2px solid #ddd; border-radius:4px; cursor:pointer;">
-                        <i class="bi bi-heart"></i> Add to Wishlist
-                    </button>
-                </div>
+                    <div class="action-buttons">
+                        <button class="add-to-cart-btn" onclick="addToCart()">
+                            <i class="bi bi-cart-plus"></i> Add to Cart
+                        </button>
+                        <button class="buy-now-btn" onclick="buyNow()">
+                            <i class="bi bi-bag-check"></i> Buy Now
+                        </button>
+                        <button class="wishlist-btn" onclick="addToWishList()"
+                            style="padding:15px; background:#f5f5f5; border:2px solid #ddd; border-radius:4px; cursor:pointer;">
+                            <i class="bi bi-heart"></i> Add to Wishlist
+                        </button>
+                    </div>
 
-                <div class="product-meta" style="border-top:1px solid var(--border-color);padding-top:20px;">
-                    <div><strong>SKU:</strong> <span th:text="${product.sku ?: product.id}"></span></div>
-                    <div><strong>Category:</strong> <span th:text="${product.category?.name ?: 'N/A'}"></span></div>
+                    <div class="product-meta" style="border-top:1px solid var(--border-color);padding-top:20px;">
+                        <div><strong>SKU:</strong> <span th:text="${product.sku ?: product.id}"></span></div>
+                        <div><strong>Category:</strong> <span th:text="${product.category?.name ?: 'N/A'}"></span></div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</main>
+    </main>
 
-<div th:replace="~{footer :: footer}"></div>
+    <div th:replace="~{footer :: footer}"></div>
 
-<!-- Head Popup -->
-<div class="head-popup success" id="headPopup" role="status" aria-live="polite">
-    <button class="hp-close" id="hpCloseBtn" aria-label="Close" title="Close">
-        <i class="bi bi-x-lg"></i>
-    </button>
-    <div class="row-flex">
-        <div class="texts">
-            <div class="title" id="hpTitle">Added to cart</div>
-            <div class="desc" id="hpDesc">Item added successfully.</div>
+    <!-- Head Popup -->
+    <div class="head-popup success" id="headPopup" role="status" aria-live="polite">
+        <button class="hp-close" id="hpCloseBtn" aria-label="Close" title="Close">
+            <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="row-flex">
+            <div class="texts">
+                <div class="title" id="hpTitle">Added to cart</div>
+                <div class="desc" id="hpDesc">Item added successfully.</div>
+            </div>
+        </div>
+        <div class="progress">
+            <div class="fill"></div>
         </div>
     </div>
-    <div class="progress"><div class="fill"></div></div>
-</div>
 
-<script th:src="@{/js/cart-update.js}"></script>
-<script th:src="@{/js/theme-customizer.js}"></script>
-<script th:src="@{/js/header.js}"></script>
+    <script th:src="@{/js/cart-update.js}"></script>
+    <script th:src="@{/js/theme-customizer.js}"></script>
+    <script th:src="@{/js/header.js}"></script>
 
-<script th:inline="javascript">
-    /*<![CDATA[*/
-    const contextPath = /*[[@{/}]]*/ '';
-    /*]]>*/
-</script>
-<script th:inline="javascript">
-    // ========== GLOBAL STATE ==========
-    let productVariants = [];
-    let uniqueSizes = [];
-    let uniqueColors = [];
-    let hideTimer = null;
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const contextPath = /*[[@{/}]]*/ '';
+        /*]]>*/
+    </script>
+    <script th:inline="javascript">
+        // ========== GLOBAL STATE ==========
+        let productVariants = [];
+        let uniqueSizes = [];
+        let uniqueColors = [];
+        let hideTimer = null;
 
-    // ⭐ Get productId from Thymeleaf
-    const productId = /*[[${product.id}]]*/ 1;
+        // ⭐ Get productId from Thymeleaf
+        const productId = /*[[${product.id}]]*/ 1;
 
-    // ========== INITIALIZATION ==========
-    document.addEventListener('DOMContentLoaded', () => {
-        initializeVariants();
-    });
+        // ========== INITIALIZATION ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeVariants();
+        });
 
-    function initializeVariants() {
-        // Parse all variants from hidden .variant-data elements
-        document.querySelectorAll('.variant-data').forEach(el => {
+        function initializeVariants() {
+            // Parse all variants from hidden .variant-data elements
+            document.querySelectorAll('.variant-data').forEach(el => {
+                try {
+                    const variantId = el.dataset.variantId;
+                    const attrs = JSON.parse(el.dataset.attributes || '{}');
+
+                    if (variantId && attrs.size && attrs.color) {
+                        productVariants.push({
+                            id: variantId,
+                            size: attrs.size,
+                            color: attrs.color
+                        });
+                    }
+                } catch (e) {
+                    console.error('Error parsing variant:', e);
+                }
+            });
+
+            console.log('✅ Parsed variants:', productVariants);
+
+            // Extract unique sizes and colors
+            uniqueSizes = [...new Set(productVariants.map(v => v.size))].filter(Boolean);
+            uniqueColors = [...new Set(productVariants.map(v => v.color))].filter(Boolean);
+
+            console.log('📦 Unique sizes:', uniqueSizes);
+            console.log('🎨 Unique colors:', uniqueColors);
+
+            // Build size and color buttons
+            buildSizeButtons();
+            buildColorButtons();
+        }
+
+        function buildSizeButtons() {
+            const container = document.querySelector('.size-options');
+            if (!container || uniqueSizes.length === 0) return;
+
+            container.innerHTML = '';
+            uniqueSizes.forEach((size, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'size-btn' + (index === 0 ? ' active' : '');
+                btn.textContent = size;
+                btn.dataset.value = size;
+                btn.onclick = function () { selectSize(this); };
+                container.appendChild(btn);
+            });
+        }
+
+        function buildColorButtons() {
+            const container = document.querySelector('.color-options');
+            if (!container || uniqueColors.length === 0) return;
+
+            container.innerHTML = '';
+            uniqueColors.forEach((color, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'color-btn' + (index === 0 ? ' active' : '');
+                btn.style.backgroundColor = color;
+                btn.dataset.value = color;
+                btn.title = color;
+                btn.onclick = function () { selectColor(this); };
+                container.appendChild(btn);
+            });
+        }
+
+        // ========== USER INTERACTIONS ==========
+        function selectSize(btn) {
+            document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            console.log('📏 Selected size:', btn.dataset.value);
+        }
+
+        function selectColor(btn) {
+            document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            console.log('🎨 Selected color:', btn.dataset.value);
+        }
+
+        function increaseQuantity() {
+            const input = document.getElementById('quantity');
+            input.value = parseInt(input.value) + 1;
+        }
+
+        function decreaseQuantity() {
+            const input = document.getElementById('quantity');
+            const val = parseInt(input.value);
+            if (val > 1) input.value = val - 1;
+        }
+
+        // ========== ADD TO CART ==========
+        async function addToCart(goCheckoutAfter = false) {
+            const activeSizeBtn = document.querySelector('.size-btn.active');
+            const activeColorBtn = document.querySelector('.color-btn.active');
+            const qty = parseInt(document.getElementById('quantity').value);
+
+            // Validate size selection
+            if (!activeSizeBtn) {
+                showHeadNotification(
+                    'Select a size',
+                    'Please choose a size before adding to cart.',
+                    { variant: 'warning', duration: 3200 }
+                );
+                return;
+            }
+
+            // Validate color selection
+            if (!activeColorBtn) {
+                showHeadNotification(
+                    'Select a color',
+                    'Please choose a color before adding to cart.',
+                    { variant: 'warning', duration: 3200 }
+                );
+                return;
+            }
+
+            // ⭐ BUILD selectedOptions object
+            const selectedOptions = {
+                size: activeSizeBtn.dataset.value,
+                color: activeColorBtn.dataset.value
+            };
+
+            console.log('🛒 Adding to cart:', {
+                productId: productId,
+                selectedOptions: selectedOptions,
+                qty: qty
+            });
+
+            // ⭐ CALL addToCartWithUpdate với productId + selectedOptions
             try {
-                const variantId = el.dataset.variantId;
-                const attrs = JSON.parse(el.dataset.attributes || '{}');
+                const success = await addToCartWithUpdate(productId, selectedOptions, qty);
 
-                if (variantId && attrs.size && attrs.color) {
-                    productVariants.push({
-                        id: variantId,
-                        size: attrs.size,
-                        color: attrs.color
-                    });
+                if (success && goCheckoutAfter) {
+                    setTimeout(() => {
+                        window.location.href = '/fashionshop/checkout';
+                    }, 600);
                 }
-            } catch (e) {
-                console.error('Error parsing variant:', e);
-            }
-        });
-
-        console.log('✅ Parsed variants:', productVariants);
-
-        // Extract unique sizes and colors
-        uniqueSizes = [...new Set(productVariants.map(v => v.size))].filter(Boolean);
-        uniqueColors = [...new Set(productVariants.map(v => v.color))].filter(Boolean);
-
-        console.log('📦 Unique sizes:', uniqueSizes);
-        console.log('🎨 Unique colors:', uniqueColors);
-
-        // Build size and color buttons
-        buildSizeButtons();
-        buildColorButtons();
-    }
-
-    function buildSizeButtons() {
-        const container = document.querySelector('.size-options');
-        if (!container || uniqueSizes.length === 0) return;
-
-        container.innerHTML = '';
-        uniqueSizes.forEach((size, index) => {
-            const btn = document.createElement('button');
-            btn.className = 'size-btn' + (index === 0 ? ' active' : '');
-            btn.textContent = size;
-            btn.dataset.value = size;
-            btn.onclick = function() { selectSize(this); };
-            container.appendChild(btn);
-        });
-    }
-
-    function buildColorButtons() {
-        const container = document.querySelector('.color-options');
-        if (!container || uniqueColors.length === 0) return;
-
-        container.innerHTML = '';
-        uniqueColors.forEach((color, index) => {
-            const btn = document.createElement('button');
-            btn.className = 'color-btn' + (index === 0 ? ' active' : '');
-            btn.style.backgroundColor = color;
-            btn.dataset.value = color;
-            btn.title = color;
-            btn.onclick = function() { selectColor(this); };
-            container.appendChild(btn);
-        });
-    }
-
-    // ========== USER INTERACTIONS ==========
-    function selectSize(btn) {
-        document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        console.log('📏 Selected size:', btn.dataset.value);
-    }
-
-    function selectColor(btn) {
-        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        console.log('🎨 Selected color:', btn.dataset.value);
-    }
-
-    function increaseQuantity() {
-        const input = document.getElementById('quantity');
-        input.value = parseInt(input.value) + 1;
-    }
-
-    function decreaseQuantity() {
-        const input = document.getElementById('quantity');
-        const val = parseInt(input.value);
-        if (val > 1) input.value = val - 1;
-    }
-
-    // ========== ADD TO CART ==========
-    async function addToCart(goCheckoutAfter = false) {
-        const activeSizeBtn = document.querySelector('.size-btn.active');
-        const activeColorBtn = document.querySelector('.color-btn.active');
-        const qty = parseInt(document.getElementById('quantity').value);
-
-        // Validate size selection
-        if (!activeSizeBtn) {
-            showHeadNotification(
-                'Select a size',
-                'Please choose a size before adding to cart.',
-                { variant: 'warning', duration: 3200 }
-            );
-            return;
-        }
-
-        // Validate color selection
-        if (!activeColorBtn) {
-            showHeadNotification(
-                'Select a color',
-                'Please choose a color before adding to cart.',
-                { variant: 'warning', duration: 3200 }
-            );
-            return;
-        }
-
-        // ⭐ BUILD selectedOptions object
-        const selectedOptions = {
-            size: activeSizeBtn.dataset.value,
-            color: activeColorBtn.dataset.value
-        };
-
-        console.log('🛒 Adding to cart:', {
-            productId: productId,
-            selectedOptions: selectedOptions,
-            qty: qty
-        });
-
-        // ⭐ CALL addToCartWithUpdate với productId + selectedOptions
-        try {
-            const success = await addToCartWithUpdate(productId, selectedOptions, qty);
-
-            if (success && goCheckoutAfter) {
-                setTimeout(() => {
-                    window.location.href = '/fashionshop/checkout';
-                }, 600);
-            }
-        } catch (error) {
-            console.error('Error adding to cart:', error);
-            showHeadNotification(
-                'Error',
-                'Failed to add item to cart. Please try again.',
-                { variant: 'error', duration: 3200 }
-            );
-        }
-    }
-
-    // ========== FIX BUY NOW FUNCTION trong product-detail.html ==========
-    // Thay thế function buyNow() cũ bằng version này:
-
-    async function buyNow() {
-        const activeSizeBtn = document.querySelector('.size-btn.active');
-        const activeColorBtn = document.querySelector('.color-btn.active');
-        const qty = parseInt(document.getElementById('quantity').value);
-
-        // Validate size selection
-        if (!activeSizeBtn) {
-            showHeadNotification(
-                'Select a size',
-                'Please choose a size before continuing.',
-                { variant: 'warning', duration: 3200 }
-            );
-            return;
-        }
-
-        // Validate color selection
-        if (!activeColorBtn) {
-            showHeadNotification(
-                'Select a color',
-                'Please choose a color before continuing.',
-                { variant: 'warning', duration: 3200 }
-            );
-            return;
-        }
-
-        // ⭐ BUILD selectedOptions object
-        const selectedOptions = {
-            size: activeSizeBtn.dataset.value,
-            color: activeColorBtn.dataset.value
-        };
-
-        console.log('🛒 Buy Now - Adding to cart:', {
-            productId,
-            selectedOptions,
-            qty
-        });
-
-        try {
-            // Add to cart first
-            const response = await fetch('/fashionshop/cart/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    productId: productId,
-                    selectedOptions: selectedOptions,
-                    qty: qty
-                })
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                console.log('✅ Added to cart, redirecting to checkout...');
-
-                // Show quick notification
-                showHeadNotification(
-                    'Processing...',
-                    'Redirecting to checkout',
-                    { variant: 'success', duration: 1000 }
-                );
-
-                // Redirect to checkout after short delay
-                setTimeout(() => {
-                    window.location.href = '/fashionshop/checkout';
-                }, 600);
-
-            } else {
-                console.error('❌ Add to cart failed:', data.message);
-                showHeadNotification(
-                    'Failed to add',
-                    data.message || 'Could not add product to cart.',
-                    { variant: 'error', duration: 3500 }
-                );
-            }
-        } catch (error) {
-            console.error('❌ Error in buyNow:', error);
-            showHeadNotification(
-                'Error',
-                'Failed to process. Please try again.',
-                { variant: 'error', duration: 3500 }
-            );
-        }
-    }
-
-    // ========== HEAD NOTIFICATION ==========
-    function showHeadNotification(title, desc = '', options = {}) {
-        const popup = document.getElementById('headPopup');
-        if (!popup) return;
-
-        const t = document.getElementById('hpTitle');
-        const d = document.getElementById('hpDesc');
-        const closeBtn = document.getElementById('hpCloseBtn');
-
-        // Set variant
-        popup.classList.remove('success', 'warning', 'error');
-        const variant = options.variant || 'success';
-        popup.classList.add(variant);
-
-        // Set duration
-        const duration = options.duration || 2600;
-        popup.style.setProperty('--dur', duration + 'ms');
-
-        // Set text
-        t.textContent = title || 'Notice';
-        d.textContent = desc || '';
-
-        // Restart animation
-        const fill = popup.querySelector('.fill');
-        if (fill) {
-            fill.style.animation = 'none';
-            void fill.offsetWidth;
-            fill.style.animation = '';
-        }
-
-        // Show popup
-        popup.classList.add('show');
-
-        // Auto hide
-        clearTimeout(hideTimer);
-        hideTimer = setTimeout(() => {
-            popup.classList.remove('show');
-        }, duration + 80);
-
-        // Close button
-        if (closeBtn && !closeBtn.dataset.bound) {
-            closeBtn.addEventListener('click', () => {
-                clearTimeout(hideTimer);
-                popup.classList.remove('show');
-            });
-            closeBtn.dataset.bound = '1';
-        }
-    }
-
-    async function addToWishList() {
-        const activeSizeBtn = document.querySelector('.size-btn.active');
-        const activeColorBtn = document.querySelector('.color-btn.active');
-
-        // Optional validation - can add without options
-        const selectedOptions = {};
-        if (activeSizeBtn) selectedOptions.size = activeSizeBtn.dataset.value;
-        if (activeColorBtn) selectedOptions.color = activeColorBtn.dataset.value;
-
-        console.log('❤️ Adding to wishlist:', {
-            productId: productId,
-            selectedOptions: selectedOptions
-        });
-
-        try {
-            // ✅ Use contextPath variable (defined earlier in your HTML)
-            const response = await fetch(contextPath + 'wishlist/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    productId: productId,
-                    selectedOptions: selectedOptions
-                })
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                showHeadNotification(
-                    'Added to wishlist',
-                    'Product added successfully.',
-                    { variant: 'success', duration: 2600 }
-                );
-                // Update header badge if needed
-                if (typeof updateWishlistBadge === 'function') {
-                    updateWishlistBadge();
-                }
-            } else {
+            } catch (error) {
+                console.error('Error adding to cart:', error);
                 showHeadNotification(
                     'Error',
-                    data.message || 'Failed to add to wishlist.',
+                    'Failed to add item to cart. Please try again.',
                     { variant: 'error', duration: 3200 }
                 );
             }
-        } catch (error) {
-            console.error('Error adding to wishlist:', error);
-            showHeadNotification(
-                'Error',
-                'Failed to add to wishlist. Please try again.',
-                { variant: 'error', duration: 3200 }
-            );
         }
-    }
 
-    console.log('✅ Product detail page loaded successfully');
-</script>
+        // ========== FIX BUY NOW FUNCTION trong product-detail.html ==========
+        // Thay thế function buyNow() cũ bằng version này:
+
+        async function buyNow() {
+            const activeSizeBtn = document.querySelector('.size-btn.active');
+            const activeColorBtn = document.querySelector('.color-btn.active');
+            const qty = parseInt(document.getElementById('quantity').value);
+
+            // Validate size selection
+            if (!activeSizeBtn) {
+                showHeadNotification(
+                    'Select a size',
+                    'Please choose a size before continuing.',
+                    { variant: 'warning', duration: 3200 }
+                );
+                return;
+            }
+
+            // Validate color selection
+            if (!activeColorBtn) {
+                showHeadNotification(
+                    'Select a color',
+                    'Please choose a color before continuing.',
+                    { variant: 'warning', duration: 3200 }
+                );
+                return;
+            }
+
+            // ⭐ BUILD selectedOptions object
+            const selectedOptions = {
+                size: activeSizeBtn.dataset.value,
+                color: activeColorBtn.dataset.value
+            };
+
+            console.log('🛒 Buy Now - Adding to cart:', {
+                productId,
+                selectedOptions,
+                qty
+            });
+
+            try {
+                // Add to cart first
+                const response = await fetch('/fashionshop/cart/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        productId: productId,
+                        selectedOptions: selectedOptions,
+                        qty: qty
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    console.log('✅ Added to cart, redirecting to checkout...');
+
+                    // Show quick notification
+                    showHeadNotification(
+                        'Processing...',
+                        'Redirecting to checkout',
+                        { variant: 'success', duration: 1000 }
+                    );
+
+                    // Redirect to checkout after short delay
+                    setTimeout(() => {
+                        window.location.href = '/fashionshop/checkout';
+                    }, 600);
+
+                } else {
+                    console.error('❌ Add to cart failed:', data.message);
+                    showHeadNotification(
+                        'Failed to add',
+                        data.message || 'Could not add product to cart.',
+                        { variant: 'error', duration: 3500 }
+                    );
+                }
+            } catch (error) {
+                console.error('❌ Error in buyNow:', error);
+                showHeadNotification(
+                    'Error',
+                    'Failed to process. Please try again.',
+                    { variant: 'error', duration: 3500 }
+                );
+            }
+        }
+
+        // ========== HEAD NOTIFICATION ==========
+        function showHeadNotification(title, desc = '', options = {}) {
+            const popup = document.getElementById('headPopup');
+            if (!popup) return;
+
+            const t = document.getElementById('hpTitle');
+            const d = document.getElementById('hpDesc');
+            const closeBtn = document.getElementById('hpCloseBtn');
+
+            // Set variant
+            popup.classList.remove('success', 'warning', 'error');
+            const variant = options.variant || 'success';
+            popup.classList.add(variant);
+
+            // Set duration
+            const duration = options.duration || 2600;
+            popup.style.setProperty('--dur', duration + 'ms');
+
+            // Set text
+            t.textContent = title || 'Notice';
+            d.textContent = desc || '';
+
+            // Restart animation
+            const fill = popup.querySelector('.fill');
+            if (fill) {
+                fill.style.animation = 'none';
+                void fill.offsetWidth;
+                fill.style.animation = '';
+            }
+
+            // Show popup
+            popup.classList.add('show');
+
+            // Auto hide
+            clearTimeout(hideTimer);
+            hideTimer = setTimeout(() => {
+                popup.classList.remove('show');
+            }, duration + 80);
+
+            // Close button
+            if (closeBtn && !closeBtn.dataset.bound) {
+                closeBtn.addEventListener('click', () => {
+                    clearTimeout(hideTimer);
+                    popup.classList.remove('show');
+                });
+                closeBtn.dataset.bound = '1';
+            }
+        }
+
+        // ========== FIX 1: Trong product-detail.html ==========
+        // Thay thế function addToWishList() cũ bằng version này:
+
+        async function addToWishList() {
+            const activeSizeBtn = document.querySelector('.size-btn.active');
+            const activeColorBtn = document.querySelector('.color-btn.active');
+
+            const selectedOptions = {};
+            if (activeSizeBtn) selectedOptions.size = activeSizeBtn.dataset.value;
+            if (activeColorBtn) selectedOptions.color = activeColorBtn.dataset.value;
+
+            console.log('❤️ Adding to wishlist:', {
+                productId: productId,
+                selectedOptions: selectedOptions
+            });
+
+            try {
+                const response = await fetch(contextPath + 'wishlist/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        productId: productId,
+                        selectedOptions: selectedOptions
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showHeadNotification(
+                        'Added to wishlist',
+                        'Product added successfully.',
+                        { variant: 'success', duration: 2600 }
+                    );
+
+                    // ⭐ QUAN TRỌNG: Gọi update ngay sau khi add thành công
+                    if (typeof window.updateWishlistCount === 'function') {
+                        window.updateWishlistCount();
+                    } else {
+                        console.error('❌ window.updateWishlistCount not found!');
+                    }
+                } else {
+                    showHeadNotification(
+                        'Error',
+                        data.message || 'Failed to add to wishlist.',
+                        { variant: 'error', duration: 3200 }
+                    );
+                }
+            } catch (error) {
+                console.error('Error adding to wishlist:', error);
+                showHeadNotification(
+                    'Error',
+                    'Failed to add to wishlist. Please try again.',
+                    { variant: 'error', duration: 3200 }
+                );
+            }
+        }
+        // ========== FIX 2: Trong wishlist.html ==========
+        // Cập nhật function removeFromWishListOnServer():
+
+        function removeFromWishListOnServer(itemId) {
+            fetch(contextPath + `wishlist/delete/${itemId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove item from DOM
+                        const itemElement = document.querySelector(`[data-item-id="${itemId}"]`);
+                        if (itemElement) {
+                            itemElement.remove();
+                        }
+
+                        showHeadNotification(
+                            'Removed',
+                            'Item removed from wishlist.',
+                            { variant: 'success', duration: 2600 }
+                        );
+
+                        // Check if empty
+                        const itemsSection = document.querySelector('.wishlist-items-section');
+                        if (data.isEmpty) {
+                            itemsSection.innerHTML = `
+                    <div class="empty-wishlist">
+                        <i class="bi bi-heart"></i>
+                        <p>Your wishlist is empty</p>
+                        <a href="${contextPath}shop" class="btn btn-dark">Continue Shopping</a>
+                    </div>
+                `;
+                        }
+
+                        // ⭐ QUAN TRỌNG: Gọi update ngay sau khi xóa thành công
+                        if (typeof window.updateWishlistCount === 'function') {
+                            window.updateWishlistCount();
+                        } else {
+                            console.error('❌ window.updateWishlistCount not found!');
+                        }
+                    } else {
+                        showHeadNotification(
+                            'Error',
+                            data.message || 'Failed to remove item',
+                            { variant: 'error', duration: 3200 }
+                        );
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showHeadNotification(
+                        'Error',
+                        'An error occurred while removing the item',
+                        { variant: 'error', duration: 3200 }
+                    );
+                });
+        }
+        // ========== FIX 3: Trong wishlist.html - function addWishlistItemToCart ==========
+        // Cập nhật để không xóa item khỏi wishlist khi add to cart:
+
+        async function addWishlistItemToCart(button) {
+            const productId = button.dataset.productId;
+            const optionsJson = button.dataset.options;
+
+            try {
+                const selectedOptions = JSON.parse(optionsJson);
+
+                console.log('🛒 Adding wishlist item to cart:', {
+                    productId,
+                    selectedOptions,
+                    qty: 1
+                });
+
+                // Use the same function from cart-update.js
+                const success = await addToCartWithUpdate(productId, selectedOptions, 1);
+
+                if (success) {
+                    showHeadNotification(
+                        'Added to cart',
+                        'Item moved to your cart successfully.',
+                        { variant: 'success', duration: 2600 }
+                    );
+                    // ⭐ Badge wishlist vẫn giữ nguyên vì item không bị xóa
+                    // Nếu muốn xóa khỏi wishlist khi add to cart, uncomment dòng dưới:
+                    // removeFromWishListOnServer(button.closest('.wishlist-item').dataset.itemId);
+                }
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                showHeadNotification(
+                    'Error',
+                    'Failed to add item to cart.',
+                    { variant: 'error', duration: 3200 }
+                );
+            }
+        }
+
+        // ========== FIX 4: Đảm bảo CSS cho badge animation ==========
+        // Thêm vào header.css hoặc trong <style> của header.html:
+
+        /*
+        .wishlist-badge.updated {
+            animation: badgePulse 0.4s ease;
+        }
+        
+        @keyframes badgePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        */
+
+        // ========== SUMMARY ==========
+        // ✅ updateWishlistCount() sẽ được gọi sau mỗi lần:
+        //    - Thêm sản phẩm vào wishlist (product-detail.html)
+        //    - Xóa sản phẩm khỏi wishlist (wishlist.html)
+        // ✅ Badge sẽ cập nhật real-time với animation
+        // ✅ Số lượng được fetch từ server để đảm bảo chính xác
+
+        console.log('✅ Product detail page loaded successfully');
+    </script>
 </body>
+
 </html>
