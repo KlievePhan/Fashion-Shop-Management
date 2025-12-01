@@ -80,9 +80,8 @@ public class AuthController {
             // 1. Store in session (your custom way)
             sessionService.login(session, user);
 
-            // 2. CRITICAL: Also authenticate with Spring Security
+            // 2. Authenticate with Spring Security
             authenticateWithSpringSecurity(user, session);
-
             System.out.println("Spring Security authentication set");
 
             // Remember-me
@@ -100,10 +99,19 @@ public class AuthController {
                 }
             }
 
-            // Redirect based on role
-            String redirectUrl = "ROLE_ADMIN".equals(user.getRole().getCode())
-                    ? "redirect:/admin"
-                    : "redirect:/shop";
+            // ===============================
+            // 🔥 FIXED REDIRECT LOGIC
+            // ===============================
+            String role = user.getRole().getCode();
+            String redirectUrl;
+
+            if ("ROLE_ADMIN".equals(role)) {
+                redirectUrl = "redirect:/admin";
+            } else if ("ROLE_STAFF".equals(role)) {
+                redirectUrl = "redirect:/staff";
+            } else {
+                redirectUrl = "redirect:/shop";
+            }
 
             System.out.println("Redirecting to: " + redirectUrl);
             return redirectUrl;
