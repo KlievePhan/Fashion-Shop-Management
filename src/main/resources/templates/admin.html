@@ -270,48 +270,64 @@
         <section id="analytics" class="content-section">
             <div class="section-header">
                 <h2>Analytics</h2>
+                <div class="filter-group">
+                    <label style="font-size: 14px; color: #6b7280;">Range:</label>
+                    <select class="filter-select" id="analyticsDays">
+                        <option value="7">Last 7 days</option>
+                        <option value="30" selected>Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                    </select>
+                </div>
             </div>
             <div class="analytics-grid">
                 <div class="card">
                     <h3>Sales Overview</h3>
-                    <div class="chart-placeholder">
-                        <p>📈 Sales chart visualization</p>
-                        <p class="chart-note">
-                            Connect to your Spring Boot backend to display real-time data
+                    <div class="stats-grid">
+                        <div class="stat-card small">
+                            <div class="stat-icon">💰</div>
+                            <div class="stat-info">
+                                <h4>Total Revenue</h4>
+                                <p class="stat-value" id="analyticsTotalRevenue">0</p>
+                                <span class="stat-change">PAID orders</span>
+                            </div>
+                        </div>
+                        <div class="stat-card small">
+                            <div class="stat-icon">🧾</div>
+                            <div class="stat-info">
+                                <h4>Total Orders</h4>
+                                <p class="stat-value" id="analyticsTotalOrders">0</p>
+                                <span class="stat-change">All time</span>
+                            </div>
+                        </div>
+                        <div class="stat-card small">
+                            <div class="stat-icon">✅</div>
+                            <div class="stat-info">
+                                <h4>Completed Orders</h4>
+                                <p class="stat-value" id="analyticsCompletedOrders">0</p>
+                                <span class="stat-change positive">Paid / Confirmed / Delivered</span>
+                            </div>
+                        </div>
+                        <div class="stat-card small">
+                            <div class="stat-icon">⏳</div>
+                            <div class="stat-info">
+                                <h4>Pending / Cancelled</h4>
+                                <p class="stat-value" id="analyticsPendingCancelled">0 / 0</p>
+                                <span class="stat-change warning">Need attention</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-placeholder" id="salesChartContainer">
+                        <p style="margin-bottom: 4px;">📈 Revenue by day</p>
+                        <p class="chart-note" id="salesChartNote">
+                            Loading analytics data...
                         </p>
+                        <div id="salesChartLine" class="sales-line-chart"></div>
                     </div>
                 </div>
                 <div class="card">
                     <h3>Category Distribution</h3>
-                    <div class="category-stats">
-                        <div class="category-item">
-                            <span class="category-name">T-Shirts</span>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 45%"></div>
-                            </div>
-                            <span class="category-percent">45%</span>
-                        </div>
-                        <div class="category-item">
-                            <span class="category-name">Jeans</span>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 30%"></div>
-                            </div>
-                            <span class="category-percent">30%</span>
-                        </div>
-                        <div class="category-item">
-                            <span class="category-name">Jackets</span>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 15%"></div>
-                            </div>
-                            <span class="category-percent">15%</span>
-                        </div>
-                        <div class="category-item">
-                            <span class="category-name">Accessories</span>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 10%"></div>
-                            </div>
-                            <span class="category-percent">10%</span>
-                        </div>
+                    <div id="categoryStats" class="category-stats">
+                        <!-- Filled by JS from analytics API -->
                     </div>
                 </div>
             </div>
@@ -835,6 +851,11 @@
                 }
 
                 localStorage.setItem("adminActiveTab", sectionId);
+
+                // Khi chuyển sang tab Analytics thì load dữ liệu
+                if (sectionId === "analytics") {
+                    loadAnalyticsOverview();
+                }
             }
 
             const savedTab = localStorage.getItem("adminActiveTab") || "dashboard";
@@ -906,7 +927,221 @@
                     }
                 });
             }
+            // Tự load analytics nếu tab đang active
+            if (savedTab === "analytics") {
+                loadAnalyticsOverview();
+            }
+
+            const analyticsDaysSelect = document.getElementById("analyticsDays");
+            if (analyticsDaysSelect) {
+                analyticsDaysSelect.addEventListener("change", () => {
+                    loadAnalyticsOverview();
+                });
+            }
         });
+
+        async function loadAnalyticsOverview() {
+            const daysSelect = document.getElementById("analyticsDays");
+            const days = daysSelect ? daysSelect.value : 30;
+            const noteEl = document.getElementById("salesChartNote");
+            const lineContainer = document.getElementById("salesChartLine");
+            const categoryContainer = document.getElementById("categoryStats");
+
+            if (noteEl) {
+                noteEl.textContent = "Loading analytics data...";
+            }
+            if (lineContainer) {
+                lineContainer.innerHTML = "";
+            }
+            if (categoryContainer) {
+                categoryContainer.innerHTML = "";
+            }
+
+            try {
+                const res = await fetch(`${contextPath}admin/analytics/overview?days=${encodeURIComponent(days)}`);
+                if (!res.ok) {
+                    throw new Error(await res.text());
+                }
+                const data = await res.json();
+
+                updateAnalyticsSummary(data);
+                renderSalesChart(data);
+                renderCategoryDistribution(data);
+
+                if (noteEl) {
+                    noteEl.textContent = `Showing last ${days} days of revenue (PAID / CONFIRMED / DELIVERED orders)`;
+                }
+            } catch (e) {
+                console.error(e);
+                if (noteEl) {
+                    noteEl.textContent = "Failed to load analytics data";
+                }
+            }
+        }
+
+        function formatCurrency(amount) {
+            if (amount == null) return "0";
+            try {
+                const num = typeof amount === "number" ? amount : Number(amount);
+                if (Number.isNaN(num)) return "0";
+                return num.toLocaleString("en-US", { style: "currency", currency: "USD" });
+            } catch {
+                return amount;
+            }
+        }
+
+        function updateAnalyticsSummary(data) {
+            const setText = (id, value) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = value;
+            };
+
+            const totalRevenue = data.totalRevenue || 0;
+            setText("analyticsTotalRevenue", formatCurrency(totalRevenue));
+            setText("analyticsTotalOrders", data.totalOrders ?? 0);
+            setText("analyticsCompletedOrders", data.completedOrders ?? 0);
+            setText("analyticsPendingCancelled", `${data.pendingOrders ?? 0} / ${data.cancelledOrders ?? 0}`);
+        }
+
+        function renderSalesChart(data) {
+            const container = document.getElementById("salesChartLine");
+            if (!container || !data || !Array.isArray(data.salesByDate)) return;
+
+            const points = data.salesByDate;
+            const maxRevenue = points.reduce((max, p) => {
+                const v = typeof p.revenue === "number" ? p.revenue : Number(p.revenue || 0);
+                return v > max ? v : max;
+            }, 0);
+
+            if (maxRevenue <= 0) {
+                container.innerHTML = "<p style='font-size: 13px; color: #6b7280;'>No completed orders in selected range.</p>";
+                return;
+            }
+
+            const svgNS = "http://www.w3.org/2000/svg";
+            const width = Math.max(points.length * 40, container.clientWidth || 680);
+            const height = 190;
+            const padding = { top: 10, right: 30, bottom: 30, left: 30 };
+
+            const svg = document.createElementNS(svgNS, "svg");
+            svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+            svg.setAttribute("preserveAspectRatio", "none");
+
+            // Grid lines
+            const grid = document.createElementNS(svgNS, "g");
+            grid.setAttribute("class", "sales-line-grid");
+            const gridCount = 4;
+            for (let i = 0; i <= gridCount; i++) {
+                const y = padding.top + ((height - padding.top - padding.bottom) / gridCount) * i;
+                const line = document.createElementNS(svgNS, "line");
+                line.setAttribute("x1", padding.left);
+                line.setAttribute("x2", width - padding.right);
+                line.setAttribute("y1", y);
+                line.setAttribute("y2", y);
+                grid.appendChild(line);
+            }
+            svg.appendChild(grid);
+
+            const scaleX = (index) => padding.left + ((width - padding.left - padding.right) / Math.max(points.length - 1, 1)) * index;
+            const scaleY = (value) => {
+                const plotHeight = height - padding.top - padding.bottom;
+                const ratio = value / maxRevenue;
+                return padding.top + plotHeight - plotHeight * ratio;
+            };
+
+            const linePoints = points.map((p, idx) => {
+                const val = typeof p.revenue === "number" ? p.revenue : Number(p.revenue || 0);
+                return `${scaleX(idx)},${scaleY(val)}`;
+            }).join(" ");
+
+            // Area fill
+            const areaPath = document.createElementNS(svgNS, "path");
+            const firstX = scaleX(0);
+            const lastX = scaleX(points.length - 1);
+            const baseY = height - padding.bottom;
+            const areaD = `M ${firstX},${baseY} L ${linePoints.replace(/ /g, " L ")} L ${lastX},${baseY} Z`;
+            areaPath.setAttribute("d", areaD);
+            areaPath.setAttribute("class", "sales-line-area");
+            svg.appendChild(areaPath);
+
+            const linePath = document.createElementNS(svgNS, "polyline");
+            linePath.setAttribute("points", linePoints);
+            linePath.setAttribute("class", "sales-line-path");
+            svg.appendChild(linePath);
+
+            // Dots + labels
+            points.forEach((p, idx) => {
+                const value = typeof p.revenue === "number" ? p.revenue : Number(p.revenue || 0);
+                const cx = scaleX(idx);
+                const cy = scaleY(value);
+
+                const circle = document.createElementNS(svgNS, "circle");
+                circle.setAttribute("cx", cx);
+                circle.setAttribute("cy", cy);
+                circle.setAttribute("r", 4);
+                circle.setAttribute("class", "sales-line-dot");
+                circle.setAttribute("title", `${p.date}: ${formatCurrency(value)} (${p.orders} orders)`);
+                svg.appendChild(circle);
+
+                if (points.length <= 15 || idx % 2 === 0) {
+                    const label = document.createElementNS(svgNS, "text");
+                    label.setAttribute("x", cx);
+                    label.setAttribute("y", height - 6);
+                    label.setAttribute("text-anchor", "middle");
+                    label.setAttribute("class", "sales-line-label");
+                    label.textContent = p.date?.substring(5);
+                    svg.appendChild(label);
+                }
+            });
+
+            container.innerHTML = "";
+            container.appendChild(svg);
+        }
+
+        function renderCategoryDistribution(data) {
+            const container = document.getElementById("categoryStats");
+            if (!container) return;
+
+            const items = data && Array.isArray(data.categoryDistribution)
+                ? data.categoryDistribution
+                : [];
+
+            if (items.length === 0) {
+                container.innerHTML = "<p style='font-size: 13px; color: #6b7280;'>No category data available yet.</p>";
+                return;
+            }
+
+            container.innerHTML = "";
+            items.forEach(item => {
+                const percent = item.percent != null ? item.percent : 0;
+
+                const wrapper = document.createElement("div");
+                wrapper.className = "category-item";
+
+                const nameEl = document.createElement("span");
+                nameEl.className = "category-name";
+                nameEl.textContent = item.categoryName || "Other";
+
+                const progressBar = document.createElement("div");
+                progressBar.className = "progress-bar";
+
+                const fill = document.createElement("div");
+                fill.className = "progress-fill";
+                fill.style.width = `${Math.min(100, Math.max(0, percent))}%`;
+                progressBar.appendChild(fill);
+
+                const rightInfo = document.createElement("span");
+                rightInfo.className = "category-percent";
+                rightInfo.textContent = `${percent.toFixed(1)}% • ${item.quantity} items`;
+                rightInfo.title = `Revenue: ${formatCurrency(item.revenue)}`;
+
+                wrapper.appendChild(nameEl);
+                wrapper.appendChild(progressBar);
+                wrapper.appendChild(rightInfo);
+
+                container.appendChild(wrapper);
+            });
+        }
 
         function updateUserStats() {
             const rows = document.querySelectorAll("#userTableBody tr");
