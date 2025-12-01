@@ -2,10 +2,12 @@ package org.fsm.controller;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.fsm.dto.response.AnalyticsOverviewResponse;
 import org.fsm.entity.Role;
 import org.fsm.entity.User;
 import org.fsm.repository.RoleRepository;
 import org.fsm.repository.UserRepository;
+import org.fsm.service.AnalyticsService;
 import org.fsm.service.AuditLogService;
 import org.fsm.service.SessionService;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +35,7 @@ public class AdminController {
     private final AuditLogService auditLogService;
     private final PasswordEncoder passwordEncoder;
     private final SessionService sessionService;
+    private final AnalyticsService analyticsService;
 
     private static final Pattern PASSWORD_PATTERN = Pattern.compile(
             "^(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$");
@@ -64,6 +67,18 @@ public class AdminController {
         model.addAttribute("currentUserRole", currentUser != null ? currentUser.getRole().getCode() : null);
 
         return "admin";
+    }
+
+    // ==========================================
+    // Analytics APIs
+    // ==========================================
+
+    @GetMapping("/admin/analytics/overview")
+    @ResponseBody
+    public ResponseEntity<AnalyticsOverviewResponse> getAnalyticsOverview(
+            @RequestParam(name = "days", defaultValue = "30") int days) {
+        AnalyticsOverviewResponse overview = analyticsService.getOverview(days);
+        return ResponseEntity.ok(overview);
     }
 
     // API lấy thông tin user để hiển thị lên Modal
