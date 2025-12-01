@@ -283,11 +283,11 @@
             <div class="section-header">
                 <h2>Orders Management</h2>
                 <div class="filter-group">
-                    <select class="filter-select" id="orderStatus">
+                    <select class="filter-select" id="orderStatusFilter">
                         <option value="all">All Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="paid">Paid</option>
-                        <option value="shipped">Shipped</option>
+                        <option value="PENDING">Pending</option>
+                        <option value="COD_PENDING">COD Pending</option>
+                        <option value="PAID">Paid</option>
                     </select>
                 </div>
             </div>
@@ -296,22 +296,47 @@
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
-                            <tr>
-                                <th>Order ID</th>
-                                <th>Customer</th>
-                                <th>Date</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                            </tr>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Order Code</th>
+                            <th>Customer Name</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
                         </thead>
-                        <tbody id="ordersTable">
-                            <tr th:each="o : ${orders}">
-                                <td th:text="${o.id}"></td>
-                                <td th:text="${o.user != null ? o.user.fullName : 'N/A'}"></td>
-                                <td th:text="${#temporals.format(o.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
-                                <td th:text="'$' + ${o.totalAmount}"></td>
-                                <td th:text="${o.status}"></td>
-                            </tr>
+                        <tbody id="ordersTableBody">
+                        <tr th:each="o : ${orders}" th:id="'order-row-' + ${o.id}">
+                            <td th:text="${o.id}"></td>
+                            <td th:text="${o.orderCode}"></td>
+                            <td class="customer-name" th:text="${o.user != null ? o.user.fullName : 'Guest'}"></td>
+                            <td th:text="${#temporals.format(o.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                            <td th:text="'$' + ${o.totalAmount}"></td>
+                            <td>
+                        <span class="badge order-status-badge"
+                              th:classappend="${o.status == 'PENDING' or o.status == 'COD_PENDING' ? 'warning' :
+                                             (o.status == 'PAID' ? 'success' :
+                                             (o.status == 'SHIPPED' or o.status == 'DELIVERED' ? 'info' : 'danger'))}"
+                              th:text="${o.status}"></span>
+                            </td>
+                            <td>
+                                <div class="action-btns">
+                                    <button type="button"
+                                            class="btn btn-sm btn-success update-to-paid-btn"
+                                            th:if="${o.status == 'PENDING' or o.status == 'COD_PENDING'}"
+                                            th:data-id="${o.id}"
+                                            th:data-code="${o.orderCode}">
+                                        Mark as Paid
+                                    </button>
+                                    <span th:unless="${o.status == 'PENDING' or o.status == 'COD_PENDING'}"
+                                          class="text-muted"
+                                          style="font-size: 0.85rem;">
+                                No actions
+                            </span>
+                                </div>
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
@@ -872,7 +897,98 @@
             document.querySelector('.dropdown-menu')?.classList.remove('show');
         });
 
+        // --- 5. ORDER MANAGEMENT ---
+
+        // Update Order to Paid
+        function updateOrderToPaid(btn) {
+            const orderId = btn.dataset.id;
+            const orderCode = btn.dataset.code;
+
+            if (!confirm(`Mark order ${orderCode} as PAID?`)) return;
+
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Updating...';
+
+            fetch(contextPath + 'staff/orders/' + orderId + '/update-to-paid', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(res => {
+                    if (!res.ok) {
+                        return res.json().then(data => {
+                            throw new Error(data.message || 'Update failed');
+                        });
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Update badge in the table
+                        const row = document.getElementById('order-row-' + orderId);
+                        if (row) {
+                            const badge = row.querySelector('.order-status-badge');
+                            badge.className = 'badge order-status-badge success';
+                            badge.textContent = data.newStatus; // Will be 'PAID'
+
+                            // Remove the button and show "No actions"
+                            const actionsCell = row.querySelector('.action-btns');
+                            actionsCell.innerHTML = '<span class="text-muted" style="font-size: 0.85rem;">No actions</span>';
+
+                            // Highlight effect
+                            row.style.backgroundColor = '#d4edda';
+                            row.style.transition = 'background-color 0.5s';
+                            setTimeout(() => row.style.backgroundColor = '', 1500);
+                        }
+
+                        showToast(data.message || 'Order updated successfully!', 'success');
+                    } else {
+                        throw new Error(data.message || 'Update failed');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    showToast(err.message || 'Failed to update order status', 'error');
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                });
+        }
+
+        // Order Status Filter - Updated to handle uppercase status values
+        document.getElementById('orderStatusFilter')?.addEventListener('change', function(e) {
+            const selectedStatus = e.target.value; // Keep original case (uppercase)
+            const tableBody = document.getElementById('ordersTableBody');
+            const rows = tableBody.querySelectorAll('tr');
+
+            rows.forEach(row => {
+                const statusBadge = row.querySelector('.order-status-badge');
+                if (!statusBadge) return;
+
+                const rowStatus = statusBadge.textContent.trim(); // Keep original case
+
+                if (selectedStatus === 'all' || rowStatus === selectedStatus) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // --- 6. GLOBAL EVENT DELEGATION (Cleaner way) ---
+        document.addEventListener('click', function (e) {
+            // ... other handlers ...
+
+            // Order Update to Paid - THIS MUST BE PRESENT
+            if (e.target.closest('.update-to-paid-btn')) {
+                e.preventDefault();
+                const btn = e.target.closest('.update-to-paid-btn');
+                updateOrderToPaid(btn);
+            }
+        });
     </script>
+
 </body>
 
 </html>

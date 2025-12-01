@@ -16,6 +16,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Page<Order> findByUserAndStatus(User user, String status, Pageable pageable);
     Page<Order> findByUserAndOrderCodeContaining(User user, String orderCode, Pageable pageable);
 
+    // New methods for staff order management
+    Page<Order> findByStatus(String status, Pageable pageable);
+
     long countByUser(User user);
     long countByUserAndStatus(User user, String status);
+    long countByStatus(String status);
 }

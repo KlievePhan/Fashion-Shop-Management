@@ -1,11 +1,13 @@
 package org.fsm.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.fsm.entity.Order;
 import org.fsm.entity.Product;
 import org.fsm.entity.User;
 import org.fsm.repository.AuditLogRepository;
 import org.fsm.repository.BrandRepository;
 import org.fsm.repository.CategoryRepository;
+import org.fsm.repository.OrderRepository;
 import org.fsm.repository.ProductRepository;
 import org.fsm.repository.UserRepository;
 import org.fsm.service.AuditLogService;
@@ -27,6 +29,7 @@ public class StaffController {
     private final ProductRepository productRepository;
     private final BrandRepository brandRepository;
     private final CategoryRepository categoryRepository;
+    private final OrderRepository orderRepository;
     private final AuditLogService auditLogService;
     private final SessionService sessionService;
     private final UserRepository userRepository;
@@ -44,8 +47,12 @@ public class StaffController {
 
         model.addAttribute("brands", brandRepository.findAll());
 
-        // CÁI NÀY QUAN TRỌNG → để Category ở staff.html có data
+        // Categories - QUAN TRỌNG → để Category ở staff.html có data
         model.addAttribute("categories", categoryRepository.findAll());
+
+        // ===== Orders - Load all orders sorted by createdAt descending =====
+        List<Order> orders = orderRepository.findAll(Sort.by("createdAt").descending());
+        model.addAttribute("orders", orders);
 
         // ===== Audit logs (nếu staff.html có dùng) =====
         var pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());

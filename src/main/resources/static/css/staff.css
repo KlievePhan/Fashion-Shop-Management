@@ -1,9 +1,87 @@
-/* Staff panel can reuse admin layout but with slight tweaks */
-@import url("/css/admin.css");
+/* Staff panel reuses admin layout with slight tweaks */
 
-/* Ví dụ đổi màu logo cho Staff */
+/* Remove the @import and rely on the HTML loading both CSS files */
+/* The admin.css is already loaded in the HTML via Thymeleaf */
+
+/* Staff-specific customizations */
 .logo h2 {
-    font-size: 20px;
+    font-size: 1.4rem;
+    letter-spacing: 0.02em;
 }
 
-/* Có thể thêm custom style riêng cho staff ở đây */
+/* Sidebar gradient for staff panel */
+.sidebar {
+    background: linear-gradient(160deg, #0ea5e9 0%, #0284c7 40%, #0c4a6e 100%);
+}
+
+/* Adjust stat card icons for staff */
+.stat-icon {
+    background: radial-gradient(circle at top left, #0ea5e9, #0284c7);
+}
+
+.stat-icon.red {
+    background: radial-gradient(circle at top left, #14b8a6, #0d9488);
+}
+
+/* Primary button adjustment for staff theme */
+.btn-primary {
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    box-shadow: 0 4px 10px rgba(14, 165, 233, 0.35);
+}
+
+.btn-primary:hover {
+    box-shadow: 0 7px 16px rgba(14, 165, 233, 0.45);
+}
+
+/* Staff-specific order status badges */
+.order-status-badge.warning {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fcd34d;
+}
+
+.order-status-badge.success {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #6ee7b7;
+}
+
+.order-status-badge.info {
+    background: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #93c5fd;
+}
+
+/* Update to paid button styling */
+.update-to-paid-btn {
+    white-space: nowrap;
+}
+
+.update-to-paid-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Customer name column styling */
+.customer-name {
+    font-weight: 500;
+    color: #1f2937;
+}
+
+/* Text muted for "No actions" */
+.text-muted {
+    color: #9ca3af;
+    font-style: italic;
+}
+
+/* Responsive adjustments for staff panel */
+@media (max-width: 768px) {
+    .action-btns {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .update-to-paid-btn {
+        width: 100%;
+    }
+}
