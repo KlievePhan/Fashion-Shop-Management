@@ -329,6 +329,14 @@
                                             th:data-code="${o.orderCode}">
                                         Mark as Paid
                                     </button>
+                                    <button type="button"
+                                            class="btn btn-sm btn-danger cancel-order-btn"
+                                            th:if="${o.status == 'PENDING' or o.status == 'COD_PENDING'}"
+                                            th:data-id="${o.id}"
+                                            th:data-code="${o.orderCode}"
+                                            th:data-email="${o.user != null ? o.user.email : ''}">
+                                        Cancel Order
+                                    </button>
                                     <span th:unless="${o.status == 'PENDING' or o.status == 'COD_PENDING'}"
                                           class="text-muted"
                                           style="font-size: 0.85rem;">
@@ -367,6 +375,52 @@
                     <button type="button" class="btn btn-secondary close-modal"
                         onclick="closeBrandModal()">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save Brand</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- CANCEL ORDER MODAL -->
+    <div id="cancelOrderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Cancel Order</h2>
+                <button class="close-modal" onclick="closeCancelOrderModal()">&times;</button>
+            </div>
+            <form id="cancelOrderForm">
+                <input type="hidden" id="cancelOrderId" name="orderId">
+                <div class="form-group">
+                    <label>Order Code</label>
+                    <input type="text" id="cancelOrderCode" readonly style="background-color: #f3f4f6;">
+                </div>
+                <div class="form-group">
+                    <label>Customer Email</label>
+                    <input type="text" id="cancelCustomerEmail" readonly style="background-color: #f3f4f6;">
+                    <small style="color: #6b7280; font-size: 0.85rem; display: block; margin-top: 4px;">
+                        📧 Notification email will be sent to this address
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label>Reason for Cancellation *</label>
+                    <select id="cancelReason" name="reason" required class="form-control">
+                        <option value="">Select a reason...</option>
+                        <option value="Product out of stock">Product out of stock</option>
+                        <option value="Technical issue">Technical issue</option>
+                        <option value="Payment processing error">Payment processing error</option>
+                        <option value="Customer request">Customer request</option>
+                        <option value="Inventory discrepancy">Inventory discrepancy</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group" id="customReasonGroup" style="display: none;">
+                    <label>Please specify</label>
+                    <textarea id="customReason" name="customReason" rows="3" 
+                              placeholder="Enter detailed reason..." 
+                              style="width: 100%; padding: 0.65rem 0.8rem; border-radius: 0.65rem; border: 1px solid #d9e6f5;"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeCancelOrderModal()">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
                 </div>
             </form>
         </div>
@@ -976,7 +1030,106 @@
             });
         });
 
-        // --- 6. GLOBAL EVENT DELEGATION (Cleaner way) ---
+        // --- 6. ORDER CANCELLATION ---
+
+        // Cancel Order Modal
+        window.openCancelOrderModal = function(orderId, orderCode, customerEmail) {
+            document.getElementById('cancelOrderId').value = orderId;
+            document.getElementById('cancelOrderCode').value = orderCode;
+            document.getElementById('cancelCustomerEmail').value = customerEmail || 'N/A (Guest order)';
+            document.getElementById('cancelReason').value = '';
+            document.getElementById('customReason').value = '';
+            document.getElementById('customReasonGroup').style.display = 'none';
+            toggleModal('cancelOrderModal', true);
+        };
+
+        window.closeCancelOrderModal = function() {
+            toggleModal('cancelOrderModal', false);
+        };
+
+        // Show custom reason field when "Other" is selected
+        document.getElementById('cancelReason')?.addEventListener('change', function(e) {
+            const customReasonGroup = document.getElementById('customReasonGroup');
+            if (e.target.value === 'Other') {
+                customReasonGroup.style.display = 'block';
+                document.getElementById('customReason').required = true;
+            } else {
+                customReasonGroup.style.display = 'none';
+                document.getElementById('customReason').required = false;
+            }
+        });
+
+        // Cancel Order Form Submit
+        document.getElementById('cancelOrderForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const orderId = document.getElementById('cancelOrderId').value;
+            const reasonSelect = document.getElementById('cancelReason');
+            const customReason = document.getElementById('customReason').value;
+            
+            let reason = reasonSelect.value;
+            if (reason === 'Other' && customReason.trim()) {
+                reason = 'Other: ' + customReason.trim();
+            }
+
+            if (!reason || reason === '') {
+                showToast('Please select or specify a reason for cancellation', 'error');
+                return;
+            }
+
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Cancelling...';
+
+            fetch(contextPath + 'staff/orders/' + orderId + '/cancel?reason=' + encodeURIComponent(reason), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(res => {
+                    if (!res.ok) {
+                        return res.json().then(data => {
+                            throw new Error(data.message || 'Cancellation failed');
+                        });
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Update badge in the table
+                        const row = document.getElementById('order-row-' + orderId);
+                        if (row) {
+                            const badge = row.querySelector('.order-status-badge');
+                            badge.className = 'badge order-status-badge danger';
+                            badge.textContent = data.newStatus; // Will be 'CANCELLED'
+
+                            // Remove action buttons and show "No actions"
+                            const actionsCell = row.querySelector('.action-btns');
+                            actionsCell.innerHTML = '<span class="text-muted" style="font-size: 0.85rem;">No actions</span>';
+
+                            // Highlight effect
+                            row.style.backgroundColor = '#fee2e2';
+                            row.style.transition = 'background-color 0.5s';
+                            setTimeout(() => row.style.backgroundColor = '', 1500);
+                        }
+
+                        closeCancelOrderModal();
+                        showToast(data.message || 'Order cancelled successfully! Customer has been notified.', 'success');
+                    } else {
+                        throw new Error(data.message || 'Cancellation failed');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    showToast(err.message || 'Failed to cancel order', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                });
+        });
+
+        // --- 7. GLOBAL EVENT DELEGATION (Cleaner way) ---
         document.addEventListener('click', function (e) {
             // ... other handlers ...
 
@@ -985,6 +1138,16 @@
                 e.preventDefault();
                 const btn = e.target.closest('.update-to-paid-btn');
                 updateOrderToPaid(btn);
+            }
+
+            // Order Cancel
+            if (e.target.closest('.cancel-order-btn')) {
+                e.preventDefault();
+                const btn = e.target.closest('.cancel-order-btn');
+                const orderId = btn.dataset.id;
+                const orderCode = btn.dataset.code;
+                const customerEmail = btn.dataset.email || '';
+                openCancelOrderModal(orderId, orderCode, customerEmail);
             }
         });
     </script>

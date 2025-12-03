@@ -13,7 +13,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -82,6 +81,34 @@ public class OrderManagementController {
         } catch (Exception e) {
             response.put("success", false);
             response.put("message", "Failed to update order status");
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    /**
+     * Cancel order with reason
+     */
+    @PostMapping("/{id}/cancel")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> cancelOrder(
+            @PathVariable Long id,
+            @RequestParam(required = false, defaultValue = "") String reason
+    ) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            Order cancelledOrder = orderManagementService.cancelOrder(id, reason);
+            response.put("success", true);
+            response.put("message", "Order cancelled successfully. Customer has been notified via email.");
+            response.put("newStatus", cancelledOrder.getStatus());
+            return ResponseEntity.ok(response);
+        } catch (IllegalStateException e) {
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Failed to cancel order: " + e.getMessage());
             return ResponseEntity.internalServerError().body(response);
         }
     }
