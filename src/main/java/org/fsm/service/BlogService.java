@@ -4,10 +4,14 @@ import org.fsm.entity.Blog;
 import org.fsm.entity.Blog.BlogStatus;
 import org.fsm.repository.BlogRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.text.Normalizer;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -70,6 +74,53 @@ public class BlogService {
                 .filter(blog -> blog.getStatus() == BlogStatus.PUBLISHED);
     }
 
+    // Lấy blog theo slug và tăng view count
+    @Transactional
+    public Optional<Blog> getBlogBySlugAndIncrementView(String slug) {
+        Optional<Blog> blog = blogRepository.findBySlug(slug);
+        if (blog.isPresent() && blog.get().getStatus() == BlogStatus.PUBLISHED) {
+            blogRepository.incrementViewCount(blog.get().getId());
+            return blogRepository.findBySlug(slug);
+        }
+        return Optional.empty();
+    }
+
+    // Tạo slug từ title
+    public String generateSlug(String title) {
+        if (title == null || title.isEmpty()) {
+            return "";
+        }
+        
+        // Normalize Vietnamese characters
+        String normalized = Normalizer.normalize(title, Normalizer.Form.NFD);
+        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        String withoutDiacritics = pattern.matcher(normalized).replaceAll("");
+        
+        // Convert to lowercase and replace spaces with hyphens
+        String slug = withoutDiacritics
+                .toLowerCase()
+                .trim()
+                .replaceAll("[^a-z0-9\\s-]", "") // Remove special characters
+                .replaceAll("\\s+", "-") // Replace spaces with hyphens
+                .replaceAll("-+", "-") // Replace multiple hyphens with single hyphen
+                .replaceAll("^-|-$", ""); // Remove leading/trailing hyphens
+        
+        // Ensure slug is not empty
+        if (slug.isEmpty()) {
+            slug = "blog-" + System.currentTimeMillis();
+        }
+        
+        // Check if slug already exists, if yes, append number
+        String finalSlug = slug;
+        int counter = 1;
+        while (blogRepository.findBySlug(finalSlug).isPresent()) {
+            finalSlug = slug + "-" + counter;
+            counter++;
+        }
+        
+        return finalSlug;
+    }
+
     // ==================== STAFF MANAGEMENT METHODS ====================
 
     // Lấy tất cả blog (cho Staff) - bao gồm draft, pending, archived
@@ -105,6 +156,10 @@ public class BlogService {
         if (blog.getStatus() == null) {
             blog.setStatus(BlogStatus.DRAFT);
         }
+        // Generate slug if not provided
+        if (blog.getSlug() == null || blog.getSlug().isEmpty()) {
+            blog.setSlug(generateSlug(blog.getTitle()));
+        }
         return blogRepository.save(blog);
     }
 
@@ -124,7 +179,45 @@ public class BlogService {
         blog.setAuthor(blogDetails.getAuthor());
         blog.setTags(blogDetails.getTags());
         blog.setMetaDescription(blogDetails.getMetaDescription());
-        blog.setSlug(blogDetails.getSlug());
+        
+        // Update slug if title changed or slug is empty
+        if (blogDetails.getSlug() != null && !blogDetails.getSlug().isEmpty()) {
+            blog.setSlug(blogDetails.getSlug());
+        } else if (!blog.getTitle().equals(blogDetails.getTitle())) {
+            blog.setSlug(generateSlug(blogDetails.getTitle()));
+        }
+        
+        blog.setUpdatedBy(staffId);
+
+        return blogRepository.save(blog);
+    }
+
+    // Cập nhật blog và tự động chuyển về PENDING_REVIEW nếu đang PUBLISHED (Staff edit published blog)
+    @Transactional
+    public Blog updateBlogAndRequestReview(Long id, Blog blogDetails, Long staffId) {
+        Blog blog = blogRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Blog not found with id: " + id));
+
+        blog.setTitle(blogDetails.getTitle());
+        blog.setExcerpt(blogDetails.getExcerpt());
+        blog.setContent(blogDetails.getContent());
+        blog.setCategory(blogDetails.getCategory());
+        blog.setImageUrl(blogDetails.getImageUrl());
+        blog.setReadTime(blogDetails.getReadTime());
+        blog.setIsFeatured(blogDetails.getIsFeatured());
+        blog.setAuthor(blogDetails.getAuthor());
+        blog.setTags(blogDetails.getTags());
+        blog.setMetaDescription(blogDetails.getMetaDescription());
+        
+        // Update slug if title changed or slug is empty
+        if (blogDetails.getSlug() != null && !blogDetails.getSlug().isEmpty()) {
+            blog.setSlug(blogDetails.getSlug());
+        } else if (!blog.getTitle().equals(blogDetails.getTitle())) {
+            blog.setSlug(generateSlug(blogDetails.getTitle()));
+        }
+        
+        // Chuyển status về PENDING_REVIEW để admin duyệt lại
+        blog.setStatus(BlogStatus.PENDING_REVIEW);
         blog.setUpdatedBy(staffId);
 
         return blogRepository.save(blog);
@@ -166,7 +259,13 @@ public class BlogService {
         return changeStatus(id, BlogStatus.ARCHIVED, staffId);
     }
 
-    // Xóa blog
+    // Request delete blog (Staff gửi yêu cầu xóa PUBLISHED blog)
+    @Transactional
+    public Blog requestDelete(Long id, Long staffId) {
+        return changeStatus(id, BlogStatus.PENDING_DELETE, staffId);
+    }
+
+    // Xóa blog (thực sự xóa khỏi database)
     @Transactional
     public void deleteBlog(Long id) {
         blogRepository.deleteById(id);
@@ -180,5 +279,42 @@ public class BlogService {
     // Đếm số blog của một staff
     public long countBlogsByCreator(Long staffId) {
         return blogRepository.countByCreatedBy(staffId);
+    }
+
+    // Đếm tổng số blog (cho Admin)
+    public long countAllBlogs() {
+        return blogRepository.count();
+    }
+
+    // ==================== PAGINATION METHODS ====================
+
+    // Phân trang: Lấy blog của một staff với Pageable
+    public Page<Blog> getBlogsByCreator(Long staffId, Pageable pageable) {
+        return blogRepository.findByCreatedByOrderByCreatedAtDesc(staffId, pageable);
+    }
+
+    // Phân trang: Lấy blog của staff theo status
+    public Page<Blog> getBlogsByCreatorAndStatus(Long staffId, BlogStatus status, Pageable pageable) {
+        return blogRepository.findByCreatedByAndStatusOrderByCreatedAtDesc(staffId, status, pageable);
+    }
+
+    // Phân trang: Lấy tất cả blog cho admin với Pageable
+    public Page<Blog> getAllBlogsForStaff(Pageable pageable) {
+        return blogRepository.findAllByOrderByCreatedAtDesc(pageable);
+    }
+
+    // Phân trang: Lấy blog theo status cho admin
+    public Page<Blog> getBlogsByStatus(BlogStatus status, Pageable pageable) {
+        return blogRepository.findByStatusOrderByCreatedAtDesc(status, pageable);
+    }
+
+    // Phân trang: Tìm kiếm blog của staff
+    public Page<Blog> searchBlogsByCreator(Long staffId, String keyword, Pageable pageable) {
+        return blogRepository.searchBlogsByCreator(staffId, keyword, pageable);
+    }
+
+    // Phân trang: Tìm kiếm blog (cho admin)
+    public Page<Blog> searchAllBlogs(String keyword, Pageable pageable) {
+        return blogRepository.searchAllBlogs(keyword, pageable);
     }
 }

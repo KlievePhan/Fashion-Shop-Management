@@ -28,6 +28,9 @@
             <a href="#" class="nav-item" data-section="auditlog">
                 <span class="icon">📋</span> Audit Log
             </a>
+            <a href="#" class="nav-item" data-section="blogs">
+                <span class="icon">📝</span> Blogs
+            </a>
         </nav>
     </aside>
 
@@ -395,6 +398,259 @@
                     </table>
                 </div>
             </div>
+        </section>
+
+        <!-- Blogs Section -->
+        <section id="blogs" class="content-section">
+            <div style="display: flex; gap: 20px; min-height: calc(100vh - 200px);">
+                <!-- Left Sidebar - Status Filter -->
+                <aside style="width: 250px; background: #f8f9fa; border-radius: 8px; padding: 20px; height: fit-content; position: sticky; top: 20px;">
+                    <h3 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 600;">Posts</h3>
+                    <nav style="display: flex; flex-direction: column; gap: 8px;">
+                        <a th:href="@{/admin(tab='blogs')}" 
+                           th:classappend="${currentBlogStatus == null or currentBlogStatus == ''} ? 'blog-filter-active'"
+                           style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-radius: 6px; text-decoration: none; color: #333; transition: all 0.2s;"
+                           onmouseover="this.style.background='#e9ecef'"
+                           onmouseout="this.style.background='transparent'">
+                            <span>All</span>
+                            <span style="background: #dee2e6; padding: 2px 8px; border-radius: 12px; font-size: 12px;" 
+                                  th:text="${totalBlogs}">0</span>
+                        </a>
+                        <a th:href="@{/admin(tab='blogs', status='PUBLISHED')}" 
+                           th:classappend="${currentBlogStatus == 'PUBLISHED'} ? 'blog-filter-active'"
+                           style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-radius: 6px; text-decoration: none; color: #333; transition: all 0.2s;"
+                           onmouseover="this.style.background='#e9ecef'"
+                           onmouseout="this.style.background='transparent'">
+                            <span>Published</span>
+                            <span style="background: #dee2e6; padding: 2px 8px; border-radius: 12px; font-size: 12px;" 
+                                  th:text="${publishedCount}">0</span>
+                        </a>
+                        <a th:href="@{/admin(tab='blogs', status='DRAFT')}" 
+                           th:classappend="${currentBlogStatus == 'DRAFT'} ? 'blog-filter-active'"
+                           style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-radius: 6px; text-decoration: none; color: #333; transition: all 0.2s;"
+                           onmouseover="this.style.background='#e9ecef'"
+                           onmouseout="this.style.background='transparent'">
+                            <span>Draft</span>
+                            <span style="background: #dee2e6; padding: 2px 8px; border-radius: 12px; font-size: 12px;" 
+                                  th:text="${draftCount}">0</span>
+                        </a>
+                        <a th:href="@{/admin(tab='blogs', status='PENDING_REVIEW')}" 
+                           th:classappend="${currentBlogStatus == 'PENDING_REVIEW'} ? 'blog-filter-active'"
+                           style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-radius: 6px; text-decoration: none; color: #333; transition: all 0.2s;"
+                           onmouseover="this.style.background='#e9ecef'"
+                           onmouseout="this.style.background='transparent'">
+                            <span>Pending</span>
+                            <span style="background: #dee2e6; padding: 2px 8px; border-radius: 12px; font-size: 12px;" 
+                                  th:text="${pendingCount}">0</span>
+                        </a>
+                        <a th:href="@{/admin(tab='blogs', status='ARCHIVED')}" 
+                           th:classappend="${currentBlogStatus == 'ARCHIVED'} ? 'blog-filter-active'"
+                           style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-radius: 6px; text-decoration: none; color: #333; transition: all 0.2s;"
+                           onmouseover="this.style.background='#e9ecef'"
+                           onmouseout="this.style.background='transparent'">
+                            <span>Archived</span>
+                            <span style="background: #dee2e6; padding: 2px 8px; border-radius: 12px; font-size: 12px;" 
+                                  th:text="${archivedCount}">0</span>
+                        </a>
+                        <a th:href="@{/admin(tab='blogs', status='PENDING_DELETE')}" 
+                           th:classappend="${currentBlogStatus == 'PENDING_DELETE'} ? 'blog-filter-active'"
+                           style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-radius: 6px; text-decoration: none; color: #333; transition: all 0.2s;"
+                           onmouseover="this.style.background='#e9ecef'"
+                           onmouseout="this.style.background='transparent'">
+                            <span>Pending Delete</span>
+                            <span style="background: #dee2e6; padding: 2px 8px; border-radius: 12px; font-size: 12px;" 
+                                  th:text="${pendingDeleteCount}">0</span>
+                        </a>
+                    </nav>
+                </aside>
+
+                <!-- Main Content Area -->
+                <div style="flex: 1;">
+                    <!-- Header -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="margin: 0;">All posts</h2>
+                    </div>
+
+                    <!-- Search and Filter Bar -->
+                    <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+                        <form method="get" th:action="@{/admin}" style="flex: 1; display: flex; gap: 12px;">
+                            <input type="hidden" name="tab" value="blogs">
+                            <input type="hidden" name="status" th:value="${currentBlogStatus}">
+                            <input type="text" name="keyword" 
+                                   th:value="${blogKeyword}"
+                                   placeholder="Search by title" 
+                                   style="flex: 1; padding: 10px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                            <select name="category" style="padding: 10px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background: white;">
+                                <option value="">All categories</option>
+                                <option value="TRENDS">TRENDS</option>
+                                <option value="STYLE TIPS">STYLE TIPS</option>
+                                <option value="ACCESSORIES">ACCESSORIES</option>
+                                <option value="INSPIRATION">INSPIRATION</option>
+                                <option value="SEASONAL">SEASONAL</option>
+                                <option value="BEAUTY">BEAUTY</option>
+                            </select>
+                            <button type="submit" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer;">Search</button>
+                        </form>
+                    </div>
+
+                    <!-- Blog Posts List - Card Layout -->
+                    <div id="blogsList" style="display: flex; flex-direction: column; gap: 16px;">
+                        <div th:each="blog : ${blogs}" 
+                             th:id="'blog-card-' + ${blog.id}"
+                             style="display: flex; gap: 16px; background: white; border: 1px solid #e9ecef; border-radius: 8px; padding: 16px; transition: box-shadow 0.2s;"
+                             onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'"
+                             onmouseout="this.style.boxShadow='none'">
+                            <!-- Thumbnail -->
+                            <div style="width: 120px; height: 80px; background: #f8f9fa; border-radius: 6px; overflow: hidden; flex-shrink: 0;">
+                                <img th:if="${blog.imageUrl != null and !blog.imageUrl.isEmpty()}" 
+                                     th:src="${blog.imageUrl}" 
+                                     alt="Blog thumbnail"
+                                     style="width: 100%; height: 100%; object-fit: cover;">
+                                <div th:if="${blog.imageUrl == null or blog.imageUrl.isEmpty()}" 
+                                     style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #adb5bd; font-size: 24px;">
+                                    📝
+                                </div>
+                            </div>
+                            
+                            <!-- Content -->
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                                    <div style="flex: 1;">
+                                        <span class="badge" 
+                                              th:classappend="${blog.status.name() == 'PUBLISHED' ? 'success' : 
+                                                              (blog.status.name() == 'PENDING_REVIEW' ? 'warning' : 
+                                                              (blog.status.name() == 'PENDING_DELETE' ? 'danger' :
+                                                              (blog.status.name() == 'DRAFT' ? 'info' : 
+                                                              (blog.status.name() == 'ARCHIVED' ? 'secondary' : 'danger'))))}"
+                                              th:text="${blog.status}"
+                                              style="display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">
+                                        </span>
+                                        <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 600; color: #212529;">
+                                            <span th:text="${blog.title}"></span>
+                                        </h3>
+                                        <p style="margin: 0 0 8px 0; color: #6c757d; font-size: 13px;">
+                                            <span th:text="${blog.author}"></span>
+                                        </p>
+                                    </div>
+                                    <div style="display: flex; gap: 8px; align-items: center; margin-left: 16px; flex-wrap: wrap;">
+                                        <a th:href="@{/admin/blog/view/{id}(id=${blog.id})}"
+                                           style="padding: 6px 16px; background: #17a2b8; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; text-decoration: none; display: inline-block;">
+                                            VIEW
+                                        </a>
+                                        <button type="button" 
+                                                th:if="${blog.status.name() == 'PENDING_REVIEW'}"
+                                                class="btn btn-sm btn-success"
+                                                th:onclick="'approveBlog(' + ${blog.id} + ', this)'"
+                                                style="padding: 6px 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                                            APPROVE
+                                        </button>
+                                        <button type="button" 
+                                                th:if="${blog.status.name() == 'PENDING_REVIEW'}"
+                                                class="btn btn-sm btn-danger"
+                                                th:onclick="'rejectBlog(' + ${blog.id} + ', this)'"
+                                                style="padding: 6px 16px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                                            REJECT
+                                        </button>
+                                        <button type="button" 
+                                                th:if="${blog.status.name() == 'PUBLISHED'}"
+                                                class="btn btn-sm btn-warning"
+                                                th:onclick="'archiveBlog(' + ${blog.id} + ', this)'"
+                                                style="padding: 6px 16px; background: #ffc107; color: #212529; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                                            ARCHIVE
+                                        </button>
+                                        <button type="button" 
+                                                th:if="${blog.status.name() == 'ARCHIVED'}"
+                                                class="btn btn-sm btn-success"
+                                                th:onclick="'unarchiveBlog(' + ${blog.id} + ', this)'"
+                                                style="padding: 6px 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                                            UNARCHIVE
+                                        </button>
+                                        <button type="button" 
+                                                th:if="${blog.status.name() == 'PENDING_DELETE'}"
+                                                class="btn btn-sm btn-danger"
+                                                th:onclick="'approveDelete(' + ${blog.id} + ', this)'"
+                                                style="padding: 6px 16px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                                            APPROVE DELETE
+                                        </button>
+                                        <button type="button" 
+                                                th:if="${blog.status.name() == 'PENDING_DELETE'}"
+                                                class="btn btn-sm btn-success"
+                                                th:onclick="'rejectDelete(' + ${blog.id} + ', this)'"
+                                                style="padding: 6px 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                                            REJECT DELETE
+                                        </button>
+                                    </div>
+                                </div>
+                                <p style="margin: 0 0 8px 0; color: #6c757d; font-size: 13px; line-height: 1.5; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;"
+                                   th:text="${blog.excerpt}">
+                                </p>
+                                <div style="display: flex; gap: 16px; font-size: 12px; color: #6c757d;">
+                                    <span th:if="${blog.createdAt != null}">
+                                        <span th:text="${#temporals.format(blog.createdAt, 'dd/MM/yyyy')}"></span>
+                                    </span>
+                                    <span th:if="${blog.viewCount != null}">
+                                        <span th:text="${blog.viewCount}"></span> views
+                                    </span>
+                                    <span th:if="${blog.category != null}">
+                                        <span th:text="${blog.category}"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Empty State -->
+                        <div th:if="${blogs == null or blogs.isEmpty()}" 
+                             style="text-align: center; padding: 60px 20px; background: white; border-radius: 8px; border: 1px solid #e9ecef;">
+                            <div style="font-size: 48px; margin-bottom: 16px;">📝</div>
+                            <p style="font-size: 18px; color: #6c757d; margin: 0;">No blog posts found</p>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div th:if="${blogTotalPages != null and blogTotalPages > 1}" 
+                         style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 30px;">
+                        <a th:href="@{/admin(tab='blogs', status=${currentBlogStatus}, keyword=${blogKeyword}, blogPage=${blogCurrentPage - 1})}"
+                           th:if="${blogCurrentPage > 0}"
+                           style="padding: 8px 12px; border: 1px solid #dee2e6; border-radius: 4px; text-decoration: none; color: #007bff;">
+                            ← Previous
+                        </a>
+                        <span th:each="i : ${#numbers.sequence(0, (blogTotalPages > 0 ? blogTotalPages - 1 : 0))}"
+                              th:if="${i >= blogCurrentPage - 2 and i <= blogCurrentPage + 2}">
+                            <a th:href="@{/admin(tab='blogs', status=${currentBlogStatus}, keyword=${blogKeyword}, blogPage=${i})}"
+                               th:classappend="${i == blogCurrentPage} ? 'pagination-active'"
+                               th:text="${i + 1}"
+                               style="padding: 8px 12px; border: 1px solid #dee2e6; border-radius: 4px; text-decoration: none; color: #007bff; margin: 0 4px; display: inline-block;">
+                            </a>
+                        </span>
+                        <a th:href="@{/admin(tab='blogs', status=${currentBlogStatus}, keyword=${blogKeyword}, blogPage=${blogCurrentPage + 1})}"
+                           th:if="${blogCurrentPage < blogTotalPages - 1}"
+                           style="padding: 8px 12px; border: 1px solid #dee2e6; border-radius: 4px; text-decoration: none; color: #007bff;">
+                            Next →
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                .blog-filter-active {
+                    background: #007bff !important;
+                    color: white !important;
+                }
+                .blog-filter-active span {
+                    background: rgba(255,255,255,0.2) !important;
+                    color: white !important;
+                }
+                .pagination-active {
+                    background: #007bff !important;
+                    color: white !important;
+                    border-color: #007bff !important;
+                }
+                .badge.success { background: #28a745; color: white; }
+                .badge.warning { background: #ffc107; color: #212529; }
+                .badge.danger { background: #dc3545; color: white; }
+                .badge.info { background: #17a2b8; color: white; }
+                .badge.secondary { background: #6c757d; color: white; }
+            </style>
         </section>
     </main>
 
@@ -833,7 +1089,7 @@
             const sections = document.querySelectorAll(".content-section");
             const pageTitleEl = document.getElementById("pageTitle");
 
-            function activateTab(sectionId) {
+            function activateTab(sectionId, updateUrl = true) {
                 navItems.forEach(n => n.classList.remove("active"));
                 sections.forEach(s => s.classList.remove("active"));
 
@@ -850,7 +1106,12 @@
                     activeSection.classList.add("active");
                 }
 
-                localStorage.setItem("adminActiveTab", sectionId);
+                // Cập nhật URL với ?tab= để giữ tab khi reload
+                if (updateUrl) {
+                    const url = new URL(window.location);
+                    url.searchParams.set('tab', sectionId);
+                    window.history.pushState({ tab: sectionId }, '', url);
+                }
 
                 // Khi chuyển sang tab Analytics thì load dữ liệu
                 if (sectionId === "analytics") {
@@ -858,17 +1119,30 @@
                 }
             }
 
-            const savedTab = localStorage.getItem("adminActiveTab") || "dashboard";
-            activateTab(savedTab);
+            // Lấy tab từ URL parameter - ƯU TIÊN DUY NHẤT
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabFromUrl = urlParams.get('tab');
+            
+            // CHỈ lấy từ URL parameter, nếu không có thì mặc định dashboard
+            // KHÔNG sử dụng localStorage khi reload để tránh nhảy vào tab sai
+            let savedTab = tabFromUrl || "dashboard";
+            activateTab(savedTab, false); // Không cập nhật URL khi load lần đầu (URL đã có sẵn)
 
             navItems.forEach((item) => {
                 item.addEventListener("click", function (e) {
                     e.preventDefault();
                     const sectionId = this.dataset.section;
                     if (sectionId) {
-                        activateTab(sectionId);
+                        activateTab(sectionId, true); // Cập nhật URL khi click
                     }
                 });
+            });
+            
+            // Xử lý khi người dùng dùng browser back/forward
+            window.addEventListener('popstate', function(e) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const tabFromUrl = urlParams.get('tab') || 'dashboard';
+                activateTab(tabFromUrl, false);
             });
 
             updateUserStats();
@@ -1364,6 +1638,206 @@
             }
 
             return true;
+        }
+
+        // ===== BLOG MANAGEMENT (AJAX) =====
+
+        // Approve Blog (PENDING_REVIEW -> PUBLISHED)
+        async function approveBlog(id, btn) {
+            if (!confirm('Approve and publish this blog?')) return;
+
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Approving...';
+
+            try {
+                const res = await secureFetch(contextPath + `admin/blog/approve/${id}`, {
+                    method: 'POST'
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    showNotification(data.message || 'Blog approved and published successfully!', 'success');
+                    
+                    // Reload trang để đảm bảo data được refresh
+                    setTimeout(() => location.reload(), 800);
+                } else {
+                    const text = await res.text();
+                    showNotification(text || 'Failed to approve blog', 'error');
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
+            } catch (err) {
+                console.error(err);
+                showNotification('System error occurred', 'error');
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        }
+
+        // Reject Blog (PENDING_REVIEW -> DRAFT)
+        async function rejectBlog(id, btn) {
+            if (!confirm('Reject this blog? It will return to DRAFT status.')) return;
+
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Rejecting...';
+
+            try {
+                const res = await secureFetch(contextPath + `admin/blog/reject/${id}`, {
+                    method: 'POST'
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    showNotification(data.message || 'Blog rejected and returned to DRAFT status', 'success');
+                    
+                    // Reload trang để đảm bảo data được refresh
+                    setTimeout(() => location.reload(), 800);
+                } else {
+                    const text = await res.text();
+                    showNotification(text || 'Failed to reject blog', 'error');
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
+            } catch (err) {
+                console.error(err);
+                showNotification('System error occurred', 'error');
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        }
+
+        // Archive Blog (PUBLISHED -> ARCHIVED)
+        async function archiveBlog(id, btn) {
+            if (!confirm('Archive this blog?')) return;
+
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Archiving...';
+
+            try {
+                const res = await secureFetch(contextPath + `admin/blog/archive/${id}`, {
+                    method: 'POST'
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    showNotification(data.message || 'Blog archived successfully!', 'success');
+                    
+                    // Reload trang để đảm bảo data được refresh
+                    setTimeout(() => location.reload(), 800);
+                } else {
+                    const text = await res.text();
+                    showNotification(text || 'Failed to archive blog', 'error');
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
+            } catch (err) {
+                console.error(err);
+                showNotification('System error occurred', 'error');
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        }
+
+        // Unarchive Blog (ARCHIVED -> PUBLISHED)
+        async function unarchiveBlog(id, btn) {
+            if (!confirm('Unarchive this blog?')) return;
+
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Unarchiving...';
+
+            try {
+                const res = await secureFetch(contextPath + `admin/blog/unarchive/${id}`, {
+                    method: 'POST'
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    showNotification(data.message || 'Blog unarchived successfully!', 'success');
+                    
+                    // Reload trang để đảm bảo data được refresh
+                    setTimeout(() => location.reload(), 800);
+                } else {
+                    const text = await res.text();
+                    showNotification(text || 'Failed to unarchive blog', 'error');
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
+            } catch (err) {
+                console.error(err);
+                showNotification('System error occurred', 'error');
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        }
+
+        // Approve Delete Request (PENDING_DELETE -> deleted)
+        async function approveDelete(id, btn) {
+            if (!confirm('⚠️ Xác nhận xóa blog này? Hành động này không thể hoàn tác!')) return;
+
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Deleting...';
+
+            try {
+                const res = await secureFetch(contextPath + `admin/blog/approve-delete/${id}`, {
+                    method: 'POST'
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    showNotification(data.message || 'Blog đã được xóa thành công!', 'success');
+                    
+                    // Reload trang để đảm bảo data được refresh
+                    setTimeout(() => location.reload(), 800);
+                } else {
+                    const text = await res.text();
+                    showNotification(text || 'Failed to approve delete', 'error');
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
+            } catch (err) {
+                console.error(err);
+                showNotification('System error occurred', 'error');
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        }
+
+        // Reject Delete Request (PENDING_DELETE -> PUBLISHED)
+        async function rejectDelete(id, btn) {
+            if (!confirm('Từ chối yêu cầu xóa blog này? Blog sẽ được trả về trạng thái PUBLISHED.')) return;
+
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Rejecting...';
+
+            try {
+                const res = await secureFetch(contextPath + `admin/blog/reject-delete/${id}`, {
+                    method: 'POST'
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    showNotification(data.message || 'Yêu cầu xóa đã bị từ chối. Blog đã được trả về PUBLISHED!', 'success');
+                    
+                    // Reload trang để đảm bảo data được refresh
+                    setTimeout(() => location.reload(), 800);
+                } else {
+                    const text = await res.text();
+                    showNotification(text || 'Failed to reject delete', 'error');
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
+            } catch (err) {
+                console.error(err);
+                showNotification('System error occurred', 'error');
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
         }
     </script>
 </body>

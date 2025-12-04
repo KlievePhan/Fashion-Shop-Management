@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Management - Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body>
+    <div style="max-width: 1400px; margin: 0 auto; padding: 20px;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Blog Management</h2>
+            <a th:href="@{/admin/blog/pending}" class="btn btn-warning">
+                🔔 Pending Review (<span th:text="${pendingCount}">0</span>)
+            </a>
+        </div>
+
+        <!-- Flash Messages -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Filter -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="get" th:action="@{/admin/blog}">
+                    <div class="row align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label">Filter by Status</label>
+                            <select name="status" class="form-select">
+                                <option value="">All Status</option>
+                                <option th:each="status : ${statuses}" 
+                                        th:value="${status}" 
+                                        th:text="${status}"
+                                        th:selected="${currentStatus == status}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-secondary">Filter</button>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <a th:href="@{/admin}" class="btn btn-outline-secondary">← Back to Admin Panel</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="text-muted">Total Blogs</h5>
+                        <h3 th:text="${totalBlogs}">0</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="text-muted">Draft</h5>
+                        <h3 th:text="${draftCount}">0</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="text-muted">Pending Review</h5>
+                        <h3 th:text="${pendingCount}">0</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="text-muted">Published</h5>
+                        <h3 th:text="${publishedCount}">0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Blog List -->
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Views</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(blogs)}">
+                                <td colspan="8" class="text-center text-muted">No blogs found</td>
+                            </tr>
+                            <tr th:each="blog : ${blogs}">
+                                <td th:text="${blog.id}"></td>
+                                <td>
+                                    <a th:href="@{/admin/blog/{id}(id=${blog.id})}" 
+                                       th:text="${blog.title}" 
+                                       style="color: #3b82f6; text-decoration: none;">
+                                    </a>
+                                </td>
+                                <td th:text="${blog.author}"></td>
+                                <td th:text="${blog.category}"></td>
+                                <td>
+                                    <span class="badge" 
+                                          th:classappend="${blog.status == 'PUBLISHED' ? 'bg-success' : 
+                                                          (blog.status == 'PENDING_REVIEW' ? 'bg-warning' : 
+                                                          (blog.status == 'DRAFT' ? 'bg-info' : 'bg-danger'))}"
+                                          th:text="${blog.status}">
+                                    </span>
+                                </td>
+                                <td th:text="${blog.viewCount}"></td>
+                                <td th:text="${#temporals.format(blog.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a th:href="@{/admin/blog/{id}(id=${blog.id})}" 
+                                           class="btn btn-sm btn-secondary">View</a>
+                                        <form th:action="@{/admin/blog/approve/{id}(id=${blog.id})}" 
+                                              method="post" 
+                                              style="display: inline;"
+                                              th:if="${blog.status == 'PENDING_REVIEW'}">
+                                            <button type="submit" 
+                                                    class="btn btn-sm btn-success"
+                                                    onclick="return confirm('Approve and publish this blog?')">
+                                                Approve
+                                            </button>
+                                        </form>
+                                        <form th:action="@{/admin/blog/reject/{id}(id=${blog.id})}" 
+                                              method="post" 
+                                              style="display: inline;"
+                                              th:if="${blog.status == 'PENDING_REVIEW'}">
+                                            <button type="submit" 
+                                                    class="btn btn-sm btn-danger"
+                                                    onclick="return confirm('Reject this blog? It will return to DRAFT status.')">
+                                                Reject
+                                            </button>
+                                        </form>
+                                        <form th:action="@{/admin/blog/archive/{id}(id=${blog.id})}" 
+                                              method="post" 
+                                              style="display: inline;"
+                                              th:if="${blog.status == 'PUBLISHED'}">
+                                            <button type="submit" 
+                                                    class="btn btn-sm btn-warning"
+                                                    onclick="return confirm('Archive this blog?')">
+                                                Archive
+                                            </button>
+                                        </form>
+                                        <form th:action="@{/admin/blog/unarchive/{id}(id=${blog.id})}" 
+                                              method="post" 
+                                              style="display: inline;"
+                                              th:if="${blog.status == 'ARCHIVED'}">
+                                            <button type="submit" 
+                                                    class="btn btn-sm btn-success"
+                                                    onclick="return confirm('Unarchive this blog?')">
+                                                Unarchive
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

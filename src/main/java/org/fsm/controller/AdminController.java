@@ -7,10 +7,14 @@ import org.fsm.entity.Role;
 import org.fsm.entity.User;
 import org.fsm.repository.RoleRepository;
 import org.fsm.repository.UserRepository;
+import org.fsm.entity.Blog;
 import org.fsm.service.AnalyticsService;
 import org.fsm.service.AuditLogService;
+import org.fsm.service.BlogService;
 import org.fsm.service.SessionService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +40,7 @@ public class AdminController {
     private final PasswordEncoder passwordEncoder;
     private final SessionService sessionService;
     private final AnalyticsService analyticsService;
+    private final BlogService blogService;
 
     private static final Pattern PASSWORD_PATTERN = Pattern.compile(
             "^(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$");
@@ -44,10 +49,14 @@ public class AdminController {
     // 1. VIEW METHODS (Trả về giao diện HTML)
     // ==========================================
 
-    @GetMapping("/admin")
+        @GetMapping("/admin")
     public String admin(Model model, HttpSession session,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "50") int size) {
+            @RequestParam(defaultValue = "50") int size,
+            @RequestParam(required = false) String tab,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int blogPage) {
         List<User> users = userRepository.findAll();
         model.addAttribute("users", users);
 
@@ -65,6 +74,59 @@ public class AdminController {
 
         model.addAttribute("currentUserId", currentUserId);
         model.addAttribute("currentUserRole", currentUser != null ? currentUser.getRole().getCode() : null);
+
+        // ===== Blogs với phân trang =====
+        Page<Blog> blogPageResult;
+        int blogPageSize = "blogs".equals(tab) ? 5 : 50; // 5 blogs per page cho tab blogs
+        
+        if ("blogs".equals(tab)) {
+            Pageable blogPageable = PageRequest.of(blogPage, blogPageSize, Sort.by("createdAt").descending());
+            
+            // Nếu có keyword, search
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                blogPageResult = blogService.searchAllBlogs(keyword.trim(), blogPageable);
+            }
+            // Nếu có status filter
+            else if (status != null && !status.isEmpty()) {
+                try {
+                    org.fsm.entity.Blog.BlogStatus blogStatus = org.fsm.entity.Blog.BlogStatus.valueOf(status.toUpperCase());
+                    blogPageResult = blogService.getBlogsByStatus(blogStatus, blogPageable);
+                } catch (IllegalArgumentException e) {
+                    blogPageResult = blogService.getAllBlogsForStaff(blogPageable);
+                }
+            }
+            // Lấy tất cả blog
+            else {
+                blogPageResult = blogService.getAllBlogsForStaff(blogPageable);
+            }
+            
+            model.addAttribute("blogs", blogPageResult.getContent());
+            model.addAttribute("blogCurrentPage", blogPageResult.getNumber());
+            model.addAttribute("blogTotalPages", blogPageResult.getTotalPages());
+            model.addAttribute("blogTotalElements", blogPageResult.getTotalElements());
+            model.addAttribute("blogPageSize", blogPageSize);
+        } else {
+            // Nếu không phải tab blogs, lấy tất cả (không phân trang) để tính stats
+            List<Blog> allBlogs = blogService.getAllBlogsForStaff();
+            model.addAttribute("blogs", allBlogs);
+        }
+        
+        model.addAttribute("blogStatuses", org.fsm.entity.Blog.BlogStatus.values());
+        model.addAttribute("currentBlogStatus", status);
+        model.addAttribute("blogKeyword", keyword);
+        
+        // Blog stats (tính từ tất cả blogs)
+        model.addAttribute("totalBlogs", blogService.countAllBlogs());
+        model.addAttribute("draftCount", blogService.countBlogsByStatus(org.fsm.entity.Blog.BlogStatus.DRAFT));
+        model.addAttribute("pendingCount", blogService.countBlogsByStatus(org.fsm.entity.Blog.BlogStatus.PENDING_REVIEW));
+        model.addAttribute("publishedCount", blogService.countBlogsByStatus(org.fsm.entity.Blog.BlogStatus.PUBLISHED));
+        model.addAttribute("archivedCount", blogService.countBlogsByStatus(org.fsm.entity.Blog.BlogStatus.ARCHIVED));
+        model.addAttribute("pendingDeleteCount", blogService.countBlogsByStatus(org.fsm.entity.Blog.BlogStatus.PENDING_DELETE));
+        
+        // Set active tab nếu có
+        if (tab != null && !tab.isEmpty()) {
+            model.addAttribute("activeTab", tab);
+        }
 
         return "admin";
     }

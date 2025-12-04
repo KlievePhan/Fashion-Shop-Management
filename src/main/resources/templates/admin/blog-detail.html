@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${blog.title}">Blog Detail</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <style>
+        .blog-detail-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 30px;
+        }
+        .blog-header {
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .status-draft { background: #dbeafe; color: #1e40af; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-published { background: #d1fae5; color: #065f46; }
+        .status-archived { background: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body>
+    <div class="blog-detail-container">
+        <div class="card">
+            <div class="card-body">
+                <div class="blog-header">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h1 th:text="${blog.title}">Blog Title</h1>
+                        <span class="status-badge" 
+                              th:classappend="${blog.status == 'PUBLISHED' ? 'status-published' : 
+                                              (blog.status == 'PENDING_REVIEW' ? 'status-pending' : 
+                                              (blog.status == 'DRAFT' ? 'status-draft' : 'status-archived'))}"
+                              th:text="${blog.status}">
+                        </span>
+                    </div>
+                    <div class="text-muted">
+                        <span th:text="${blog.category}"></span> • 
+                        <span th:text="${blog.readTime} + ' min read'"></span> • 
+                        <span th:text="${blog.viewCount} + ' views'"></span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h4>Excerpt</h4>
+                    <p class="text-muted" th:text="${blog.excerpt}"></p>
+                </div>
+
+                <div class="mb-4" th:if="${blog.imageUrl}">
+                    <img th:src="${blog.imageUrl}" 
+                         alt="Blog image" 
+                         class="img-fluid rounded"
+                         style="max-height: 400px; object-fit: cover;">
+                </div>
+
+                <div class="mb-4">
+                    <h4>Content</h4>
+                    <div th:utext="${blog.content}"></div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <strong>Author:</strong> <span th:text="${blog.author ?: 'N/A'}"></span><br>
+                        <strong>Created:</strong> <span th:text="${#temporals.format(blog.createdAt, 'yyyy-MM-dd HH:mm')}"></span><br>
+                        <strong>Updated:</strong> <span th:text="${#temporals.format(blog.updatedAt, 'yyyy-MM-dd HH:mm')}"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Tags:</strong> <span th:text="${blog.tags ?: 'N/A'}"></span><br>
+                        <strong>Slug:</strong> <code th:text="${blog.slug}"></code>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <a th:href="@{/admin/blog}" class="btn btn-secondary">Back to List</a>
+                    <form th:action="@{/admin/blog/approve/{id}(id=${blog.id})}" 
+                          method="post" 
+                          style="display: inline;"
+                          th:if="${blog.status == 'PENDING_REVIEW'}">
+                        <button type="submit" 
+                                class="btn btn-success"
+                                onclick="return confirm('Approve and publish this blog?')">
+                            Approve & Publish
+                        </button>
+                    </form>
+                    <form th:action="@{/admin/blog/reject/{id}(id=${blog.id})}" 
+                          method="post" 
+                          style="display: inline;"
+                          th:if="${blog.status == 'PENDING_REVIEW'}">
+                        <button type="submit" 
+                                class="btn btn-danger"
+                                onclick="return confirm('Reject this blog? It will return to DRAFT status.')">
+                            Reject
+                        </button>
+                    </form>
+                    <form th:action="@{/admin/blog/archive/{id}(id=${blog.id})}" 
+                          method="post" 
+                          style="display: inline;"
+                          th:if="${blog.status == 'PUBLISHED'}">
+                        <button type="submit" 
+                                class="btn btn-warning"
+                                onclick="return confirm('Archive this blog?')">
+                            Archive
+                        </button>
+                    </form>
+                    <form th:action="@{/admin/blog/unarchive/{id}(id=${blog.id})}" 
+                          method="post" 
+                          style="display: inline;"
+                          th:if="${blog.status == 'ARCHIVED'}">
+                        <button type="submit" 
+                                class="btn btn-success"
+                                onclick="return confirm('Unarchive this blog?')">
+                            Unarchive
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+

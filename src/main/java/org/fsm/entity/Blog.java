@@ -95,7 +95,8 @@ public class Blog {
         PENDING_REVIEW("Pending Review - Waiting for approval"),
         PUBLISHED("Published - Live on website"),
         SCHEDULED("Scheduled - Will be published later"),
-        ARCHIVED("Archived - No longer visible");
+        ARCHIVED("Archived - No longer visible"),
+        PENDING_DELETE("Pending Delete - Waiting for admin approval");
 
         private final String description;
 
