@@ -47,20 +47,64 @@ public class Blog {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "published")
-    private Boolean published = true;
+    @Column(name = "published_at")
+    private LocalDateTime publishedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private BlogStatus status = BlogStatus.DRAFT;
 
     @Column(length = 200)
     private String author;
+
+    @Column(name = "created_by")
+    private Long createdBy; // Staff ID who created
+
+    @Column(name = "updated_by")
+    private Long updatedBy; // Staff ID who last updated
+
+    @Column(length = 500)
+    private String tags; // Comma-separated tags
+
+    @Column(name = "meta_description", length = 160)
+    private String metaDescription; // SEO description
+
+    @Column(name = "slug", unique = true, length = 200)
+    private String slug; // URL-friendly version of title
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        if (status == BlogStatus.PUBLISHED && publishedAt == null) {
+            publishedAt = LocalDateTime.now();
+        }
     }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+        if (status == BlogStatus.PUBLISHED && publishedAt == null) {
+            publishedAt = LocalDateTime.now();
+        }
+    }
+
+    // Enum for Blog Status
+    public enum BlogStatus {
+        DRAFT("Draft - Not visible to customers"),
+        PENDING_REVIEW("Pending Review - Waiting for approval"),
+        PUBLISHED("Published - Live on website"),
+        SCHEDULED("Scheduled - Will be published later"),
+        ARCHIVED("Archived - No longer visible");
+
+        private final String description;
+
+        BlogStatus(String description) {
+            this.description = description;
+        }
+
+        public String getDescription() {
+            return description;
+        }
     }
 }
