@@ -41,7 +41,7 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(Model model) {
-       model.addAttribute("currentPath", "/");
+        model.addAttribute("currentPath", "/");
 
         // Chỉ lấy 3 sản phẩm active mới nhất
         List<Product> products = productRepository.findTop3ByActiveTrueOrderByCreatedAtDesc();
@@ -50,33 +50,7 @@ public class HomeController {
         return "home";
     }
 
-    @GetMapping("/product/{id}")
-    public String productDetail(@PathVariable Long id, Model model) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-        model.addAttribute("currentPath", "/product/" + id);
-        model.addAttribute("product", product);
-        List<Product> relatedProducts = productRepository.findAll()
-                .stream()
-                .filter(p -> !p.getId().equals(id))
-                .limit(4)
-                .toList();
-        model.addAttribute("relatedProducts", relatedProducts);
-        return "product-detail";
-    }
-
-    // @GetMapping("/admin")
-    // public String admin() {
-    // return "admin";
-    // }
-
-//    @GetMapping("/shop")
-//    public String shop(Model model) {
-//        model.addAttribute("currentPath", "/shop");
-//        List<Product> products = productRepository.findAll();
-//        model.addAttribute("products", products);
-//        return "shop";
-//    }
+    // ⭐ REMOVED: productDetail - now handled by ProductController
 
     @GetMapping("/about")
     public String about(Model model) {
@@ -145,8 +119,8 @@ public class HomeController {
 
     @PostMapping("/register")
     public String doRegister(@Valid @ModelAttribute("registerRequest") RegisterRequest request,
-            BindingResult result,
-            Model model) {
+                             BindingResult result,
+                             Model model) {
 
         model.addAttribute("currentPath", "/signup");
 
@@ -175,5 +149,4 @@ public class HomeController {
         userRepository.save(user);
         return "redirect:/login?success=registered";
     }
-
 }

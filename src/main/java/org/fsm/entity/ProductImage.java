@@ -1,29 +1,42 @@
 package org.fsm.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
 @Table(name = "product_images")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ProductImage {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonBackReference("product-variants")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Column(nullable = false, length = 1000)
+    @Column(nullable = false, length = 500)
     private String url;
 
-    @Column(name = "orders", columnDefinition = "INT DEFAULT 0")
-    private Integer orders = 0;
+    @Column(name = "color_variant", length = 50)
+    private String colorVariant; // ⭐ ĐẢM BẢO CÓ FIELD NÀY
 
-    @Column(name = "is_primary", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    @Column(name = "orders")
+    private Integer orders;
+
+    @Column(name = "is_primary")
     private Boolean primary = false;
+
+    public String getColorVariant() {
+        return colorVariant;
+    }
+
+    public void setColorVariant(String colorVariant) {
+        this.colorVariant = colorVariant;
+    }
 }
