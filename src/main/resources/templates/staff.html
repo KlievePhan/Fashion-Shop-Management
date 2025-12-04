@@ -1768,6 +1768,23 @@
                 openCancelOrderModal(orderId, orderCode, customerEmail);
             }
         });
+
+        // Check for login success on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('loginSuccess') === 'true') {
+                setTimeout(() => {
+                    showToast('Welcome Back, Staff! 🎉 You have successfully logged in.', 'success');
+                }, 300);
+                
+                // Remove param from URL after showing toast
+                setTimeout(() => {
+                    const url = new URL(window.location);
+                    url.searchParams.delete('loginSuccess');
+                    window.history.replaceState({}, '', url);
+                }, 4500);
+            }
+        });
     </script>
 
 </body>

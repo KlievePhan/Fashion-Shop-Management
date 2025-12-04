@@ -3,6 +3,7 @@ package org.fsm.security;
 import lombok.RequiredArgsConstructor;
 import org.fsm.service.CustomOAuth2UserService;
 import org.fsm.service.OAuth2AuthenticationSuccessHandler;
+import org.fsm.security.FormLoginSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,6 +23,7 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oauth2SuccessHandler;
+    private final FormLoginSuccessHandler formLoginSuccessHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -44,18 +46,7 @@ public class SecurityConfig {
                         .loginProcessingUrl("/login")           // Important: POST here
                         .usernameParameter("email")             // Because you use email, not username
                         .passwordParameter("password")
-                        .successHandler((request, response, authentication) -> {
-                            String role = authentication.getAuthorities().stream()
-                                    .findFirst().get().getAuthority();
-
-                            if ("ROLE_ADMIN".equals(role)) {
-                                response.sendRedirect("/fashionshop/admin");
-                            } else if ("ROLE_STAFF".equals(role)) {
-                                response.sendRedirect("/fashionshop/staff");
-                            } else {
-                                response.sendRedirect("/fashionshop");
-                            }
-                        })
+                        .successHandler(formLoginSuccessHandler)
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )
