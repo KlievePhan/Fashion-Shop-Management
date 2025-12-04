@@ -67,6 +67,8 @@
     font-size: 1.1rem;
     line-height: 1.8;
     color: #333;
+    white-space: pre-line !important; /* Giữ nguyên xuống dòng từ textarea */
+    word-wrap: break-word;
 }
 
 .blog-detail-content h2 {
