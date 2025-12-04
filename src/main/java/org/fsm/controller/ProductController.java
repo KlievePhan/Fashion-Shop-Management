@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.fsm.dto.ProductDTO;
 import org.fsm.entity.*;
+import org.fsm.repository.ProductImageRepository;
 import org.fsm.repository.ProductOptionRepository;
 import org.fsm.repository.ProductRepository;
 import org.fsm.repository.UserRepository;
@@ -40,12 +41,32 @@ public class ProductController {
     private final ObjectMapper objectMapper;
     private final ProductRepository productRepository;
     private final ProductOptionRepository productOptionRepository;
+    private final ProductImageRepository productImageRepository;
 
     @GetMapping("/product/{id}")
     public String getProductDetail(@PathVariable Long id, Model model) {
+        // ⭐ Fetch product
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
 
+        // ⭐ CRITICAL: Fetch images directly from repository
+        List<ProductImage> allImages = productImageRepository.findByProductIdOrderByOrdersAsc(id);
+
+        System.out.println("===========================================");
+        System.out.println("🔍 DEBUG: Product ID = " + id);
+        System.out.println("🖼️ Total images found: " + allImages.size());
+
+        // ⭐ Debug each image
+        for (ProductImage img : allImages) {
+            System.out.println("  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            System.out.println("  Image ID: " + img.getId());
+            System.out.println("  URL: " + img.getUrl());
+            System.out.println("  Color Variant: '" + img.getColorVariant() + "'");
+            System.out.println("  Orders: " + img.getOrders());
+            System.out.println("  Is Primary: " + img.getPrimary());
+        }
+
+        // ⭐ Fetch options
         List<ProductOption> allOptions = productOptionRepository.findActiveOptionsByProductId(id);
 
         List<ProductOption> sizeOptions = allOptions.stream()
@@ -56,9 +77,72 @@ public class ProductController {
                 .filter(opt -> "COLOR".equalsIgnoreCase(opt.getOptionType()))
                 .collect(Collectors.toList());
 
+        // ⭐ BUILD imagesByColor map
+        Map<String, List<Map<String, Object>>> imagesByColor = new LinkedHashMap<>();
+
+        System.out.println("🎨 Building imagesByColor map...");
+
+        for (ProductImage image : allImages) {
+            String color = image.getColorVariant();
+
+            System.out.println("  → Processing image ID: " + image.getId());
+            System.out.println("    Color value: '" + color + "'");
+            System.out.println("    Color is null? " + (color == null));
+            System.out.println("    Color is empty? " + (color != null && color.trim().isEmpty()));
+
+            // ⭐ CRITICAL: Check for null or empty
+            if (color == null || color.trim().isEmpty()) {
+                System.out.println("    ⚠️ SKIPPED - No color variant");
+                continue;
+            }
+
+            // Create image map
+            Map<String, Object> imageMap = new HashMap<>();
+            imageMap.put("id", image.getId());
+            imageMap.put("url", image.getUrl());
+            imageMap.put("orders", image.getOrders() != null ? image.getOrders() : 0);
+            imageMap.put("primary", image.getPrimary() != null ? image.getPrimary() : false);
+
+            // Add to color group
+            imagesByColor.computeIfAbsent(color, k -> new ArrayList<>()).add(imageMap);
+            System.out.println("    ✅ ADDED to group: '" + color + "'");
+        }
+
+        System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        System.out.println("🎨 FINAL imagesByColor:");
+        System.out.println("   Color groups: " + imagesByColor.keySet());
+        System.out.println("   Total groups: " + imagesByColor.size());
+
+        for (Map.Entry<String, List<Map<String, Object>>> entry : imagesByColor.entrySet()) {
+            System.out.println("   - " + entry.getKey() + ": " + entry.getValue().size() + " images");
+        }
+
+        // Sort images by orders within each color
+        imagesByColor.values().forEach(images ->
+                images.sort((a, b) ->
+                        Integer.compare((Integer)a.get("orders"), (Integer)b.get("orders"))
+                )
+        );
+
+        // ⭐ FIX: Convert to JSON properly - DON'T ESCAPE HTML
+        String imagesByColorJson = "{}";
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            imagesByColorJson = mapper.writeValueAsString(imagesByColor);
+            System.out.println("📦 JSON Output Length: " + imagesByColorJson.length() + " chars");
+            System.out.println("📦 JSON Content: " + imagesByColorJson);
+        } catch (Exception e) {
+            System.err.println("❌ ERROR converting to JSON: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        System.out.println("===========================================");
+
         model.addAttribute("product", product);
         model.addAttribute("sizeOptions", sizeOptions);
         model.addAttribute("colorOptions", colorOptions);
+        model.addAttribute("imagesByColorJson", imagesByColorJson);
 
         return "product-detail";
     }
