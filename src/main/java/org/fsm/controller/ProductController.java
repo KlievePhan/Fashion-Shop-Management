@@ -11,6 +11,10 @@ import org.fsm.repository.ProductRepository;
 import org.fsm.repository.UserRepository;
 import org.fsm.service.AuditLogService;
 import org.fsm.service.ProductService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -39,14 +43,11 @@ public class ProductController {
 
     @GetMapping("/product/{id}")
     public String getProductDetail(@PathVariable Long id, Model model) {
-        // Load product
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
 
-        // Load all active options
         List<ProductOption> allOptions = productOptionRepository.findActiveOptionsByProductId(id);
 
-        // Tách SIZE và COLOR options
         List<ProductOption> sizeOptions = allOptions.stream()
                 .filter(opt -> "SIZE".equalsIgnoreCase(opt.getOptionType()))
                 .collect(Collectors.toList());
@@ -55,7 +56,6 @@ public class ProductController {
                 .filter(opt -> "COLOR".equalsIgnoreCase(opt.getOptionType()))
                 .collect(Collectors.toList());
 
-        // Add to model
         model.addAttribute("product", product);
         model.addAttribute("sizeOptions", sizeOptions);
         model.addAttribute("colorOptions", colorOptions);
@@ -67,6 +67,39 @@ public class ProductController {
     public String listProducts(Model model) {
         model.addAttribute("products", productService.getAllProducts());
         return "staff";
+    }
+
+    /**
+     * Get paginated products with search support
+     */
+    @GetMapping("/paginated")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getPaginatedProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<Product> productPage;
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            productPage = productService.searchProductsBySkuOrTitle(keyword, pageable);
+        } else {
+            productPage = productService.getAllProducts(pageable);
+        }
+
+        List<ProductDTO> dtos = productPage.getContent().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", dtos);
+        response.put("currentPage", productPage.getNumber());
+        response.put("totalPages", productPage.getTotalPages());
+        response.put("totalElements", productPage.getTotalElements());
+        response.put("size", productPage.getSize());
+
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -105,8 +138,6 @@ public class ProductController {
         return ResponseEntity.ok(dtos);
     }
 
-    // Add this method to your ProductController.java
-
     /**
      * Search products by SKU or Title
      */
@@ -114,7 +145,6 @@ public class ProductController {
     @ResponseBody
     public ResponseEntity<List<ProductDTO>> searchProducts(@RequestParam String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
-            // Return all products if search is empty
             List<Product> products = productService.getAllProducts();
             List<ProductDTO> dtos = products.stream()
                     .map(this::convertToDTO)
@@ -122,16 +152,13 @@ public class ProductController {
             return ResponseEntity.ok(dtos);
         }
 
-        // Search by title first
         List<Product> products = productService
                 .searchProducts(keyword,
                         org.springframework.data.domain.PageRequest.of(0, 1000))
                 .getContent();
 
-        // Also search by SKU
         productService.getProductBySku(keyword).ifPresent(products::add);
 
-        // Remove duplicates and convert to DTO
         List<ProductDTO> dtos = products.stream()
                 .distinct()
                 .map(this::convertToDTO)
@@ -161,7 +188,6 @@ public class ProductController {
         try {
             User currentUser = getCurrentUser();
 
-            // Parse image URLs
             List<String> imageUrlList = null;
             if (imageUrls != null && !imageUrls.trim().isEmpty()) {
                 imageUrlList = Arrays.stream(imageUrls.split(","))
@@ -170,13 +196,11 @@ public class ProductController {
                         .collect(Collectors.toList());
             }
 
-            // Parse variants JSON
             List<ProductVariant> variantList = null;
             if (variantsJson != null && !variantsJson.trim().isEmpty()) {
                 variantList = parseVariantsJson(variantsJson);
             }
 
-            // Build product object
             Product product = new Product();
             product.setSku(sku);
             product.setTitle(title);
@@ -184,12 +208,10 @@ public class ProductController {
             product.setBasePrice(basePrice);
             product.setActive(active);
 
-            // Set category
             Category category = new Category();
             category.setId(categoryId);
             product.setCategory(category);
 
-            // Set brand if provided
             if (brandId != null) {
                 Brand brand = new Brand();
                 brand.setId(brandId);
@@ -197,11 +219,9 @@ public class ProductController {
             }
 
             if (id != null) {
-                // Update existing product
                 Product oldProduct = productService.getProductById(id).orElse(null);
                 Product updated = productService.updateProduct(id, product, imageUrlList, variantList);
 
-                // Manual audit log
                 if (currentUser != null && oldProduct != null) {
                     auditLogService.createAuditLog(
                             currentUser,
@@ -215,10 +235,8 @@ public class ProductController {
 
                 redirectAttributes.addFlashAttribute("successMessage", "Product updated successfully!");
             } else {
-                // Create new product
                 Product created = productService.createProduct(product, imageUrlList, variantList);
 
-                // Manual audit log
                 if (currentUser != null) {
                     auditLogService.createAuditLog(
                             currentUser,
@@ -253,7 +271,6 @@ public class ProductController {
 
             productService.deleteProduct(id);
 
-            // Manual audit log
             if (currentUser != null && product != null) {
                 auditLogService.createAuditLog(
                         currentUser,
@@ -285,7 +302,6 @@ public class ProductController {
             User currentUser = getCurrentUser();
             Product product = productService.toggleProductActive(id);
 
-            // Manual audit log
             if (currentUser != null) {
                 auditLogService.createAuditLog(
                         currentUser,

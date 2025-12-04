@@ -178,6 +178,11 @@
                            id="productSearchInput"
                            placeholder="Search by SKU or Title..."
                            style="width: 300px;">
+                    <select id="pageSizeSelect" class="filter-select ms-2" style="width: 100px;">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="15">15</option>
+                    </select>
                 </div>
                 <button class="btn btn-primary" id="addProductBtn">+ Add Product</button>
             </div>
@@ -199,42 +204,17 @@
                         </tr>
                         </thead>
                         <tbody id="productsTableBody">
-                        <tr th:each="product : ${products}">
-                            <td style="display: none;" th:text="${product.id}"></td>
-                            <td th:text="${product.sku}"></td>
-                            <td>
-                                <img th:src="${product.primaryImageUrl}" alt="Product"
-                                     style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
-                            </td>
-                            <td th:text="${product.title}"></td>
-                            <td th:text="${product.category != null ? product.category.name : 'N/A'}"></td>
-                            <td th:text="${product.brand != null ? product.brand.name : 'N/A'}"></td>
-                            <td th:text="'$' + ${product.basePrice}"></td>
-                            <td>
-                            <span class="badge" th:classappend="${product.active ? 'success' : 'danger'}"
-                                  th:text="${product.active ? 'Active' : 'Inactive'}"></span>
-                            </td>
-                            <td>
-                                <div class="action-btns">
-                                    <button type="button" class="btn btn-secondary"
-                                            th:onclick="'editProduct(\'' + ${product.id} + '\')'">
-                                        Edit
-                                    </button>
-                                    <button type="button" class="btn btn-sm toggle-active-btn"
-                                            th:classappend="${product.active ? 'btn-warning' : 'btn-success'}"
-                                            th:data-id="${product.id}" th:data-active="${product.active}">
-                                        <span th:text="${product.active ? 'Deactivate' : 'Activate'}"></span>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-danger delete-product-btn"
-                                            th:data-id="${product.id}" th:data-title="${product.title}">
-                                        Delete
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                        <!-- Filled dynamically by JS -->
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Pagination -->
+                <nav aria-label="Product pagination" class="mt-3">
+                    <ul class="pagination justify-content-center" id="paginationList">
+                        <!-- Filled dynamically by JS -->
+                    </ul>
+                </nav>
             </div>
         </section>
 
@@ -414,8 +394,8 @@
                 </div>
                 <div class="form-group" id="customReasonGroup" style="display: none;">
                     <label>Please specify</label>
-                    <textarea id="customReason" name="customReason" rows="3" 
-                              placeholder="Enter detailed reason..." 
+                    <textarea id="customReason" name="customReason" rows="3"
+                              placeholder="Enter detailed reason..."
                               style="width: 100%; padding: 0.65rem 0.8rem; border-radius: 0.65rem; border: 1px solid #d9e6f5;"></textarea>
                 </div>
                 <div class="modal-footer">
@@ -676,7 +656,7 @@
                             }
                             showToast('Brand updated successfully!', 'success');
                         } else {
-                            // Nếu là Thêm mới (Add), ta vẫn nên reload để lấy ID mới từ server 
+                            // Nếu là Thêm mới (Add), ta vẫn nên reload để lấy ID mới từ server
                             // (hoặc append row nếu backend trả về JSON object đầy đủ)
                             showToast('New brand added! Reloading...', 'success');
                             setTimeout(() => window.location.reload(), 1000);
@@ -696,6 +676,136 @@
         });
 
         // --- 4. PRODUCT MANAGEMENT ---
+
+        // ==================== DYNAMIC PAGINATION FOR PRODUCTS ====================
+        let currentPage = 0;
+        let currentSize = 10;
+        let currentKeyword = '';
+
+        // Simple debounce helper
+        const debounce = (func, delay) => {
+            let timer;
+            return (...args) => {
+                clearTimeout(timer);
+                timer = setTimeout(() => func.apply(this, args), delay);
+            };
+        };
+
+        function loadProducts(page = 0, size = 10, keyword = '') {
+            currentPage = page;
+            currentSize = size;
+            currentKeyword = keyword;
+
+            const params = new URLSearchParams({
+                page: page,
+                size: size
+            });
+            if (keyword) params.append('keyword', keyword);
+
+            fetch(`${contextPath}staff/products/paginated?${params}`)
+                .then(res => {
+                    if (!res.ok) throw new Error('Failed');
+                    return res.json();
+                })
+                .then(data => {
+                    const tbody = document.getElementById('productsTableBody');
+                    tbody.innerHTML = '';
+
+                    data.content.forEach(p => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td style="display: none;">${p.id}</td>
+                            <td>${p.sku || ''}</td>
+                            <td><img src="${p.primaryImageUrl || ''}" alt="img"
+                                     style="width:50px;height:50px;object-fit:cover;border-radius:4px;"></td>
+                            <td>${p.title || ''}</td>
+                            <td>${p.category ? p.category.name : 'N/A'}</td>
+                            <td>${p.brand ? p.brand.name : 'N/A'}</td>
+                            <td>$${Number(p.basePrice || 0).toFixed(2)}</td>
+                            <td><span class="badge ${p.active ? 'success' : 'danger'}">${p.active ? 'Active' : 'Inactive'}</span></td>
+                            <td>
+                                <div class="action-btns">
+                                    <button type="button" class="btn btn-secondary btn-sm"
+                                            onclick="editProduct(${p.id})">Edit</button>
+                                    <button type="button"
+                                            class="btn btn-sm toggle-active-btn ${p.active ? 'btn-warning' : 'btn-success'}"
+                                            data-id="${p.id}" data-active="${p.active}">
+                                        <span>${p.active ? 'Deactivate' : 'Activate'}</span>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-danger delete-product-btn"
+                                            data-id="${p.id}" data-title="${p.title}">Delete</button>
+                                </div>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+
+                    renderPagination(data.currentPage, data.totalPages);
+                    // Update total products counter on dashboard
+                    const counter = document.querySelectorAll('.stat-card .stat-value')[0];
+                    if (counter) counter.textContent = data.totalElements;
+                })
+                .catch(() => showToast('Failed to load products', 'error'));
+        }
+
+        function renderPagination(current, total) {
+            const ul = document.getElementById('paginationList');
+            ul.innerHTML = '';
+
+            // Previous
+            const prev = `<li class="page-item ${current === 0 ? 'disabled' : ''}">
+                          <a class="page-link" href="#" data-page="${current - 1}">Previous</a></li>`;
+            ul.innerHTML += prev;
+
+            // Pages (show max 7 buttons, ellipsis if needed)
+            let start = Math.max(0, current - 3);
+            let end   = Math.min(total, current + 4);
+            if (start > 0) ul.innerHTML += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
+            for (let i = start; i < end; i++) {
+                ul.innerHTML += `<li class="page-item ${i === current ? 'active' : ''}">
+                                 <a class="page-link" href="#" data-page="${i}">${i + 1}</a></li>`;
+            }
+            if (end < total) ul.innerHTML += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
+
+            // Next
+            const next = `<li class="page-item ${current >= total - 1 ? 'disabled' : ''}">
+                          <a class="page-link" href="#" data-page="${current + 1}">Next</a></li>`;
+            ul.innerHTML += next;
+        }
+
+        // Pagination click
+        document.getElementById('paginationList').addEventListener('click', e => {
+            const link = e.target.closest('.page-link');
+            if (link && !link.parentElement.classList.contains('disabled')) {
+                e.preventDefault();
+                const page = parseInt(link.dataset.page);
+                loadProducts(page, currentSize, currentKeyword);
+            }
+        });
+
+        // Search with debounce
+        document.getElementById('productSearchInput').addEventListener('input', debounce(e => {
+            loadProducts(0, currentSize, e.target.value.trim());
+        }, 400));
+
+        // Page size change
+        document.getElementById('pageSizeSelect').addEventListener('change', e => {
+            loadProducts(0, parseInt(e.target.value), currentKeyword);
+        });
+
+        // Load products when the Products tab becomes active
+        document.querySelector('[data-section="products"]').addEventListener('click', () => {
+            if (document.getElementById('products').classList.contains('active')) {
+                loadProducts(0, currentSize, currentKeyword);
+            }
+        });
+
+        // Initial load when page finishes loading (or when Products tab is first opened)
+        document.addEventListener('DOMContentLoaded', () => {
+            if (document.getElementById('products').classList.contains('active')) {
+                loadProducts();
+            }
+        });
 
         // Toggle Active
         window.toggleProductActive = function (btn) {
@@ -1066,7 +1176,7 @@
             const orderId = document.getElementById('cancelOrderId').value;
             const reasonSelect = document.getElementById('cancelReason');
             const customReason = document.getElementById('customReason').value;
-            
+
             let reason = reasonSelect.value;
             if (reason === 'Other' && customReason.trim()) {
                 reason = 'Other: ' + customReason.trim();
