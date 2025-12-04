@@ -30,15 +30,40 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/staff/**").hasAuthority("ROLE_STAFF")
-                        .requestMatchers("/profile/**", "/cart/**", "/wishlist/**").authenticated()
-                        .requestMatchers("/css/**", "/images/**", "/js/**", "/login", "/forgot-password", "/reset-password").permitAll()
-                        .anyRequest().permitAll()
+                        .requestMatchers("/profile/**", "/cart/**", "/wishlist/**", "/checkout/**").authenticated()
+                        .requestMatchers(
+                                "/", "/shop", "/shop/**", "/product/**",
+                                "/css/**", "/js/**", "/images/**", "/fonts/**",
+                                "/login", "/signup", "/register",
+                                "/forgot-password", "/reset-password"
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")           // Important: POST here
+                        .usernameParameter("email")             // Because you use email, not username
+                        .passwordParameter("password")
+                        .successHandler((request, response, authentication) -> {
+                            String role = authentication.getAuthorities().stream()
+                                    .findFirst().get().getAuthority();
+
+                            if ("ROLE_ADMIN".equals(role)) {
+                                response.sendRedirect("/fashionshop/admin");
+                            } else if ("ROLE_STAFF".equals(role)) {
+                                response.sendRedirect("/fashionshop/staff");
+                            } else {
+                                response.sendRedirect("/fashionshop");
+                            }
+                        })
+                        .failureUrl("/login?error=true")
+                        .permitAll()
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("/login")
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService)
-                                .oidcUserService(customOidcUserService()) // ADD THIS
+                                .oidcUserService(customOidcUserService())
                         )
                         .successHandler(oauth2SuccessHandler)
                 )
@@ -47,16 +72,17 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/login?logout=true")
                         .invalidateHttpSession(true)
                         .deleteCookies("remember-me", "JSESSIONID")
+                        .permitAll()
                 )
                 .rememberMe(remember -> remember
+                        .rememberMeParameter("rememberMe")  // matches your checkbox name
                         .rememberMeCookieName("remember-me")
-                        .tokenValiditySeconds(30 * 24 * 60 * 60)
+                        .tokenValiditySeconds(30 * 24 * 60 * 60) // 30 days
                         .userDetailsService(userDetailsService)
-                        .alwaysRemember(false)
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                        .invalidSessionUrl("/login?invalid=true")
+                        .maximumSessions(1)
+                        .expiredUrl("/login?expired=true")
                 );
 
         return http.build();

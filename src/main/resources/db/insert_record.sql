@@ -517,3 +517,109 @@ VALUES
 -- 42: Louis Vuitton Keepall Bandoulière
 (42, 'https://vn.louisvuitton.com/images/is/image/lv/1/PP_VP_L/louis-vuitton-keepall-bandouliere-50--M20513_PM2_Front%20view.jpg', 1, TRUE),
 (42, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS62McJ249OjTWsDcCE-r1cqrKyS2Bn-1-FkQ&usqp=CAU', 2, FALSE);
+
+-- 1. Thêm cột color_variant vào bảng product_images
+ALTER TABLE product_images
+    ADD COLUMN color_variant VARCHAR(50) NULL AFTER url;
+
+-- 2. Cập nhật ảnh cho các sản phẩm có nhiều màu
+-- Nike Air Max 270 React (Product ID 18) - Black
+UPDATE product_images SET color_variant = 'Black'
+WHERE product_id = 18 AND id IN (
+    SELECT id FROM (
+                       SELECT id FROM product_images WHERE product_id = 18 ORDER BY orders LIMIT 2
+                   ) tmp
+);
+
+-- Nike Windrunner Jacket (19) - Blue
+UPDATE product_images SET color_variant = 'Blue' WHERE product_id = 19;
+
+-- Nike Dri-FIT Headband (20)
+UPDATE product_images SET color_variant = 'Black' WHERE product_id = 20 AND orders = 1;
+UPDATE product_images SET color_variant = 'White' WHERE product_id = 20 AND orders = 2;
+
+-- Nike Court Vision Low (21) - White
+UPDATE product_images SET color_variant = 'White' WHERE product_id = 21;
+
+-- Nike Heritage86 Cap (22)
+UPDATE product_images SET color_variant = 'Black' WHERE product_id = 22 AND orders = 1;
+UPDATE product_images SET color_variant = 'White' WHERE product_id = 22 AND orders = 2;
+
+-- Adidas Cloudfoam Pure (23)
+UPDATE product_images SET color_variant = 'Black' WHERE product_id = 23 AND orders = 1;
+UPDATE product_images SET color_variant = 'Grey' WHERE product_id = 23 AND orders = 2;
+
+-- Adidas Tennis Dress (24) - White
+UPDATE product_images SET color_variant = 'White' WHERE product_id = 24;
+
+-- Adidas Puffer Jacket (25)
+UPDATE product_images SET color_variant = 'Black' WHERE product_id = 25 AND orders = 1;
+UPDATE product_images SET color_variant = 'White' WHERE product_id = 25 AND orders = 2;
+
+-- Adidas Duffel Bag (26)
+UPDATE product_images SET color_variant = 'Black' WHERE product_id = 26 AND orders = 1;
+UPDATE product_images SET color_variant = 'Blue' WHERE product_id = 26 AND orders = 2;
+
+-- Adidas Backpack (27)
+UPDATE product_images SET color_variant = 'Black' WHERE product_id = 27 AND orders = 1;
+UPDATE product_images SET color_variant = 'Grey' WHERE product_id = 27 AND orders = 2;
+
+-- Puma Training Gloves (28)
+UPDATE product_images SET color_variant = 'Black' WHERE product_id = 28 AND orders = 1;
+UPDATE product_images SET color_variant = 'White' WHERE product_id = 28 AND orders = 2;
+
+-- Puma Padded Jacket (29)
+UPDATE product_images SET color_variant = 'Green' WHERE product_id = 29 AND orders = 1;
+UPDATE product_images SET color_variant = 'Black' WHERE product_id = 29 AND orders = 2;
+
+-- Puma Cap (30)
+UPDATE product_images SET color_variant = 'Black' WHERE product_id = 30 AND orders = 1;
+UPDATE product_images SET color_variant = 'Red' WHERE product_id = 30 AND orders = 2;
+
+-- Puma Tazon 6 (31)
+UPDATE product_images SET color_variant = 'Black' WHERE product_id = 31 AND orders = 1;
+UPDATE product_images SET color_variant = 'White' WHERE product_id = 31 AND orders = 2;
+
+-- Puma Evostripe Jacket (32)
+UPDATE product_images SET color_variant = 'Black' WHERE product_id = 32 AND orders = 1;
+UPDATE product_images SET color_variant = 'Grey' WHERE product_id = 32 AND orders = 2;
+
+-- Hummel Stadil Sneakers (33)
+UPDATE product_images SET color_variant = 'Blue' WHERE product_id = 33 AND orders = 1;
+UPDATE product_images SET color_variant = 'Black' WHERE product_id = 33 AND orders = 2;
+
+-- Hummel Aerocharge (34)
+UPDATE product_images SET color_variant = 'Pink' WHERE product_id = 34 AND orders = 1;
+UPDATE product_images SET color_variant = 'White' WHERE product_id = 34 AND orders = 2;
+
+-- Hummel Dress (35)
+UPDATE product_images SET color_variant = 'Red' WHERE product_id = 35 AND orders = 1;
+UPDATE product_images SET color_variant = 'White' WHERE product_id = 35 AND orders = 2;
+
+-- Hummel Backpack (36)
+UPDATE product_images SET color_variant = 'Red' WHERE product_id = 36 AND orders = 1;
+UPDATE product_images SET color_variant = 'Blue' WHERE product_id = 36 AND orders = 2;
+
+-- Hummel Crosslite (37)
+UPDATE product_images SET color_variant = 'Black' WHERE product_id = 37 AND orders = 1;
+UPDATE product_images SET color_variant = 'Purple' WHERE product_id = 37 AND orders = 2;
+
+-- Louis Vuitton Neverfull (38)
+UPDATE product_images SET color_variant = 'Brown Monogram' WHERE product_id = 38 AND orders = 1;
+UPDATE product_images SET color_variant = 'White Damier' WHERE product_id = 38 AND orders = 2;
+
+-- LV Necklace (39)
+UPDATE product_images SET color_variant = 'Gold' WHERE product_id = 39 AND orders = 1;
+UPDATE product_images SET color_variant = 'Silver' WHERE product_id = 39 AND orders = 2;
+
+-- LV Bomber Jacket (40)
+UPDATE product_images SET color_variant = 'Purple' WHERE product_id = 40 AND orders = 1;
+UPDATE product_images SET color_variant = 'Black' WHERE product_id = 40 AND orders = 2;
+
+-- LV Platform Boot (41)
+UPDATE product_images SET color_variant = 'Brown' WHERE product_id = 41 AND orders = 1;
+UPDATE product_images SET color_variant = 'Black' WHERE product_id = 41 AND orders = 2;
+
+-- LV Keepall (42)
+UPDATE product_images SET color_variant = 'Brown Monogram' WHERE product_id = 42 AND orders = 1;
+UPDATE product_images SET color_variant = 'Graphite' WHERE product_id = 42 AND orders = 2;

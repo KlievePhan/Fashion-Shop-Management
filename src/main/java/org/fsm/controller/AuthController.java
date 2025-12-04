@@ -56,70 +56,24 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@Valid @ModelAttribute("loginRequest") LoginRequest request,
-                        BindingResult result,
-                        @RequestParam(defaultValue = "false") boolean rememberMe,
-                        HttpSession session,
-                        HttpServletResponse response,
-                        Model model) {
-
-        System.out.println("=== LOGIN ATTEMPT ===");
-        System.out.println("Email: " + request.getEmail());
-        System.out.println("Remember Me: " + rememberMe);
+    public String login(
+            @Valid @ModelAttribute("loginRequest") LoginRequest request,
+            BindingResult result,
+            @RequestParam(defaultValue = "false") boolean rememberMe,
+            Model model,
+            HttpServletResponse response) {
 
         if (result.hasErrors()) {
-            System.out.println("Validation errors: " + result.getAllErrors());
             return "login_signup";
         }
 
         try {
-            // Authenticate user
-            User user = authService.authenticate(request.getEmail(), request.getPassword());
-            System.out.println("Authentication successful for user: " + user.getEmail());
+            // Let Spring Security handle authentication via formLogin
 
-            // 1. Store in session (your custom way)
-            sessionService.login(session, user);
-
-            // 2. Authenticate with Spring Security
-            authenticateWithSpringSecurity(user, session);
-            System.out.println("Spring Security authentication set");
-
-            // Remember-me
-            if (rememberMe) {
-                try {
-                    String token = authService.createRememberMeToken(user);
-                    Cookie cookie = new Cookie("remember-me", token);
-                    cookie.setMaxAge(30 * 24 * 60 * 60);
-                    cookie.setPath("/");
-                    cookie.setHttpOnly(true);
-                    response.addCookie(cookie);
-                    System.out.println("Remember me cookie created");
-                } catch (Exception e) {
-                    System.out.println("Error creating remember me cookie: " + e.getMessage());
-                }
-            }
-
-            // ===============================
-            // 🔥 FIXED REDIRECT LOGIC
-            // ===============================
-            String role = user.getRole().getCode();
-            String redirectUrl;
-
-            if ("ROLE_ADMIN".equals(role)) {
-                redirectUrl = "redirect:/admin";
-            } else if ("ROLE_STAFF".equals(role)) {
-                redirectUrl = "redirect:/staff";
-            } else {
-                redirectUrl = "redirect:/shop";
-            }
-
-            System.out.println("Redirecting to: " + redirectUrl);
-            return redirectUrl;
+            return "login_signup";
 
         } catch (Exception e) {
-            System.out.println("Login failed: " + e.getMessage());
-            e.printStackTrace();
-            model.addAttribute("loginError", e.getMessage());
+            model.addAttribute("loginError", "Invalid email or password");
             return "login_signup";
         }
     }

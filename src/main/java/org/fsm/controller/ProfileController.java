@@ -28,23 +28,19 @@ public class ProfileController {
     private final FileStorageService fileStorageService;
 
     // ───── SHOW FORM (setup OR edit) ─────
-    @GetMapping({"/setup"})
-    public String showForm(Model model,
-                           Authentication authentication,
-                           HttpServletRequest request) {
-
+    @GetMapping("/setup")
+    public String showForm(Model model, Authentication authentication, HttpServletRequest request) {
         model.addAttribute("currentPath", request.getRequestURI());
 
-        if (authentication == null || !(authentication.getPrincipal() instanceof OAuth2User)) {
+        User user = getCurrentUser(authentication);
+        if (user == null) {
             return "redirect:/login?error=not_authenticated";
         }
 
-        OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
-        String email = oauth2User.getAttribute("email");
-        if (email == null) return "redirect:/login?error=email_missing";
-
-        User user = userRepository.findByEmail(email).orElse(null);
-        if (user == null) return "redirect:/login?error=user_not_found";
+        // Optional: Only allow setup if profile not completed
+        if (user.getProfileCompleted()) {
+            return "redirect:/profile/view";
+        }
 
         ProfileUpdateRequest dto = new ProfileUpdateRequest();
         dto.setFullName(user.getFullName());
@@ -55,7 +51,7 @@ public class ProfileController {
         model.addAttribute("userForm", dto);
         model.addAttribute("currentAvatarUrl", user.getAvatarUrl());
 
-        return "profile/setup";   // SAME FORM for both
+        return "profile/setup";
     }
 
     // ───── SAVE (setup OR edit) ─────
@@ -67,97 +63,84 @@ public class ProfileController {
                               Model model,
                               HttpServletRequest request) {
 
-        model.addAttribute("currentPath", request.getRequestURI());
-
-        // Keep avatar preview on validation error
-        String currentAvatarUrl = null;
-        if (authentication != null && authentication.getPrincipal() instanceof OAuth2User oauth2User) {
-            String email = oauth2User.getAttribute("email");
-            User u = userRepository.findByEmail(email).orElse(null);
-            currentAvatarUrl = u != null ? u.getAvatarUrl() : null;
-        }
-        model.addAttribute("currentAvatarUrl", currentAvatarUrl);
-
-        if (result.hasErrors()) {
-            String path = request.getRequestURI();
-            if (path.contains("/setup")) {
-                model.addAttribute("currentPath", "/profile/setup");
-            } else {
-                model.addAttribute("currentPath", "/profile/edit");
-            }
-        }
-
-        // ---- Auth check ----
-        if (authentication == null || !(authentication.getPrincipal() instanceof OAuth2User oauth2User)) {
+        User user = getCurrentUser(authentication);
+        if (user == null) {
             return "redirect:/login?error=not_authenticated";
         }
-        String email = oauth2User.getAttribute("email");
-        if (email == null) return "redirect:/login?error=email_missing";
 
-        User existing = userRepository.findByEmail(email).orElse(null);
-        if (existing == null) return "redirect:/login?error=user_not_found";
+        model.addAttribute("currentPath", request.getRequestURI());
+        model.addAttribute("currentAvatarUrl", user.getAvatarUrl());
 
-        // ---- 1. Avatar (optional) ----
+        if (result.hasErrors()) {
+            return request.getRequestURI().contains("/setup") ? "profile/setup" : "profile/edit";
+        }
+
+        // Avatar upload
         MultipartFile avatarFile = form.getAvatar();
-        String oldAvatar = existing.getAvatarUrl();
+        String oldAvatar = user.getAvatarUrl();
 
         if (avatarFile != null && !avatarFile.isEmpty()) {
             try {
-                String newUrl = fileStorageService.storeAvatar(avatarFile, existing.getId());
-                existing.setAvatarUrl(newUrl);
-                if (oldAvatar != null) {
+                String newUrl = fileStorageService.storeAvatar(avatarFile, user.getId());
+                user.setAvatarUrl(newUrl);
+                if (oldAvatar != null && !oldAvatar.contains("default")) {
                     try { fileStorageService.deleteAvatar(oldAvatar); } catch (Exception ignored) {}
                 }
-            } catch (IllegalArgumentException e) {
-                result.rejectValue("avatar", "avatar.invalid", e.getMessage());
-                return "profile/setup";
-            } catch (IOException e) {
-                model.addAttribute("errorMessage", "Avatar upload failed: " + e.getMessage());
-                return "profile/setup";
+            } catch (Exception e) {
+                result.rejectValue("avatar", "avatar.invalid", "Upload failed: " + e.getMessage());
+                return request.getRequestURI().contains("/setup") ? "profile/setup" : "profile/edit";
             }
         }
 
-        // ---- 2. TEXT FIELDS (THIS IS THE PART THAT WAS MISSING) ----
-        existing.setFullName(form.getFullName());
-        existing.setPhone(form.getPhone());
-        existing.setDefaultAddress(form.getDefaultAddress());
-        existing.setProfileCompleted(true);   // <-- ALWAYS true after save
+        // Update fields
+        user.setFullName(form.getFullName());
+        user.setPhone(form.getPhone());
+        user.setDefaultAddress(form.getDefaultAddress());
+        user.setProfileCompleted(true);
 
-        // ---- 3. SAVE TO DB ----
-        try {
-            userRepository.save(existing);
-        } catch (Exception ex) {
-            model.addAttribute("errorMessage", "Save failed: " + ex.getMessage());
-            model.addAttribute("currentAvatarUrl", oldAvatar);
-            return "profile/setup";
-        }
+        userRepository.save(user);
 
         return "redirect:/profile/view?success=true";
     }
 
     // ───── VIEW PROFILE ─────
     @GetMapping("/view")
-    public String viewProfile(Model model,
-                              Authentication authentication,
-                              HttpServletRequest request) {
+    public String viewProfile(Model model, Authentication authentication, HttpServletRequest request) {
         model.addAttribute("currentPath", request.getRequestURI());
 
-        if (authentication == null || !(authentication.getPrincipal() instanceof OAuth2User)) {
+        User user = getCurrentUser(authentication);
+        if (user == null) {
             return "redirect:/login?error=not_authenticated";
         }
 
-        OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
-        String email = oauth2User.getAttribute("email");
-        if (email == null) return "redirect:/login?error=email_missing";
-
-        User user = userRepository.findByEmail(email).orElse(null);
-        if (user == null) return "redirect:/login?error=user_not_found";
-
         if (user.getAvatarUrl() == null || user.getAvatarUrl().isEmpty()) {
-            user.setAvatarUrl("images/default_avatar.png");
+            user.setAvatarUrl("/images/default_avatar.png");
         }
 
         model.addAttribute("user", user);
         return "profile/view";
+    }
+
+    // ADD THIS HELPER METHOD at the top of the class
+    private User getCurrentUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        String email;
+
+        if (principal instanceof OAuth2User oauth2User) {
+            email = oauth2User.getAttribute("email");
+        } else if (principal instanceof org.springframework.security.core.userdetails.UserDetails userDetails) {
+            email = userDetails.getUsername(); // because you store email as username
+        } else if (principal instanceof String) {
+            email = (String) principal;
+        } else {
+            return null;
+        }
+
+        return userRepository.findByEmail(email).orElse(null);
     }
 }

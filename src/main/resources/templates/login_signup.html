@@ -335,7 +335,7 @@
         <div class="message success" th:if="${param.success == 'registered'}" style="display:block">Registration
           successful! Please login.</div>
 
-        <form th:action="@{/login}" method="post" th:object="${loginRequest}">
+        <form method="post" th:object="${loginRequest}">
           <div class="form-group">
             <label>Email</label>
             <div class="input-wrapper">
