@@ -30,135 +30,335 @@
       display: block;
     }
 
-    /* Đảm bảo các nút vẫn bấm được */
     .product-actions {
       position: relative;
       z-index: 2;
+    }
+
+    /* Sizes styling */
+    .product-sizes {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .sizes-label {
+      font-weight: 600;
+      font-size: 14px;
+      color: #333;
+      min-width: 50px;
+    }
+
+    .sizes-list {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .size-btn {
+      padding: 5px 14px;
+      border: 1px solid #ddd;
+      background: white;
+      cursor: pointer;
+      font-size: 13px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      font-weight: 500;
+      color: #555;
+    }
+
+    .size-btn:hover {
+      border-color: #333;
+      background: #f8f8f8;
+    }
+
+    .size-btn.active {
+      background: #333;
+      color: white;
+      border-color: #333;
+    }
+
+    /* Colors styling */
+    .product-colors {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .colors-label {
+      font-weight: 600;
+      font-size: 14px;
+      color: #333;
+      min-width: 50px;
+    }
+
+    .colors-list {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .color-option {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid #ddd;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .color-option:hover {
+      transform: scale(1.1);
+      border-color: #999;
+    }
+
+    .color-option.active {
+      border-color: #333;
+      box-shadow: 0 0 0 2px white, 0 0 0 4px #333;
+    }
+
+    .color-option::after {
+      content: attr(data-color-name);
+      position: absolute;
+      bottom: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .color-option:hover::after {
+      opacity: 1;
     }
   </style>
 </head>
 
 <body>
-  <!-- HEADER using Thymeleaf fragment -->
-  <div th:insert="~{header}">
+<!-- HEADER using Thymeleaf fragment -->
+<div th:insert="~{header}">
+</div>
+
+<!-- PROMO BAR -->
+<div class="promo-bar">Get 15% off on your first order</div>
+
+<!-- HERO SECTION -->
+<section class="brand-image">
+  <div class="overlay"></div>
+  <div class="content">
+    <h1>Timeless Fashion for the<br />Modern Wardrobe</h1>
+    <p>
+      Discover timeless fashion for Men, Women, and Kids — crafted for
+      comfort, designed for confidence.
+    </p>
+    <button class="explore-btn"><a th:href="@{/shop}"
+                                   th:classappend="${currentPath != null && currentPath.contains('/shop')} ? 'active' : ''">EXPLORE THE COLLECTION</a></button>
   </div>
+</section>
 
-  <!-- PROMO BAR -->
-  <div class="promo-bar">Get 15% off on your first order</div>
-
-  <!-- HERO SECTION -->
-  <section class="brand-image">
-    <div class="overlay"></div>
-    <div class="content">
-      <h1>Timeless Fashion for the<br />Modern Wardrobe</h1>
-      <p>
-        Discover timeless fashion for Men, Women, and Kids – crafted for
-        comfort, designed for confidence.
-      </p>
-      <button class="explore-btn"><a th:href="@{/shop}"
-        th:classappend="${currentPath != null && currentPath.contains('/shop')} ? 'active' : ''">EXPLORE THE COLLECTION</a></button>
+<!-- MAIN -->
+<main class="container">
+  <section class="new-arrivals d-flex gap-3 align-items-center pt-5 pb-5">
+    <div class="w-50">
+      <div>
+        <h1 class="fw-bold">New Arrivals</h1>
+      </div>
+      <div>
+        <p class="text-secondary">
+          Be the first to wear this season's latest looks. Handpicked and
+          freshly styled.
+        </p>
+      </div>
+    </div>
+    <div class="w-50 text-end">
+      <button class="new-arrivals-btn">See What's new</button>
     </div>
   </section>
 
-  <!-- MAIN -->
-  <main class="container">
-    <section class="new-arrivals d-flex gap-3 align-items-center pt-5 pb-5">
-      <div class="w-50">
-        <div>
-          <h1 class="fw-bold">New Arrivals</h1>
-        </div>
-        <div>
-          <p class="text-secondary">
-            Be the first to wear this season's latest looks. Handpicked and
-            freshly styled.
-          </p>
+  <div class="products-grid">
+    <div class="product-card" th:each="p : ${products}">
+      <div class="product-image">
+        <img th:src="${p.primaryImageUrl}" th:alt="${p.title}" />
+        <a class="product-link-overlay" th:href="@{'/product/' + ${p.id}}" title="View details"></a>
+        <div class="product-actions">
+          <button class="action-btn" title="Add to Cart" th:onclick="'addToCart(' + ${p.id} + ')'">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+          </button>
+          <button class="action-btn" title="Quick View" th:onclick="'showQuickView(' + ${p.id} + ')'">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </button>
         </div>
       </div>
-      <div class="w-50 text-end">
-        <button class="new-arrivals-btn">See What's new</button>
-      </div>
-    </section>
-    <div class="products-grid">
-      <div class="product-card" th:each="p : ${products}">
-        <div class="product-image">
-          <img th:src="${p.primaryImageUrl}" th:alt="${p.title}" />
-          <a class="product-link-overlay" th:href="@{'/product/' + ${p.id}}" title="Xem chi tiết"></a>
-          <div class="product-actions">
-            <button class="action-btn" title="Add to Cart" th:onclick="'addToCart(' + ${p.id} + ')'">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <path d="M16 10a4 4 0 0 1-8 0"></path>
-              </svg>
-            </button>
-            <button class="action-btn" title="Quick View" th:onclick="'showQuickView(' + ${p.id} + ')'">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                <circle cx="12" cy="12" r="3"></circle>
-              </svg>
-            </button>
-          </div>
-        </div>
-        <div class="product-info">
-          <h3 class="product-title" th:text="${p.title}">Tên sản phẩm</h3>
-          <p class="product-category" th:text="${p.category != null ? p.category.name : 'Uncategorized'}"></p>
+      <div class="product-info">
+        <h3 class="product-title" th:text="${p.title}">Product name</h3>
+        <p class="product-category" th:text="${p.category != null ? p.category.name : 'Uncategorized'}"></p>
 
-          <div class="product-price">
+        <div class="product-price">
             <span class="price-current"
-              th:text="${#numbers.formatDecimal(p.basePrice, 0, 'COMMA', 2, 'POINT')} + ' ₫'">Giá</span>
-          </div>
-          <div class="product-sizes" th:if="${p.variants != null}">
-            <button class="size-btn" th:each="v, iter : ${p.variants}" th:text="'Size'"
-              th:data-attributes="${v.attributeJson}" th:classappend="${iter.index == 0} ? ' active' : ''">
-            </button>
-          </div>
+                  th:text="${#numbers.formatDecimal(p.basePrice, 0, 'COMMA', 2, 'POINT')} + ' ₫'">Price</span>
+        </div>
 
-          <div class="product-colors" th:if="${p.variants != null}">
-            <div class="color-option" th:each="v, iter : ${p.variants}" th:data-attributes="${v.attributeJson}"
-              th:classappend="${iter.index == 0} ? ' active' : ''">
-            </div>
+        <!-- Sizes section -->
+        <div class="product-sizes" th:if="${p.variants != null and !p.variants.isEmpty()}">
+          <span class="sizes-label">Sizes:</span>
+          <div class="sizes-list" th:attr="data-product-id=${p.id}">
+            <!-- Sizes will be populated by JavaScript -->
           </div>
+        </div>
+
+        <!-- Colors section -->
+        <div class="product-colors" th:if="${p.variants != null and !p.variants.isEmpty()}">
+          <span class="colors-label">Colors:</span>
+          <div class="colors-list" th:attr="data-product-id=${p.id}">
+            <!-- Colors will be populated by JavaScript -->
+          </div>
+        </div>
+
+        <!-- Hidden variants data for JavaScript -->
+        <div class="variants-data" style="display: none;" th:attr="data-product-id=${p.id}">
+            <span th:each="v : ${p.variants}"
+                  th:attr="data-variant-id=${v.id},
+                           data-sku=${v.sku},
+                           data-price=${v.price},
+                           data-stock=${v.stock},
+                           data-attributes=${v.attributeJson}"
+                  class="variant-item"></span>
         </div>
       </div>
     </div>
-  </main>
+  </div>
+</main>
 
-  <!-- FOOTER using Thymeleaf fragment -->
-  <div th:replace="~{footer :: footer}"></div>
+<!-- FOOTER using Thymeleaf fragment -->
+<div th:replace="~{footer :: footer}"></div>
 
-  <!-- BUY NOW, CUSTOMIZE BUTTONS -->
-  <!-- Buy Now -->
+<!-- BUY NOW, CUSTOMIZE BUTTONS -->
+<a th:href="@{/shop}" class="buy-now-btn">
+  <i class="bi bi-cart-fill"></i> Buy Now
+</a>
 
-  <a th:href="@{/shop}" class="buy-now-btn">
-    <i class="bi bi-cart-fill"></i> Buy Now
-  </a>
+<a href="#" class="customize-btn">
+  <i class="bi bi-sliders"></i>
+  <span>Customize</span>
+</a>
 
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Process each product card
+    document.querySelectorAll(".product-card").forEach(card => {
+      const variantsDataEl = card.querySelector(".variants-data");
+      if (!variantsDataEl) return;
 
-  <!-- Customize -->
-  <a href="#" class="customize-btn">
-    <i class="bi bi-sliders"></i>
-    <span>Customize</span>
-  </a>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      // Sizes
-      document.querySelectorAll(".size-btn").forEach(btn => {
-        const attrs = JSON.parse(btn.dataset.attributes);
-        btn.textContent = attrs.size;          // hiển thị size
-        btn.style.background = attrs.color;    // optional: màu nền theo color
+      const variantItems = variantsDataEl.querySelectorAll(".variant-item");
+      if (variantItems.length === 0) return;
+
+      // Extract all variants
+      const variants = [];
+      variantItems.forEach(item => {
+        const attributesStr = item.getAttribute("data-attributes");
+        if (attributesStr) {
+          try {
+            const attributes = JSON.parse(attributesStr);
+            variants.push({
+              id: item.getAttribute("data-variant-id"),
+              sku: item.getAttribute("data-sku"),
+              price: item.getAttribute("data-price"),
+              stock: item.getAttribute("data-stock"),
+              attributes: attributes
+            });
+          } catch (e) {
+            console.error("Error parsing variant attributes:", e);
+          }
+        }
       });
 
-      // Colors
-      document.querySelectorAll(".color-option").forEach(div => {
-        const attrs = JSON.parse(div.dataset.attributes);
-        div.style.background = attrs.color;
+      if (variants.length === 0) return;
+
+      // Extract distinct sizes and colors
+      const sizesMap = new Map(); // Use Map to maintain order
+      const colorsMap = new Map();
+
+      variants.forEach(v => {
+        if (v.attributes.size) {
+          sizesMap.set(v.attributes.size, true);
+        }
+        if (v.attributes.color) {
+          colorsMap.set(v.attributes.color, true);
+        }
       });
+
+      const sizes = Array.from(sizesMap.keys());
+      const colors = Array.from(colorsMap.keys());
+
+      // Render sizes
+      const sizesListEl = card.querySelector(".sizes-list");
+      if (sizesListEl && sizes.length > 0) {
+        sizes.forEach((size, idx) => {
+          const sizeBtn = document.createElement("button");
+          sizeBtn.className = "size-btn";
+          if (idx === 0) sizeBtn.classList.add("active");
+          sizeBtn.textContent = size;
+          sizeBtn.setAttribute("data-size", size);
+          sizesListEl.appendChild(sizeBtn);
+
+          // Add click handler
+          sizeBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            card.querySelectorAll(".size-btn").forEach(btn => btn.classList.remove("active"));
+            sizeBtn.classList.add("active");
+          });
+        });
+      }
+
+      // Render colors
+      const colorsListEl = card.querySelector(".colors-list");
+      if (colorsListEl && colors.length > 0) {
+        colors.forEach((color, idx) => {
+          const colorDiv = document.createElement("div");
+          colorDiv.className = "color-option";
+          if (idx === 0) colorDiv.classList.add("active");
+          colorDiv.style.backgroundColor = color;
+          colorDiv.setAttribute("data-color", color);
+          colorDiv.setAttribute("data-color-name", color);
+          colorDiv.title = color;
+          colorsListEl.appendChild(colorDiv);
+
+          // Add click handler
+          colorDiv.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            card.querySelectorAll(".color-option").forEach(opt => opt.classList.remove("active"));
+            colorDiv.classList.add("active");
+          });
+        });
+      }
     });
-  </script>
-  <!-- JS links using Thymeleaf -->
-  <script th:src="@{/js/index.js}"></script>
-  <script th:src="@{/js/header.js}"></script>
-  <script th:src="@{/js/theme-customizer.js}"></script>
+  });
+</script>
+
+<!-- JS links using Thymeleaf -->
+<script th:src="@{/js/index.js}"></script>
+<script th:src="@{/js/header.js}"></script>
+<script th:src="@{/js/theme-customizer.js}"></script>
 </body>
 
 </html>
