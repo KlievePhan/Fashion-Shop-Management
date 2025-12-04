@@ -45,17 +45,17 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         System.out.println("User role from DB: " + roleCode);
 
         if ("ROLE_ADMIN".equals(roleCode)) {
-            response.sendRedirect(contextPath + "/admin");
+            response.sendRedirect(contextPath + "/admin?loginSuccess=true");
             return;
         }
 
         if ("ROLE_STAFF".equals(roleCode)) {
-            response.sendRedirect(contextPath + "/staff");
+            response.sendRedirect(contextPath + "/staff?loginSuccess=true");
             return;
         }
 
         if (Boolean.TRUE.equals(user.getProfileCompleted())) {
-            response.sendRedirect(contextPath + "/");
+            response.sendRedirect(contextPath + "/shop?loginSuccess=true");
         } else {
             response.sendRedirect(contextPath + "/profile/setup");
         }

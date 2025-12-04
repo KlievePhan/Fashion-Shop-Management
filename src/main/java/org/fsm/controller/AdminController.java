@@ -61,7 +61,21 @@ public class AdminController {
         model.addAttribute("users", users);
 
         Long currentUserId = sessionService.getCurrentUserId(session);
-        User currentUser = userRepository.findById(currentUserId).orElse(null);
+        User currentUser = null;
+        
+        // Fallback: nếu session chưa có userId, lấy từ Spring Security authentication
+        if (currentUserId == null) {
+            org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
+                String email = auth.getName();
+                currentUser = userRepository.findByEmail(email).orElse(null);
+                if (currentUser != null) {
+                    currentUserId = currentUser.getId();
+                }
+            }
+        } else {
+            currentUser = userRepository.findById(currentUserId).orElse(null);
+        }
 
         List<Role> roles = roleRepository.findAllByCodeIn(List.of("ROLE_USER", "ROLE_STAFF"));
         model.addAttribute("roles", roles);

@@ -1839,6 +1839,23 @@
                 btn.textContent = originalText;
             }
         }
+
+        // Check for login success on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('loginSuccess') === 'true') {
+                setTimeout(() => {
+                    showNotification('Welcome Back, Admin! 🎉 You have successfully logged in.', 'success');
+                }, 300);
+                
+                // Remove param from URL after showing notification
+                setTimeout(() => {
+                    const url = new URL(window.location);
+                    url.searchParams.delete('loginSuccess');
+                    window.history.replaceState({}, '', url);
+                }, 4500);
+            }
+        });
     </script>
 </body>
 

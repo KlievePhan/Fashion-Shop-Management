@@ -303,6 +303,173 @@
       margin-top: 6px;
       display: block;
     }
+
+    /* Toast Notification Styles */
+    .toast-notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      padding: 20px 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3);
+      z-index: 10000;
+      animation: slideInToast 0.4s ease-out;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      min-width: 350px;
+      max-width: 500px;
+      font-family: 'Lato', sans-serif;
+    }
+
+    .toast-notification.error {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      box-shadow: 0 10px 40px rgba(239, 68, 68, 0.3);
+    }
+
+    .toast-notification .toast-icon {
+      font-size: 28px;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    .toast-notification .toast-content {
+      flex: 1;
+    }
+
+    .toast-notification .toast-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .toast-notification .toast-message {
+      font-size: 14px;
+      opacity: 0.95;
+      line-height: 1.4;
+    }
+
+    .toast-notification.hiding {
+      animation: slideOutToast 0.3s ease-in forwards;
+    }
+
+    @keyframes slideInToast {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOutToast {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+    }
+
+    /* Success Modal */
+    .success-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 10001;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .success-modal.active {
+      display: flex;
+    }
+
+    .success-modal-content {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 450px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      animation: scaleIn 0.3s ease-out;
+    }
+
+    .success-modal-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 40px;
+      color: white;
+    }
+
+    .success-modal-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 12px;
+    }
+
+    .success-modal-message {
+      font-size: 16px;
+      color: #6b7280;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+
+    .success-modal-button {
+      background: #dc2626;
+      color: white;
+      border: none;
+      padding: 14px 30px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .success-modal-button:hover {
+      background: #991b1b;
+      transform: translateY(-2px);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes scaleIn {
+      from {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
   </style>
 </head>
 
@@ -329,11 +496,8 @@
         </div>
 
         <div class="message error" th:if="${loginError}" style="display:block" th:text="${loginError}"></div>
-        <div class="message success" th:if="${param.logout}" style="display:block">Logged out successfully</div>
         <div class="message success" th:if="${param.resetSuccess}" style="display:block">Password reset successfully.
           Please login.</div>
-        <div class="message success" th:if="${param.success == 'registered'}" style="display:block">Registration
-          successful! Please login.</div>
 
         <form method="post" th:object="${loginRequest}">
           <div class="form-group">
@@ -386,9 +550,6 @@
         </div>
 
         <div class="message error" th:if="${registerError}" style="display:block" th:text="${registerError}"></div>
-        <div class="message success" id="registerSuccess" style="display:none;">
-          Registration successful! Redirecting to login...
-        </div>
 
         <form id="registerFormElement" th:action="@{/register}" method="post" onsubmit="return validatePassword()">
           <!-- Full Name -->
@@ -455,6 +616,18 @@
   <!-- FOOTER -->
   <div th:replace="~{footer :: footer}"></div>
 
+  <!-- Success Modal -->
+  <div id="successModal" class="success-modal">
+    <div class="success-modal-content">
+      <div class="success-modal-icon">✓</div>
+      <div class="success-modal-title" id="successModalTitle">Registration Successful!</div>
+      <div class="success-modal-message" id="successModalMessage">
+        Your account has been created successfully. Please log in to continue shopping.
+      </div>
+      <button class="success-modal-button" onclick="closeSuccessModal()">Close</button>
+    </div>
+  </div>
+
   <script>
     function switchForm(form) {
       document.querySelectorAll('.toggle-form').forEach(f => f.classList.remove('active'));
@@ -466,7 +639,7 @@
     // Auto-switch on URL params
     document.addEventListener('DOMContentLoaded', () => {
       const url = new URL(window.location);
-      if (url.pathname.includes('signup') || url.searchParams.get('success') === 'registered') {
+      if (url.pathname.includes('signup')) {
         switchForm('register');
       }
     });
@@ -564,16 +737,107 @@
       return true;
     }
 
-    // Success alert
+    // Toast Notification Function
+    function showToast(title, message, type = 'success') {
+      const existingToast = document.querySelector('.toast-notification');
+      if (existingToast) existingToast.remove();
+
+      const toast = document.createElement('div');
+      toast.className = `toast-notification ${type}`;
+      
+      const icon = type === 'success' ? '✓' : '✕';
+
+      toast.innerHTML = `
+        <span class="toast-icon">${icon}</span>
+        <div class="toast-content">
+          <div class="toast-title">${title}</div>
+          <div class="toast-message">${message}</div>
+        </div>
+      `;
+
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('hiding');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    // Success Modal Function
+    function showSuccessModal(title, message, callback) {
+      document.getElementById('successModalTitle').textContent = title;
+      document.getElementById('successModalMessage').textContent = message;
+      
+      const modal = document.getElementById('successModal');
+      modal.classList.add('active');
+
+      window.successModalCallback = callback;
+    }
+
+    function closeSuccessModal() {
+      const modal = document.getElementById('successModal');
+      if (modal) {
+        modal.classList.remove('active');
+        if (window.successModalCallback) {
+          window.successModalCallback();
+          window.successModalCallback = null;
+        }
+      }
+    }
+
+    // Success notifications
     document.addEventListener('DOMContentLoaded', () => {
       const urlParams = new URLSearchParams(window.location.search);
+      
+      // Registration successful
       if (urlParams.get('success') === 'registered') {
-        const successDiv = document.getElementById('registerSuccess');
-        if (successDiv) successDiv.style.display = 'block';
+        // Switch to login form
+        switchForm('login');
+        
+        // Show toast notification immediately
         setTimeout(() => {
-          alert('Account created successfully!\nYou can now log in.');
-          switchForm('login');
+          showToast(
+            'Registration Successful!',
+            'Your account has been created successfully. You can now log in.',
+            'success'
+          );
         }, 300);
+
+        // Show beautiful modal after 0.6 seconds
+        setTimeout(() => {
+          showSuccessModal(
+            'Welcome! 🎉',
+            'Your account has been created successfully. Please log in to continue shopping.',
+            () => {
+              // Remove param from URL when modal is closed
+              const url = new URL(window.location);
+              url.searchParams.delete('success');
+              window.history.replaceState({}, '', url);
+            }
+          );
+        }, 600);
+      }
+      
+      // Logout successful
+      if (urlParams.get('logout') === 'true') {
+        // Switch to login form
+        switchForm('login');
+        
+        // Show toast notification
+        setTimeout(() => {
+          showToast(
+            'Logged Out Successfully!',
+            'You have been logged out. Thank you for visiting!',
+            'success'
+          );
+        }, 300);
+        
+        // Remove param from URL after showing toast
+        setTimeout(() => {
+          const url = new URL(window.location);
+          url.searchParams.delete('logout');
+          window.history.replaceState({}, '', url);
+        }, 4500);
       }
     });
   </script>
