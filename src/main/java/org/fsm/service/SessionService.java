@@ -61,6 +61,11 @@ public class SessionService {
         return "ROLE_ADMIN".equals(role);
     }
 
+    public boolean isStaff(HttpSession session) {
+        String role = getCurrentUserRole(session);
+        return "ROLE_STAFF".equals(role);
+    }
+
     public void logout(HttpSession session) {
         if (session != null) {
             session.invalidate();
