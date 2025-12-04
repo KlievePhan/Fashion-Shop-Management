@@ -2,6 +2,8 @@ package org.fsm.repository;
 
 import org.fsm.entity.Blog;
 import org.fsm.entity.Blog.BlogStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -52,6 +54,32 @@ public interface BlogRepository extends JpaRepository<Blog, Long> {
 
     // Lấy blog theo creator - cho Staff
     List<Blog> findByCreatedByOrderByCreatedAtDesc(Long createdBy);
+    
+    // Phân trang: Lấy blog theo creator với Pageable
+    Page<Blog> findByCreatedByOrderByCreatedAtDesc(Long createdBy, Pageable pageable);
+    
+    // Phân trang: Lấy blog theo status với Pageable
+    Page<Blog> findByStatusOrderByCreatedAtDesc(BlogStatus status, Pageable pageable);
+    
+    // Phân trang: Lấy tất cả blog với Pageable
+    Page<Blog> findAllByOrderByCreatedAtDesc(Pageable pageable);
+    
+    // Phân trang: Lấy blog theo creator và status
+    Page<Blog> findByCreatedByAndStatusOrderByCreatedAtDesc(Long createdBy, BlogStatus status, Pageable pageable);
+    
+    // Phân trang: Tìm kiếm blog theo title (cho Staff)
+    @Query("SELECT b FROM Blog b WHERE b.createdBy = :createdBy AND " +
+            "(LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(b.excerpt) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+            "ORDER BY b.createdAt DESC")
+    Page<Blog> searchBlogsByCreator(@Param("createdBy") Long createdBy, @Param("keyword") String keyword, Pageable pageable);
+    
+    // Phân trang: Tìm kiếm blog theo title (cho Admin)
+    @Query("SELECT b FROM Blog b WHERE " +
+            "(LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(b.excerpt) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+            "ORDER BY b.createdAt DESC")
+    Page<Blog> searchAllBlogs(@Param("keyword") String keyword, Pageable pageable);
 
     // Lấy blog pending review - cho Manager/Admin
     List<Blog> findByStatusOrderByCreatedAtAsc(BlogStatus status);

@@ -32,18 +32,31 @@ public class BlogController {
         return "blog";
     }
 
-    // Hiển thị chi tiết một blog
-    @GetMapping("/{id}")
-    public String blogDetail(@PathVariable Long id, Model model) {
-        Blog blog = blogService.getBlogByIdAndIncrementView(id)
-                .orElseThrow(() -> new RuntimeException("Blog not found"));
+    // Hiển thị chi tiết một blog (theo ID hoặc slug)
+    @GetMapping({"/{id}", "/slug/{slug}"})
+    public String blogDetail(
+            @PathVariable(required = false) Long id,
+            @PathVariable(required = false) String slug,
+            Model model) {
+        final Blog blog;
+        
+        if (slug != null) {
+            blog = blogService.getBlogBySlugAndIncrementView(slug)
+                    .orElseThrow(() -> new RuntimeException("Blog not found"));
+        } else if (id != null) {
+            blog = blogService.getBlogByIdAndIncrementView(id)
+                    .orElseThrow(() -> new RuntimeException("Blog not found"));
+        } else {
+            throw new RuntimeException("Blog not found");
+        }
 
         model.addAttribute("blog", blog);
 
         // Lấy các blog liên quan (cùng category)
+        final Long blogId = blog.getId();
         List<Blog> relatedBlogs = blogService.getBlogsByCategory(blog.getCategory())
                 .stream()
-                .filter(b -> !b.getId().equals(id))
+                .filter(b -> !b.getId().equals(blogId))
                 .limit(3)
                 .toList();
         model.addAttribute("relatedBlogs", relatedBlogs);

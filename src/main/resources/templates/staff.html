@@ -100,6 +100,10 @@
                 <span class="icon">📦</span>
                 Orders
             </a>
+            <a href="#" class="nav-item" data-section="blogs">
+                <span class="icon">📝</span>
+                Blogs
+            </a>
         </nav>
     </aside>
 
@@ -141,6 +145,16 @@
                 </div>
             </div>
         </header>
+
+        <!-- Flash Messages (Global) -->
+        <div th:if="${success}" class="toast-notification" style="position: fixed; top: 20px; right: 20px; z-index: 10000;">
+            <span class="toast-icon">✓</span>
+            <span class="toast-message" th:text="${success}"></span>
+        </div>
+        <div th:if="${error}" class="toast-notification error" style="position: fixed; top: 20px; right: 20px; z-index: 10000;">
+            <span class="toast-icon">✕</span>
+            <span class="toast-message" th:text="${error}"></span>
+        </div>
 
         <!-- Staff Dashboard Section -->
         <section id="dashboard" class="content-section active">
@@ -330,6 +344,231 @@
                 </div>
             </div>
         </section>
+
+        <!-- Blogs Section -->
+        <section id="blogs" class="content-section">
+            <!-- Flash Messages -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert" style="margin: 20px;">
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert" style="margin: 20px;">
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            
+            <div style="display: flex; gap: 20px; min-height: calc(100vh - 200px);">
+                <!-- Left Sidebar - Status Filter -->
+                <aside style="width: 250px; background: #f8f9fa; border-radius: 8px; padding: 20px; height: fit-content; position: sticky; top: 20px;">
+                    <h3 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 600;">Posts</h3>
+                    <nav style="display: flex; flex-direction: column; gap: 8px;">
+                        <a th:href="@{/staff(tab='blogs')}" 
+                           th:classappend="${currentBlogStatus == null or currentBlogStatus == ''} ? 'blog-filter-active'"
+                           style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-radius: 6px; text-decoration: none; color: #333; transition: all 0.2s;"
+                           onmouseover="this.style.background='#e9ecef'"
+                           onmouseout="this.style.background='transparent'">
+                            <span>All</span>
+                            <span style="background: #dee2e6; padding: 2px 8px; border-radius: 12px; font-size: 12px;" 
+                                  th:text="${totalBlogs}">0</span>
+                        </a>
+                        <a th:href="@{/staff(tab='blogs', status='PUBLISHED')}" 
+                           th:classappend="${currentBlogStatus == 'PUBLISHED'} ? 'blog-filter-active'"
+                           style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-radius: 6px; text-decoration: none; color: #333; transition: all 0.2s;"
+                           onmouseover="this.style.background='#e9ecef'"
+                           onmouseout="this.style.background='transparent'">
+                            <span>Published</span>
+                            <span style="background: #dee2e6; padding: 2px 8px; border-radius: 12px; font-size: 12px;" 
+                                  th:text="${publishedBlogCount}">0</span>
+                        </a>
+                        <a th:href="@{/staff(tab='blogs', status='DRAFT')}" 
+                           th:classappend="${currentBlogStatus == 'DRAFT'} ? 'blog-filter-active'"
+                           style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-radius: 6px; text-decoration: none; color: #333; transition: all 0.2s;"
+                           onmouseover="this.style.background='#e9ecef'"
+                           onmouseout="this.style.background='transparent'">
+                            <span>Draft</span>
+                            <span style="background: #dee2e6; padding: 2px 8px; border-radius: 12px; font-size: 12px;" 
+                                  th:text="${draftBlogCount}">0</span>
+                        </a>
+                        <a th:href="@{/staff(tab='blogs', status='PENDING_REVIEW')}" 
+                           th:classappend="${currentBlogStatus == 'PENDING_REVIEW'} ? 'blog-filter-active'"
+                           style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-radius: 6px; text-decoration: none; color: #333; transition: all 0.2s;"
+                           onmouseover="this.style.background='#e9ecef'"
+                           onmouseout="this.style.background='transparent'">
+                            <span>Pending</span>
+                            <span style="background: #dee2e6; padding: 2px 8px; border-radius: 12px; font-size: 12px;" 
+                                  th:text="${pendingBlogCount}">0</span>
+                        </a>
+                        <a th:href="@{/staff(tab='blogs', status='PENDING_DELETE')}" 
+                           th:classappend="${currentBlogStatus == 'PENDING_DELETE'} ? 'blog-filter-active'"
+                           style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-radius: 6px; text-decoration: none; color: #333; transition: all 0.2s;"
+                           onmouseover="this.style.background='#e9ecef'"
+                           onmouseout="this.style.background='transparent'">
+                            <span>Pending Delete</span>
+                            <span style="background: #dee2e6; padding: 2px 8px; border-radius: 12px; font-size: 12px;">0</span>
+                        </a>
+                    </nav>
+                </aside>
+
+                <!-- Main Content Area -->
+                <div style="flex: 1;">
+                    <!-- Header with Search and Create Button -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="margin: 0;">All posts</h2>
+                        <button class="btn btn-primary" id="addBlogBtn" style="background: #28a745; border: none; padding: 10px 20px; border-radius: 6px; color: white; cursor: pointer; font-weight: 500;">
+                            + CREATE A NEW POST
+                        </button>
+                    </div>
+
+                    <!-- Search and Filter Bar -->
+                    <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+                        <form method="get" th:action="@{/staff}" style="flex: 1; display: flex; gap: 12px;">
+                            <input type="hidden" name="tab" value="blogs">
+                            <input type="hidden" name="status" th:value="${currentBlogStatus}">
+                            <input type="text" name="keyword" 
+                                   th:value="${blogKeyword}"
+                                   placeholder="Search by title" 
+                                   style="flex: 1; padding: 10px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                            <select name="category" style="padding: 10px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background: white;">
+                                <option value="">All categories</option>
+                                <option value="TRENDS">TRENDS</option>
+                                <option value="STYLE TIPS">STYLE TIPS</option>
+                                <option value="ACCESSORIES">ACCESSORIES</option>
+                                <option value="INSPIRATION">INSPIRATION</option>
+                                <option value="SEASONAL">SEASONAL</option>
+                                <option value="BEAUTY">BEAUTY</option>
+                            </select>
+                            <button type="submit" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer;">Search</button>
+                        </form>
+                    </div>
+
+                    <!-- Blog Posts List - Card Layout -->
+                    <div id="blogsList" style="display: flex; flex-direction: column; gap: 16px;">
+                        <div th:each="blog : ${blogs}" 
+                             th:id="'blog-card-' + ${blog.id}"
+                             style="display: flex; gap: 16px; background: white; border: 1px solid #e9ecef; border-radius: 8px; padding: 16px; transition: box-shadow 0.2s;"
+                             onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'"
+                             onmouseout="this.style.boxShadow='none'">
+                            <!-- Thumbnail -->
+                            <div style="width: 120px; height: 80px; background: #f8f9fa; border-radius: 6px; overflow: hidden; flex-shrink: 0;">
+                                <img th:if="${blog.imageUrl != null and !blog.imageUrl.isEmpty()}" 
+                                     th:src="${blog.imageUrl}" 
+                                     alt="Blog thumbnail"
+                                     style="width: 100%; height: 100%; object-fit: cover;">
+                                <div th:if="${blog.imageUrl == null or blog.imageUrl.isEmpty()}" 
+                                     style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #adb5bd; font-size: 24px;">
+                                    📝
+                                </div>
+                            </div>
+                            
+                            <!-- Content -->
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                                    <div style="flex: 1;">
+                                        <span class="badge" 
+                                              th:classappend="${blog.status.name() == 'PUBLISHED' ? 'success' : 
+                                                              (blog.status.name() == 'PENDING_REVIEW' ? 'warning' : 
+                                                              (blog.status.name() == 'PENDING_DELETE' ? 'danger' :
+                                                              (blog.status.name() == 'DRAFT' ? 'info' : 'danger')))}"
+                                              th:text="${blog.status}"
+                                              style="display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; margin-bottom: 8px;">
+                                        </span>
+                                        <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 600; color: #212529;">
+                                            <span th:text="${blog.title}"></span>
+                                        </h3>
+                                    </div>
+                                    <div style="display: flex; gap: 8px; align-items: center; margin-left: 16px;">
+                                        <a th:href="@{/staff/blog/view/{id}(id=${blog.id})}"
+                                           style="padding: 6px 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; text-decoration: none; display: inline-block;">
+                                            VIEW
+                                        </a>
+                                        <button type="button" 
+                                                class="btn btn-sm btn-primary"
+                                                th:onclick="'editBlog(' + ${blog.id} + ')'"
+                                                style="padding: 6px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                                            EDIT
+                                        </button>
+                                        <button type="button" 
+                                                th:if="${blog.status.name() == 'DRAFT'}"
+                                                class="btn btn-sm btn-warning"
+                                                th:onclick="'submitBlogForReview(' + ${blog.id} + ', this)'"
+                                                style="padding: 6px 16px; background: #ffc107; color: #212529; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                                            SUBMIT
+                                        </button>
+                                        <button type="button" 
+                                                th:if="${blog.status.name() == 'PUBLISHED'}"
+                                                class="btn btn-sm btn-danger"
+                                                th:onclick="'requestDeleteBlog(' + ${blog.id} + ', this)'"
+                                                style="padding: 6px 16px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                                            DELETE
+                                        </button>
+                                    </div>
+                                </div>
+                                <p style="margin: 0 0 8px 0; color: #6c757d; font-size: 13px; line-height: 1.5; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;"
+                                   th:text="${blog.excerpt}">
+                                </p>
+                                <div style="display: flex; gap: 16px; font-size: 12px; color: #6c757d;">
+                                    <span th:if="${blog.createdAt != null}">
+                                        <span th:text="${#temporals.format(blog.createdAt, 'dd/MM/yyyy')}"></span>
+                                    </span>
+                                    <span th:if="${blog.viewCount != null}">
+                                        <span th:text="${blog.viewCount}"></span> views
+                                    </span>
+                                    <span th:if="${blog.category != null}">
+                                        <span th:text="${blog.category}"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Empty State -->
+                        <div th:if="${blogs == null or blogs.isEmpty()}" 
+                             style="text-align: center; padding: 60px 20px; background: white; border-radius: 8px; border: 1px solid #e9ecef;">
+                            <div style="font-size: 48px; margin-bottom: 16px;">📝</div>
+                            <p style="font-size: 18px; color: #6c757d; margin: 0;">No blog posts found</p>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div th:if="${blogTotalPages != null and blogTotalPages > 1}" 
+                         style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 30px;">
+                        <a th:href="@{/staff(tab='blogs', status=${currentBlogStatus}, keyword=${blogKeyword}, blogPage=${blogCurrentPage - 1})}"
+                           th:if="${blogCurrentPage > 0}"
+                           style="padding: 8px 12px; border: 1px solid #dee2e6; border-radius: 4px; text-decoration: none; color: #007bff;">
+                            ← Previous
+                        </a>
+                        <span th:each="i : ${#numbers.sequence(0, (blogTotalPages > 0 ? blogTotalPages - 1 : 0))}"
+                              th:if="${i >= blogCurrentPage - 2 and i <= blogCurrentPage + 2}">
+                            <a th:href="@{/staff(tab='blogs', status=${currentBlogStatus}, keyword=${blogKeyword}, blogPage=${i})}"
+                               th:classappend="${i == blogCurrentPage} ? 'pagination-active'"
+                               th:text="${i + 1}"
+                               style="padding: 8px 12px; border: 1px solid #dee2e6; border-radius: 4px; text-decoration: none; color: #007bff; margin: 0 4px; display: inline-block;">
+                            </a>
+                        </span>
+                        <a th:href="@{/staff(tab='blogs', status=${currentBlogStatus}, keyword=${blogKeyword}, blogPage=${blogCurrentPage + 1})}"
+                           th:if="${blogCurrentPage < blogTotalPages - 1}"
+                           style="padding: 8px 12px; border: 1px solid #dee2e6; border-radius: 4px; text-decoration: none; color: #007bff;">
+                            Next →
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                .blog-filter-active {
+                    background: #007bff !important;
+                    color: white !important;
+                }
+                .blog-filter-active span {
+                    background: rgba(255,255,255,0.2) !important;
+                    color: white !important;
+                }
+                .pagination-active {
+                    background: #007bff !important;
+                    color: white !important;
+                    border-color: #007bff !important;
+                }
+            </style>
+        </section>
     </main>
 
     <!-- Brand Modal -->
@@ -487,6 +726,100 @@
         </div>
     </div>
 
+    <!-- BLOG MODAL -->
+    <div id="blogModal" class="modal">
+        <div class="modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h2 id="blogModalTitle">Create New Blog</h2>
+                <button class="close-modal" onclick="closeBlogModal()">&times;</button>
+            </div>
+            <form id="blogForm" onsubmit="handleSaveBlog(event)">
+                <input type="hidden" id="blogId" name="id">
+                
+                <div class="form-group">
+                    <label>Title *</label>
+                    <input type="text" id="blogTitle" name="title" required maxlength="200" 
+                           class="form-control" placeholder="Enter blog title">
+                </div>
+
+                <div class="form-group">
+                    <label>Excerpt *</label>
+                    <textarea id="blogExcerpt" name="excerpt" rows="3" required maxlength="500" 
+                              class="form-control" placeholder="Short description of the blog"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Content *</label>
+                    <textarea id="blogContent" name="content" rows="10" required 
+                              class="form-control" placeholder="Blog content (HTML supported)"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select id="blogCategory" name="category" required class="form-control">
+                            <option value="">Select Category</option>
+                            <option value="TRENDS">TRENDS</option>
+                            <option value="STYLE TIPS">STYLE TIPS</option>
+                            <option value="ACCESSORIES">ACCESSORIES</option>
+                            <option value="INSPIRATION">INSPIRATION</option>
+                            <option value="SEASONAL">SEASONAL</option>
+                            <option value="BEAUTY">BEAUTY</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Read Time (minutes)</label>
+                        <input type="number" id="blogReadTime" name="readTime" min="1" 
+                               class="form-control" placeholder="e.g., 5">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Image URL</label>
+                    <input type="url" id="blogImageUrl" name="imageUrl" maxlength="500" 
+                           class="form-control" placeholder="https://example.com/image.jpg">
+                </div>
+
+                <div class="form-group">
+                    <label>Author</label>
+                    <input type="text" id="blogAuthor" name="author" maxlength="200" 
+                           class="form-control" placeholder="Author name">
+                </div>
+
+                <div class="form-group">
+                    <label>Tags (comma-separated)</label>
+                    <input type="text" id="blogTags" name="tags" maxlength="500" 
+                           class="form-control" placeholder="tag1, tag2, tag3">
+                </div>
+
+                <div class="form-group">
+                    <label>Meta Description (SEO)</label>
+                    <textarea id="blogMetaDescription" name="metaDescription" rows="2" maxlength="160" 
+                              class="form-control" placeholder="SEO description (max 160 characters)"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Slug (URL-friendly)</label>
+                    <input type="text" id="blogSlug" name="slug" maxlength="200" 
+                           class="form-control" placeholder="url-friendly-slug (auto-generated if empty)">
+                    <small class="form-text text-muted">Leave empty to auto-generate from title</small>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-check">
+                        <input type="checkbox" id="blogIsFeatured" name="isFeatured" class="form-check-input">
+                        <label class="form-check-label" for="blogIsFeatured">Featured Blog</label>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeBlogModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Blog</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script th:src="@{/js/staff.js}"></script>
 
     <script th:inline="javascript">
@@ -535,11 +868,16 @@
             const sections = document.querySelectorAll('.content-section');
             const pageTitle = document.getElementById('pageTitle');
 
-            // Lấy tab đã lưu từ localStorage, mặc định là dashboard
-            const activeSectionId = localStorage.getItem('staffActiveTab') || 'dashboard';
+            // Lấy tab từ URL parameter - ƯU TIÊN DUY NHẤT
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabFromUrl = urlParams.get('tab');
+            
+            // CHỈ lấy từ URL parameter, nếu không có thì mặc định dashboard
+            // KHÔNG sử dụng localStorage khi reload để tránh nhảy vào tab sai
+            let activeSectionId = tabFromUrl || 'dashboard';
 
             // Hàm kích hoạt tab
-            function activateTab(sectionId) {
+            function activateTab(sectionId, updateUrl = true) {
                 // Update Nav state
                 navItems.forEach(nav => {
                     if (nav.dataset.section === sectionId) nav.classList.add('active');
@@ -556,19 +894,30 @@
                 const activeNav = document.querySelector(`.nav-item[data-section="${sectionId}"]`);
                 if (activeNav) pageTitle.textContent = activeNav.textContent.trim();
 
-                // Save to storage
-                localStorage.setItem('staffActiveTab', sectionId);
+                // Cập nhật URL với ?tab= để giữ tab khi reload
+                if (updateUrl) {
+                    const url = new URL(window.location);
+                    url.searchParams.set('tab', sectionId);
+                    window.history.pushState({ tab: sectionId }, '', url);
+                }
             }
 
-            // Khởi chạy tab ban đầu
-            activateTab(activeSectionId);
+            // Khởi chạy tab ban đầu (không cập nhật URL vì URL đã có sẵn)
+            activateTab(activeSectionId, false);
 
             // Sự kiện click menu
             navItems.forEach(item => {
                 item.addEventListener('click', function (e) {
                     e.preventDefault();
-                    activateTab(this.dataset.section);
+                    activateTab(this.dataset.section, true); // Cập nhật URL khi click
                 });
+            });
+            
+            // Xử lý khi người dùng dùng browser back/forward
+            window.addEventListener('popstate', function(e) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const tabFromUrl = urlParams.get('tab') || 'dashboard';
+                activateTab(tabFromUrl, false);
             });
         });
 
@@ -1238,6 +1587,165 @@
                     submitBtn.textContent = originalText;
                 });
         });
+
+        // --- 6. BLOG MANAGEMENT ---
+
+        // Auto Generate Slug from Title
+        document.getElementById('blogTitle')?.addEventListener('input', function(e) {
+            const slugInput = document.getElementById('blogSlug');
+            if (!slugInput.value || slugInput.dataset.autoGenerated === 'true') {
+                const slug = e.target.value.toLowerCase()
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/^-+|-+$/g, '');
+                slugInput.value = slug;
+                slugInput.dataset.autoGenerated = 'true';
+            }
+        });
+
+        // Open Add Blog Modal
+        document.getElementById('addBlogBtn')?.addEventListener('click', function() {
+            document.getElementById('blogModalTitle').textContent = 'Create New Blog';
+            document.getElementById('blogForm').reset();
+            document.getElementById('blogId').value = '';
+            document.getElementById('blogSlug').dataset.autoGenerated = 'true';
+            toggleModal('blogModal', true);
+        });
+
+        // Close Blog Modal
+        window.closeBlogModal = function() {
+            toggleModal('blogModal', false);
+        };
+
+        // Edit Blog: Fetch Data
+        window.editBlog = function(id) {
+            fetch(contextPath + 'staff/blog/' + id, { headers: { 'Accept': 'application/json' } })
+                .then(r => {
+                    if (!r.ok) throw new Error('Blog not found');
+                    return r.json();
+                })
+                .then(blog => {
+                    document.getElementById('blogModalTitle').textContent = 'Edit Blog';
+                    document.getElementById('blogId').value = blog.id;
+                    document.getElementById('blogTitle').value = blog.title || '';
+                    document.getElementById('blogExcerpt').value = blog.excerpt || '';
+                    document.getElementById('blogContent').value = blog.content || '';
+                    document.getElementById('blogCategory').value = blog.category || '';
+                    document.getElementById('blogReadTime').value = blog.readTime || '';
+                    document.getElementById('blogImageUrl').value = blog.imageUrl || '';
+                    document.getElementById('blogAuthor').value = blog.author || '';
+                    document.getElementById('blogTags').value = blog.tags || '';
+                    document.getElementById('blogMetaDescription').value = blog.metaDescription || '';
+                    document.getElementById('blogSlug').value = blog.slug || '';
+                    document.getElementById('blogSlug').dataset.autoGenerated = 'false';
+                    document.getElementById('blogIsFeatured').checked = blog.isFeatured || false;
+                    toggleModal('blogModal', true);
+                })
+                .catch(err => showToast(err.message, 'error'));
+        };
+
+        // Save Blog Function (AJAX)
+        async function handleSaveBlog(e) {
+            e.preventDefault();
+
+            const form = document.getElementById('blogForm');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            // Handle checkbox
+            data.isFeatured = document.getElementById('blogIsFeatured').checked;
+
+            const isNew = !data.id;
+            if (!data.id) data.id = null;
+
+            const btn = form.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            try {
+                const res = await fetch(contextPath + 'staff/blog/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    showToast(data.message || (isNew ? 'Blog created successfully!' : 'Blog updated successfully!'), 'success');
+                    closeBlogModal();
+
+                    // Giữ nguyên tab hiện tại, chỉ reload trang
+                    setTimeout(() => location.reload(), 800);
+                } else {
+                    const text = await res.text();
+                    showToast(text || 'Error saving blog', 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('System error occurred', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        }
+
+        // Submit Blog for Review (AJAX)
+        function submitBlogForReview(id, btn) {
+            if (!confirm('Submit blog for review?')) return;
+
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Submitting...';
+
+            fetch(contextPath + 'staff/blog/submit/' + id, { method: 'POST' })
+                .then(res => {
+                    if (!res.ok) {
+                        return res.text().then(text => Promise.reject(new Error(text)));
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    showToast(data.message || 'Blog submitted for review successfully!', 'success');
+                    // Giữ nguyên tab hiện tại, chỉ reload trang
+                    setTimeout(() => location.reload(), 800);
+                })
+                .catch(err => {
+                    showToast(err.message || 'Failed to submit blog', 'error');
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                });
+        }
+
+        // Request Delete Blog PUBLISHED (AJAX) - Gửi yêu cầu xóa đến admin
+        function requestDeleteBlog(id, btn) {
+            if (!confirm('Bạn có chắc muốn yêu cầu xóa bài viết này? Yêu cầu sẽ được gửi đến admin để duyệt.')) return;
+
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Requesting...';
+
+            fetch(contextPath + 'staff/blog/request-delete/' + id, { method: 'POST' })
+                .then(res => {
+                    if (!res.ok) {
+                        return res.text().then(text => Promise.reject(new Error(text)));
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    showToast(data.message || 'Yêu cầu xóa blog đã được gửi đến admin!', 'success');
+                    // Giữ nguyên tab hiện tại, chỉ reload trang
+                    setTimeout(() => location.reload(), 800);
+                })
+                .catch(err => {
+                    showToast(err.message || 'Failed to request delete blog', 'error');
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                });
+        }
 
         // --- 7. GLOBAL EVENT DELEGATION (Cleaner way) ---
         document.addEventListener('click', function (e) {

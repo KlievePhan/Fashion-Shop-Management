@@ -1,18 +1,22 @@
 package org.fsm.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.fsm.entity.Blog;
+import org.fsm.entity.Blog.BlogStatus;
 import org.fsm.entity.Order;
 import org.fsm.entity.Product;
 import org.fsm.entity.User;
-import org.fsm.repository.AuditLogRepository;
 import org.fsm.repository.BrandRepository;
 import org.fsm.repository.CategoryRepository;
 import org.fsm.repository.OrderRepository;
 import org.fsm.repository.ProductRepository;
 import org.fsm.repository.UserRepository;
 import org.fsm.service.AuditLogService;
+import org.fsm.service.BlogService;
 import org.fsm.service.SessionService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,13 +37,18 @@ public class StaffController {
     private final AuditLogService auditLogService;
     private final SessionService sessionService;
     private final UserRepository userRepository;
+    private final BlogService blogService;
 
     @GetMapping("/staff")
     public String staff(
             Model model,
             HttpSession session,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "50") int size
+            @RequestParam(defaultValue = "50") int size,
+            @RequestParam(required = false) String tab,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int blogPage
     ) {
         // ===== Products / Brands / Categories cho staff.html =====
         List<Product> products = productRepository.findAll();
@@ -68,6 +77,60 @@ public class StaffController {
         if (currentUserId != null) {
             User currentUser = userRepository.findById(currentUserId).orElse(null);
             model.addAttribute("currentUser", currentUser);
+            
+            // ===== Blogs của staff với phân trang =====
+            Page<Blog> blogPageResult;
+            int blogPageSize = "blogs".equals(tab) ? 5 : 50; // 5 blogs per page cho tab blogs
+            
+            if ("blogs".equals(tab)) {
+                Pageable blogPageable = PageRequest.of(blogPage, blogPageSize, Sort.by("createdAt").descending());
+                
+                // Nếu có keyword, search
+                if (keyword != null && !keyword.trim().isEmpty()) {
+                    blogPageResult = blogService.searchBlogsByCreator(currentUserId, keyword.trim(), blogPageable);
+                }
+                // Nếu có status filter
+                else if (status != null && !status.isEmpty()) {
+                    try {
+                        BlogStatus blogStatus = BlogStatus.valueOf(status.toUpperCase());
+                        blogPageResult = blogService.getBlogsByCreatorAndStatus(currentUserId, blogStatus, blogPageable);
+                    } catch (IllegalArgumentException e) {
+                        blogPageResult = blogService.getBlogsByCreator(currentUserId, blogPageable);
+                    }
+                }
+                // Lấy tất cả blog của staff
+                else {
+                    blogPageResult = blogService.getBlogsByCreator(currentUserId, blogPageable);
+                }
+                
+                model.addAttribute("blogs", blogPageResult.getContent());
+                model.addAttribute("blogCurrentPage", blogPageResult.getNumber());
+                model.addAttribute("blogTotalPages", blogPageResult.getTotalPages());
+                model.addAttribute("blogTotalElements", blogPageResult.getTotalElements());
+                model.addAttribute("blogPageSize", blogPageSize);
+            } else {
+                // Nếu không phải tab blogs, lấy tất cả (không phân trang) để tính stats
+                List<Blog> allBlogs = blogService.getBlogsByCreator(currentUserId);
+                model.addAttribute("blogs", allBlogs);
+            }
+            
+            model.addAttribute("blogStatuses", BlogStatus.values());
+            model.addAttribute("currentBlogStatus", status);
+            model.addAttribute("blogKeyword", keyword);
+            
+            // Blog stats (tính từ tất cả blogs của staff)
+            model.addAttribute("totalBlogs", blogService.countBlogsByCreator(currentUserId));
+            model.addAttribute("draftBlogCount", blogService.getBlogsByStatus(BlogStatus.DRAFT)
+                    .stream().filter(b -> b.getCreatedBy().equals(currentUserId)).count());
+            model.addAttribute("pendingBlogCount", blogService.getBlogsByStatus(BlogStatus.PENDING_REVIEW)
+                    .stream().filter(b -> b.getCreatedBy().equals(currentUserId)).count());
+            model.addAttribute("publishedBlogCount", blogService.getBlogsByStatus(BlogStatus.PUBLISHED)
+                    .stream().filter(b -> b.getCreatedBy().equals(currentUserId)).count());
+        }
+        
+        // Set active tab nếu có
+        if (tab != null && !tab.isEmpty()) {
+            model.addAttribute("activeTab", tab);
         }
 
         // Trả về staff.html
