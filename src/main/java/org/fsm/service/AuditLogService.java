@@ -202,4 +202,22 @@ public class AuditLogService {
     public long countByEntity(String entity) {
         return auditLogRepository.countByEntity(entity);
     }
+
+    /**
+     * Delete single audit log by ID
+     */
+    @Transactional
+    public void deleteAuditLog(Long id) {
+        auditLogRepository.deleteById(id);
+    }
+
+    /**
+     * Delete multiple audit logs by IDs
+     */
+    @Transactional
+    public void deleteAuditLogs(List<Long> ids) {
+        if (ids != null && !ids.isEmpty()) {
+            auditLogRepository.deleteAllById(ids);
+        }
+    }
 }

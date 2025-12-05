@@ -315,6 +315,8 @@ public class AdminController {
             User currentUser = userRepository.findById(currentUserId).orElse(null);
             Map<String, Object> changes = new HashMap<>();
             changes.put("status", user.getActive() ? "Active" : "Inactive");
+            changes.put("userEmail", user.getEmail());
+            changes.put("userFullName", user.getFullName() != null ? user.getFullName() : user.getEmail());
             auditLogService.createAuditLog(currentUser, "User", id.toString(), "UPDATE", changes, request);
 
             return ResponseEntity.ok("Status updated");
@@ -422,6 +424,50 @@ public class AdminController {
         } catch (Exception e) {
             // Catch-all để frontend không bị treo nếu có lỗi hệ thống
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Delete single audit log
+     */
+    @DeleteMapping("/admin/audit-log/{id}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> deleteAuditLog(@PathVariable Long id) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            auditLogService.deleteAuditLog(id);
+            response.put("success", true);
+            response.put("message", "Audit log deleted successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    /**
+     * Delete multiple audit logs
+     */
+    @DeleteMapping("/admin/audit-log/bulk")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> deleteAuditLogs(@RequestBody List<Long> ids) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            if (ids == null || ids.isEmpty()) {
+                response.put("success", false);
+                response.put("message", "No audit logs selected");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            auditLogService.deleteAuditLogs(ids);
+            response.put("success", true);
+            response.put("message", ids.size() + " audit log(s) deleted successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 }
