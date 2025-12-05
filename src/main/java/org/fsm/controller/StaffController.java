@@ -20,11 +20,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import jakarta.servlet.http.HttpSession;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Controller
@@ -135,5 +139,47 @@ public class StaffController {
 
         // Trả về staff.html
         return "staff";
+    }
+
+    @GetMapping("/staff/dashboard/stats")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getDashboardStats() {
+        Map<String, Object> stats = new HashMap<>();
+        
+        // Product stats
+        long totalProducts = productRepository.count();
+        long activeProducts = productRepository.findAll().stream()
+                .filter(p -> p.getActive() != null && p.getActive())
+                .count();
+        long inactiveProducts = totalProducts - activeProducts;
+        
+        // Brand stats
+        long totalBrands = brandRepository.count();
+        
+        // Order stats
+        long totalOrders = orderRepository.count();
+        long pendingOrders = orderRepository.countByStatus("PENDING") + orderRepository.countByStatus("COD_PENDING");
+        long completedOrders = orderRepository.countByStatus("PAID") + orderRepository.countByStatus("CONFIRMED") + orderRepository.countByStatus("DELIVERED");
+        
+        // Blog stats
+        long totalBlogs = blogService.getAllBlogsForStaff().size();
+        
+        stats.put("products", Map.of(
+                "total", totalProducts,
+                "active", activeProducts,
+                "inactive", inactiveProducts
+        ));
+        
+        stats.put("brands", Map.of("total", totalBrands));
+        
+        stats.put("orders", Map.of(
+                "total", totalOrders,
+                "pending", pendingOrders,
+                "completed", completedOrders
+        ));
+        
+        stats.put("blogs", Map.of("total", totalBlogs));
+        
+        return ResponseEntity.ok(stats);
     }
 }

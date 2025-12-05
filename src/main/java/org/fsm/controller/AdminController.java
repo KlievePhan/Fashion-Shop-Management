@@ -41,6 +41,10 @@ public class AdminController {
     private final SessionService sessionService;
     private final AnalyticsService analyticsService;
     private final BlogService blogService;
+    private final org.fsm.repository.OrderRepository orderRepository;
+    private final org.fsm.repository.ProductRepository productRepository;
+    private final org.fsm.repository.BrandRepository brandRepository;
+    private final org.fsm.repository.OrderItemRepository orderItemRepository;
 
     private static final Pattern PASSWORD_PATTERN = Pattern.compile(
             "^(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$");
@@ -155,6 +159,136 @@ public class AdminController {
             @RequestParam(name = "days", defaultValue = "30") int days) {
         AnalyticsOverviewResponse overview = analyticsService.getOverview(days);
         return ResponseEntity.ok(overview);
+    }
+
+    @GetMapping("/admin/dashboard/stats")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getDashboardStats() {
+        Map<String, Object> stats = new HashMap<>();
+        
+        // User stats
+        long totalUsers = userRepository.count();
+        long activeUsers = userRepository.findAll().stream()
+                .filter(u -> u.getActive() != null && u.getActive())
+                .count();
+        long inactiveUsers = totalUsers - activeUsers;
+        long adminCount = userRepository.findAll().stream()
+                .filter(u -> u.getRole() != null && "ROLE_ADMIN".equals(u.getRole().getCode()))
+                .count();
+        long staffCount = userRepository.findAll().stream()
+                .filter(u -> u.getRole() != null && "ROLE_STAFF".equals(u.getRole().getCode()))
+                .count();
+        
+        // Order stats
+        long totalOrders = orderRepository.count();
+        long pendingOrders = orderRepository.countByStatus("PENDING") + orderRepository.countByStatus("COD_PENDING");
+        long completedOrders = orderRepository.countByStatus("PAID") + orderRepository.countByStatus("CONFIRMED") + orderRepository.countByStatus("DELIVERED");
+        long cancelledOrders = orderRepository.countByStatus("CANCELLED");
+        
+        // Product stats
+        long totalProducts = productRepository.count();
+        long activeProducts = productRepository.findAll().stream()
+                .filter(p -> p.getActive() != null && p.getActive())
+                .count();
+        long inactiveProducts = totalProducts - activeProducts;
+        
+        // Brand stats
+        long totalBrands = brandRepository.count();
+        
+        // Revenue (from completed orders)
+        java.math.BigDecimal totalRevenue = orderRepository.findAll().stream()
+                .filter(o -> List.of("PAID", "CONFIRMED", "DELIVERED").contains(o.getStatus()))
+                .map(o -> o.getTotalAmount() != null ? o.getTotalAmount() : java.math.BigDecimal.ZERO)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+        
+        stats.put("users", Map.of(
+                "total", totalUsers,
+                "active", activeUsers,
+                "inactive", inactiveUsers,
+                "admin", adminCount,
+                "staff", staffCount
+        ));
+        
+        stats.put("orders", Map.of(
+                "total", totalOrders,
+                "pending", pendingOrders,
+                "completed", completedOrders,
+                "cancelled", cancelledOrders
+        ));
+        
+        stats.put("products", Map.of(
+                "total", totalProducts,
+                "active", activeProducts,
+                "inactive", inactiveProducts
+        ));
+        
+        stats.put("brands", Map.of("total", totalBrands));
+        stats.put("revenue", totalRevenue);
+        
+        return ResponseEntity.ok(stats);
+    }
+
+    @GetMapping("/admin/dashboard/recent-orders")
+    @ResponseBody
+    public ResponseEntity<List<Map<String, Object>>> getRecentOrders(
+            @RequestParam(defaultValue = "10") int limit) {
+        List<org.fsm.entity.Order> orders = orderRepository.findAll(
+                org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt")
+        ).stream().limit(limit).toList();
+        
+        List<Map<String, Object>> result = orders.stream().map(order -> {
+            Map<String, Object> orderMap = new HashMap<>();
+            orderMap.put("id", order.getId());
+            orderMap.put("orderCode", order.getOrderCode());
+            orderMap.put("customerName", order.getUser() != null ? order.getUser().getFullName() : "Guest");
+            orderMap.put("totalAmount", order.getTotalAmount());
+            orderMap.put("status", order.getStatus());
+            orderMap.put("createdAt", order.getCreatedAt());
+            return orderMap;
+        }).toList();
+        
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/admin/dashboard/top-products")
+    @ResponseBody
+    public ResponseEntity<List<Map<String, Object>>> getTopProducts(
+            @RequestParam(defaultValue = "5") int limit) {
+        // Get all completed orders
+        List<org.fsm.entity.Order> completedOrders = orderRepository.findAll().stream()
+                .filter(o -> List.of("PAID", "CONFIRMED", "DELIVERED").contains(o.getStatus()))
+                .toList();
+        
+        // Count product sales
+        Map<Long, Integer> productSales = new HashMap<>();
+        for (org.fsm.entity.Order order : completedOrders) {
+            List<org.fsm.entity.OrderItem> items = orderItemRepository.findByOrder(order);
+            for (org.fsm.entity.OrderItem item : items) {
+                if (item.getProduct() != null) {
+                    Long productId = item.getProduct().getId();
+                    int quantity = item.getQty() != null ? item.getQty() : 0;
+                    productSales.put(productId, productSales.getOrDefault(productId, 0) + quantity);
+                }
+            }
+        }
+        
+        // Sort by sales and get top products
+        List<Map<String, Object>> topProducts = productSales.entrySet().stream()
+                .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
+                .limit(limit)
+                .map(entry -> {
+                    org.fsm.entity.Product product = productRepository.findById(entry.getKey()).orElse(null);
+                    if (product == null) return null;
+                    Map<String, Object> productMap = new HashMap<>();
+                    productMap.put("id", product.getId());
+                    productMap.put("title", product.getTitle());
+                    productMap.put("sales", entry.getValue());
+                    return productMap;
+                })
+                .filter(p -> p != null)
+                .toList();
+        
+        return ResponseEntity.ok(topProducts);
     }
 
     // API lấy thông tin user để hiển thị lên Modal

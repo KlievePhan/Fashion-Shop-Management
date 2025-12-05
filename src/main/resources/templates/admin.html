@@ -89,95 +89,80 @@
 
         <!-- Dashboard Section -->
         <section id="dashboard" class="content-section active">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon red">👥</div>
+            <!-- Key Metrics -->
+            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <div class="stat-icon" style="background: rgba(255,255,255,0.2);">💰</div>
                     <div class="stat-info">
-                        <h3>Total Users</h3>
-                        <p class="stat-value" id="totalUsersStat">0</p>
-                        <span class="stat-change">All registered accounts</span>
+                        <h3 style="color: rgba(255,255,255,0.9); font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">Total Revenue</h3>
+                        <p class="stat-value" id="totalRevenueStat" style="color: white; font-size: 2rem; font-weight: 700; margin: 0;">$0</p>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">✅</div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+                    <div class="stat-icon" style="background: rgba(255,255,255,0.2);">📦</div>
                     <div class="stat-info">
-                        <h3>Active Users</h3>
-                        <p class="stat-value" id="activeUsersStat">0</p>
-                        <span class="stat-change positive">Can log in & use system</span>
+                        <h3 style="color: rgba(255,255,255,0.9); font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">Total Orders</h3>
+                        <p class="stat-value" id="totalOrdersStat" style="color: white; font-size: 2rem; font-weight: 700; margin: 0;">0</p>
+                        <span style="color: rgba(255,255,255,0.8); font-size: 0.75rem; margin-top: 0.25rem; display: block;">
+                            <span id="pendingOrdersStat" style="margin-right: 0.5rem;">0 pending</span>
+                            <span id="completedOrdersStat">0 completed</span>
+                        </span>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">⛔</div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+                    <div class="stat-icon" style="background: rgba(255,255,255,0.2);">👥</div>
                     <div class="stat-info">
-                        <h3>Inactive Users</h3>
-                        <p class="stat-value" id="inactiveUsersStat">0</p>
-                        <span class="stat-change warning">Locked / deactivated</span>
+                        <h3 style="color: rgba(255,255,255,0.9); font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">Total Users</h3>
+                        <p class="stat-value" id="totalUsersStat" style="color: white; font-size: 2rem; font-weight: 700; margin: 0;">0</p>
+                        <span style="color: rgba(255,255,255,0.8); font-size: 0.75rem; margin-top: 0.25rem; display: block;">
+                            <span id="activeUsersStat" style="margin-right: 0.5rem;">0 active</span>
+                            <span id="adminStaffStat">0 admin/staff</span>
+                        </span>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">👑</div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white;">
+                    <div class="stat-icon" style="background: rgba(255,255,255,0.2);">👕</div>
                     <div class="stat-info">
-                        <h3>Admin & Staff</h3>
-                        <p class="stat-value" id="adminStaffStat">0 admin / 0 staff</p>
-                        <span class="stat-change info">Privileged accounts</span>
+                        <h3 style="color: rgba(255,255,255,0.9); font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">Total Products</h3>
+                        <p class="stat-value" id="totalProductsStat" style="color: white; font-size: 2rem; font-weight: 700; margin: 0;">0</p>
+                        <span style="color: rgba(255,255,255,0.8); font-size: 0.75rem; margin-top: 0.25rem; display: block;">
+                            <span id="activeProductsStat">0 active</span>
+                        </span>
                     </div>
                 </div>
             </div>
-            <div class="dashboard-grid">
-                <div class="card">
-                    <h3>Recent Orders</h3>
-                    <div class="table-container">
+
+            <!-- Recent Orders & Top Products -->
+            <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr; gap: 1.5rem;">
+                <div class="card" style="padding: 0;">
+                    <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-soft);">
+                        <h3 style="margin: 0; font-size: 1.125rem; font-weight: 600;">Recent Orders</h3>
+                    </div>
+                    <div class="table-container" style="max-height: 400px; overflow-y: auto;">
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Order ID</th>
+                                    <th>Order Code</th>
                                     <th>Customer</th>
                                     <th>Amount</th>
                                     <th>Status</th>
+                                    <th>Date</th>
                                 </tr>
                             </thead>
                             <tbody id="recentOrdersTable">
                                 <tr>
-                                    <td>#ORD-001</td>
-                                    <td>John Doe</td>
-                                    <td>$125.00</td>
-                                    <td><span class="badge success">Purchased</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#ORD-002</td>
-                                    <td>Jane Smith</td>
-                                    <td>$89.50</td>
-                                    <td><span class="badge warning">Pending</span></td>
-                                </tr>
-                                <tr>
-                                    <td>#ORD-003</td>
-                                    <td>Mike Johnson</td>
-                                    <td>$245.00</td>
-                                    <td><span class="badge warning">Pending</span></td>
+                                    <td colspan="5" style="text-align: center; padding: 40px; color: var(--text-muted);">Loading...</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-                <div class="card">
-                    <h3>Top Products</h3>
-                    <div class="product-list">
-                        <div class="product-item">
-                            <span class="product-name">Classic T-Shirt</span>
-                            <span class="product-sales">245 sales</span>
-                        </div>
-                        <div class="product-item">
-                            <span class="product-name">Denim Jeans</span>
-                            <span class="product-sales">198 sales</span>
-                        </div>
-                        <div class="product-item">
-                            <span class="product-name">Leather Jacket</span>
-                            <span class="product-sales">156 sales</span>
-                        </div>
-                        <div class="product-item">
-                            <span class="product-name">Summer Dress</span>
-                            <span class="product-sales">143 sales</span>
-                        </div>
+                <div class="card" style="padding: 0;">
+                    <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-soft);">
+                        <h3 style="margin: 0; font-size: 1.125rem; font-weight: 600;">Top Products</h3>
+                    </div>
+                    <div id="topProductsList" style="padding: 1.5rem;">
+                        <div style="text-align: center; padding: 40px; color: var(--text-muted);">Loading...</div>
                     </div>
                 </div>
             </div>
@@ -1288,7 +1273,99 @@
         }
 
         // --- 4. Helpers & Init ---
+        // Load Dashboard Data
+        async function loadDashboardData() {
+            try {
+                // Load stats
+                const statsRes = await fetch(contextPath + 'admin/dashboard/stats');
+                if (statsRes.ok) {
+                    const stats = await statsRes.json();
+                    
+                    // Update revenue
+                    const revenue = stats.revenue || 0;
+                    document.getElementById('totalRevenueStat').textContent = 
+                        '$' + parseFloat(revenue).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    
+                    // Update order stats
+                    document.getElementById('totalOrdersStat').textContent = stats.orders.total || 0;
+                    document.getElementById('pendingOrdersStat').textContent = `${stats.orders.pending || 0} pending`;
+                    document.getElementById('completedOrdersStat').textContent = `${stats.orders.completed || 0} completed`;
+                    
+                    // Update user stats
+                    document.getElementById('totalUsersStat').textContent = stats.users.total || 0;
+                    document.getElementById('activeUsersStat').textContent = `${stats.users.active || 0} active`;
+                    document.getElementById('adminStaffStat').textContent = `${stats.users.admin || 0} admin/staff`;
+                    
+                    // Update product stats
+                    document.getElementById('totalProductsStat').textContent = stats.products.total || 0;
+                    document.getElementById('activeProductsStat').textContent = `${stats.products.active || 0} active`;
+                }
+                
+                // Load recent orders
+                const ordersRes = await fetch(contextPath + 'admin/dashboard/recent-orders?limit=10');
+                if (ordersRes.ok) {
+                    const orders = await ordersRes.json();
+                    const tbody = document.getElementById('recentOrdersTable');
+                    if (orders.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">No orders yet</td></tr>';
+                    } else {
+                        tbody.innerHTML = orders.map(order => {
+                            const statusClass = order.status === 'PAID' || order.status === 'CONFIRMED' || order.status === 'DELIVERED' 
+                                ? 'success' : order.status === 'CANCELLED' ? 'danger' : 'warning';
+                            const date = new Date(order.createdAt).toLocaleDateString('en-US', {
+                                year: 'numeric', month: 'short', day: 'numeric'
+                            });
+                            return `
+                                <tr>
+                                    <td>${order.orderCode || 'N/A'}</td>
+                                    <td>${order.customerName || 'Guest'}</td>
+                                    <td>$${parseFloat(order.totalAmount || 0).toFixed(2)}</td>
+                                    <td><span class="badge ${statusClass}">${order.status || 'N/A'}</span></td>
+                                    <td>${date}</td>
+                                </tr>
+                            `;
+                        }).join('');
+                    }
+                }
+                
+                // Load top products
+                const productsRes = await fetch(contextPath + 'admin/dashboard/top-products?limit=5');
+                if (productsRes.ok) {
+                    const products = await productsRes.json();
+                    const productList = document.getElementById('topProductsList');
+                    if (products.length === 0) {
+                        productList.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-muted);">No sales data yet</div>';
+                    } else {
+                        productList.innerHTML = products.map((product, index) => `
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; border-bottom: 1px solid var(--border-soft); transition: background 0.2s;" 
+                                 onmouseover="this.style.background='var(--bg-soft)'" 
+                                 onmouseout="this.style.background='transparent'">
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <span style="width: 24px; height: 24px; border-radius: 50%; background: var(--primary-soft); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600;">${index + 1}</span>
+                                    <span style="font-weight: 500; color: var(--text-main);">${product.title || 'N/A'}</span>
+                                </div>
+                                <span style="color: var(--text-muted); font-size: 0.875rem;">${product.sales || 0} sales</span>
+                            </div>
+                        `).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
+            // Load dashboard data when dashboard section is active
+            if (document.getElementById('dashboard').classList.contains('active')) {
+                loadDashboardData();
+            }
+            
+            // Reload dashboard data when switching to dashboard section
+            document.querySelectorAll('.nav-item[data-section="dashboard"]').forEach(item => {
+                item.addEventListener('click', () => {
+                    setTimeout(loadDashboardData, 100);
+                });
+            });
             const navItems = document.querySelectorAll(".nav-item");
             const sections = document.querySelectorAll(".content-section");
             const pageTitleEl = document.getElementById("pageTitle");
@@ -1320,6 +1397,11 @@
                 // Khi chuyển sang tab Analytics thì load dữ liệu
                 if (sectionId === "analytics") {
                     loadAnalyticsOverview();
+                }
+                
+                // Khi chuyển sang tab Dashboard thì load dữ liệu
+                if (sectionId === "dashboard") {
+                    loadDashboardData();
                 }
             }
 
@@ -2089,4 +2171,5 @@
     </script>
 </body>
 
+</html>
 </html>
