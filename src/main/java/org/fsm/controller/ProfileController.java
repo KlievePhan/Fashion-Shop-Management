@@ -17,8 +17,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-
 @Controller
 @RequestMapping("/profile")
 @RequiredArgsConstructor
@@ -28,18 +26,14 @@ public class ProfileController {
     private final FileStorageService fileStorageService;
 
     // ───── SHOW FORM (setup OR edit) ─────
-    @GetMapping("/setup")
-    public String showForm(Model model, Authentication authentication, HttpServletRequest request) {
-        model.addAttribute("currentPath", request.getRequestURI());
+    @GetMapping({"/setup", "/edit"})
+    public String showProfileForm(Model model, Authentication authentication, HttpServletRequest request) {
+        String requestUri = request.getRequestURI();
+        model.addAttribute("currentPath", requestUri);
 
         User user = getCurrentUser(authentication);
         if (user == null) {
             return "redirect:/login?error=not_authenticated";
-        }
-
-        // Optional: Only allow setup if profile not completed
-        if (user.getProfileCompleted()) {
-            return "redirect:/profile/view";
         }
 
         ProfileUpdateRequest dto = new ProfileUpdateRequest();
@@ -50,7 +44,9 @@ public class ProfileController {
 
         model.addAttribute("userForm", dto);
         model.addAttribute("currentAvatarUrl", user.getAvatarUrl());
+        model.addAttribute("isEdit", requestUri.contains("/edit") || user.getProfileCompleted());
 
+        // Use setup.html template for both setup and edit
         return "profile/setup";
     }
 

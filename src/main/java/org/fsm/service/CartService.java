@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -47,22 +48,19 @@ public class CartService {
         // 4. ⭐ NORMALIZE và convert selectedOptions thành JSON string
         String optionsJson = normalizeAndConvertToJson(selectedOptions);
 
-        System.out.println("🔍 DEBUG - Looking for existing item:");
-        System.out.println("   Cart ID: " + cart.getId());
-        System.out.println("   Product ID: " + productId);
-        System.out.println("   Options JSON: [" + optionsJson + "]");
-
-        // 5. ⭐ DEBUG: List all existing items for this product
-        cartItemRepository.findByCartAndProduct(cart, product).forEach(item -> {
-            System.out.println("   📦 Existing item: ID=" + item.getId() +
-                    ", JSON=[" + item.getSelectedOptionsJson() + "]" +
-                    ", QTY=" + item.getQty());
-        });
-
-        // 6. ⭐ FIX: Truyền entity objects thay vì IDs
-        CartItem existingItem = cartItemRepository
-                .findByCartAndProductAndSelectedOptionsJson(cart, product, optionsJson)
-                .orElse(null);
+        // 5. ⭐ FIX: Tìm item đã tồn tại bằng cách so sánh JSON đã normalize
+        // Lấy tất cả items của product này trong cart
+        List<CartItem> existingItems = cartItemRepository.findByCartAndProduct(cart, product);
+        
+        CartItem existingItem = null;
+        for (CartItem item : existingItems) {
+            // Normalize JSON của item trong database để so sánh
+            String existingJson = normalizeAndConvertToJson(item.getSelectedOptions());
+            if (optionsJson.equals(existingJson)) {
+                existingItem = item;
+                break;
+            }
+        }
 
         if (existingItem != null) {
             // ⭐ Tăng số lượng
