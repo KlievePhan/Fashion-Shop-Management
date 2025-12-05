@@ -515,6 +515,17 @@ body {
     border-color: rgba(129, 140, 248, 0.8);
 }
 
+/* Gradient stat cards */
+.stat-card[style*="gradient"] {
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card[style*="gradient"]:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
 .stat-icon {
     width: 52px;
     height: 52px;

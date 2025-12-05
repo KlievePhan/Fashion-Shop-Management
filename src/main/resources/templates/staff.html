@@ -155,27 +155,67 @@
 
         <!-- Staff Dashboard Section -->
         <section id="dashboard" class="content-section active">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon red">👕</div>
+            <!-- Key Metrics -->
+            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="stat-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <div class="stat-icon" style="background: rgba(255,255,255,0.2);">👕</div>
                     <div class="stat-info">
-                        <h3>Total Products</h3>
-                        <p class="stat-value" th:text="${#lists.size(products)}">0</p>
+                        <h3 style="color: rgba(255,255,255,0.9); font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">Total Products</h3>
+                        <p class="stat-value" id="staffTotalProducts" style="color: white; font-size: 2rem; font-weight: 700; margin: 0;" th:text="${#lists.size(products)}">0</p>
+                        <span style="color: rgba(255,255,255,0.8); font-size: 0.75rem; margin-top: 0.25rem; display: block;">
+                            <span id="staffActiveProducts">0 active</span>
+                        </span>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🏷️</div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+                    <div class="stat-icon" style="background: rgba(255,255,255,0.2);">📦</div>
                     <div class="stat-info">
-                        <h3>Total Brands</h3>
-                        <p class="stat-value" th:text="${#lists.size(brands)}">0</p>
+                        <h3 style="color: rgba(255,255,255,0.9); font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">Total Orders</h3>
+                        <p class="stat-value" id="staffTotalOrders" style="color: white; font-size: 2rem; font-weight: 700; margin: 0;" th:text="${orders != null ? #lists.size(orders) : 0}">0</p>
+                        <span style="color: rgba(255,255,255,0.8); font-size: 0.75rem; margin-top: 0.25rem; display: block;">
+                            <span id="staffPendingOrders" style="margin-right: 0.5rem;">0 pending</span>
+                            <span id="staffCompletedOrders">0 completed</span>
+                        </span>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon">📦</div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+                    <div class="stat-icon" style="background: rgba(255,255,255,0.2);">🏷️</div>
                     <div class="stat-info">
-                        <h3>Total Orders</h3>
-                        <p class="stat-value" th:text="${orders != null ? #lists.size(orders) : 0}">0</p>
+                        <h3 style="color: rgba(255,255,255,0.9); font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">Total Brands</h3>
+                        <p class="stat-value" id="staffTotalBrands" style="color: white; font-size: 2rem; font-weight: 700; margin: 0;" th:text="${#lists.size(brands)}">0</p>
                     </div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white;">
+                    <div class="stat-icon" style="background: rgba(255,255,255,0.2);">📝</div>
+                    <div class="stat-info">
+                        <h3 style="color: rgba(255,255,255,0.9); font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">Total Blogs</h3>
+                        <p class="stat-value" id="staffTotalBlogs" style="color: white; font-size: 2rem; font-weight: 700; margin: 0;">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card" style="padding: 0;">
+                <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-soft);">
+                    <h3 style="margin: 0; font-size: 1.125rem; font-weight: 600;">Quick Actions</h3>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; padding: 1.5rem;">
+                    <a href="#" onclick="activateSection('products'); return false;" class="btn btn-primary" style="text-align: center; padding: 1.25rem; border-radius: 8px; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; transition: transform 0.2s;">
+                        <div style="font-size: 2rem;">👕</div>
+                        <div style="font-weight: 500;">Products</div>
+                    </a>
+                    <a href="#" onclick="activateSection('brands'); return false;" class="btn btn-secondary" style="text-align: center; padding: 1.25rem; border-radius: 8px; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; transition: transform 0.2s;">
+                        <div style="font-size: 2rem;">🏷️</div>
+                        <div style="font-weight: 500;">Brands</div>
+                    </a>
+                    <a href="#" onclick="activateSection('orders'); return false;" class="btn btn-info" style="text-align: center; padding: 1.25rem; border-radius: 8px; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; transition: transform 0.2s;">
+                        <div style="font-size: 2rem;">📦</div>
+                        <div style="font-weight: 500;">Orders</div>
+                    </a>
+                    <a href="#" onclick="activateSection('blogs'); return false;" class="btn btn-warning" style="text-align: center; padding: 1.25rem; border-radius: 8px; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; transition: transform 0.2s;">
+                        <div style="font-size: 2rem;">📝</div>
+                        <div style="font-weight: 500;">Blogs</div>
+                    </a>
                 </div>
             </div>
         </section>
@@ -916,6 +956,52 @@
                 const tabFromUrl = urlParams.get('tab') || 'dashboard';
                 activateTab(tabFromUrl, false);
             });
+
+            // Load Dashboard Data
+            async function loadStaffDashboardData() {
+                try {
+                    const statsRes = await fetch(contextPath + 'staff/dashboard/stats');
+                    if (statsRes.ok) {
+                        const stats = await statsRes.json();
+                        
+                        // Update product stats
+                        document.getElementById('staffTotalProducts').textContent = stats.products.total || 0;
+                        document.getElementById('staffActiveProducts').textContent = `${stats.products.active || 0} active`;
+                        
+                        // Update brand stats
+                        document.getElementById('staffTotalBrands').textContent = stats.brands.total || 0;
+                        
+                        // Update order stats
+                        document.getElementById('staffTotalOrders').textContent = stats.orders.total || 0;
+                        document.getElementById('staffPendingOrders').textContent = `${stats.orders.pending || 0} pending`;
+                        document.getElementById('staffCompletedOrders').textContent = `${stats.orders.completed || 0} completed`;
+                        
+                        // Update blog stats
+                        document.getElementById('staffTotalBlogs').textContent = stats.blogs.total || 0;
+                    }
+                } catch (error) {
+                    console.error('Error loading staff dashboard data:', error);
+                }
+            }
+
+            // Load dashboard data when dashboard section is active
+            if (activeSectionId === 'dashboard') {
+                loadStaffDashboardData();
+            }
+
+            // Reload dashboard data when switching to dashboard section
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    if (this.dataset.section === 'dashboard') {
+                        setTimeout(loadStaffDashboardData, 100);
+                    }
+                });
+            });
+
+            // Expose activateSection for quick actions
+            window.activateSection = function(sectionId) {
+                activateTab(sectionId, true);
+            };
         });
 
         // --- 3. BRAND MANAGEMENT (Đã sửa lỗi Reload) ---
