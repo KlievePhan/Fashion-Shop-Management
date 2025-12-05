@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Complete Your Profile - Fashion Shop</title>
+  <title>Edit Profile - Fashion Shop</title>
 
   <!-- External -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -29,6 +29,7 @@
     .message.success { background:#d1fae5; color:#065f46; border:1px solid #6ee7b7; }
     .message.error { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; }
     .form-group { margin-bottom:20px; }
+    .form-group label { display:block; margin-bottom:8px; font-weight:600; color:#374151; }
     .input-wrapper { position:relative; }
     .input-wrapper i { position:absolute; left:15px; top:50%; transform:translateY(-50%); color:#9ca3af; }
     input[type="text"], input[type="tel"], textarea { width:100%; padding:14px 15px 14px 45px; border:2px solid #e5e7eb; border-radius:12px; font-size:15px; font-family:inherit; }
@@ -38,9 +39,7 @@
     .btn-submit { width:100%; padding:15px; background:#dc2626; color:white; border:none; border-radius:12px; font-weight:600; cursor:pointer; transition:all 0.3s; font-size:16px; }
     .btn-submit:hover { background:#b91c1c; transform:translateY(-1px); }
     .btn-submit:disabled { background:#9ca3af; cursor:not-allowed; transform:none; }
-    .form-group label { display:block; margin-bottom:8px; font-weight:600; color:#374151; }
     .field-error { color:#dc2626; font-size:13px; margin-top:5px; display:block; }
-    .avatar-preview { width:80px; height:80px; border-radius:50%; object-fit:cover; border:3px solid #e5e7eb; }
     .avatar-section {
       text-align: center;
       margin-bottom: 25px;
@@ -48,7 +47,7 @@
 
     .avatar-large {
       width: 22%;
-      aspect-ratio: 1 / 1; /* Keeps it a perfect square */
+      aspect-ratio: 1 / 1;
       border-radius: 50%;
       object-fit: cover;
       border: 4px solid #e5e7eb;
@@ -60,6 +59,17 @@
       transform: scale(1.05);
     }
 
+    input[type="file"] {
+      padding: 10px;
+      border: 2px dashed #e5e7eb;
+      border-radius: 8px;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    input[type="file"]:hover {
+      border-color: #dc2626;
+    }
   </style>
 </head>
 
@@ -68,34 +78,25 @@
 <!-- HEADER -->
 <div th:replace="~{header :: header}" th:with="currentPath=${currentPath}"></div>
 
-<div class="promo-bar">Complete your profile to start shopping!</div>
-
 <div class="container">
   <div class="form-container">
 
     <div class="form-header">
-      <h2 th:text="${isEdit != null and isEdit ? 'Edit Your Profile' : 'Complete Your Profile'}">
-        Complete Your Profile
-      </h2>
-      <p th:text="${isEdit != null and isEdit ? 'Update your personal information' : 'Help us personalize your experience'}">
-        Help us personalize your experience
-      </p>
+      <h2>Edit Your Profile</h2>
+      <p>Update your personal information</p>
     </div>
 
-    <!-- SUCCESS / ERROR MESSAGES -->
+    <!-- SUCCESS MESSAGE -->
     <div class="message success" th:if="${param.success}" style="display:block">
-      Profile saved successfully!
-    </div>
-    <div class="message error" th:if="${errorMessage}" style="display:block">
-      <span th:text="${errorMessage}">Error</span>
+      Profile updated successfully!
     </div>
 
-    <!-- FIXED: Use BindingResult instead of #fields -->
-    <div class="message error" th:if="${result?.hasErrors()}" style="display:block">
+    <!-- VALIDATION ERRORS -->
+    <div class="message error" th:if="${#fields.hasErrors('*')}" style="display:block">
       Please fix the errors below.
     </div>
 
-    <!-- FORM - USES THYMELEAF @{} to handle context path automatically -->
+    <!-- FORM -->
     <form th:action="${currentPath}"
           th:object="${userForm}"
           method="post"
@@ -103,40 +104,22 @@
           id="profileForm"
           novalidate>
 
-      <!-- SUCCESS MESSAGE -->
-      <div class="message success" th:if="${param.success}" style="display:block">
-        Profile saved successfully!
-      </div>
-
-      <!-- GENERAL ERROR -->
-      <div class="message error" th:if="${errorMessage}" style="display:block">
-        <span th:text="${errorMessage}">Error</span>
-      </div>
-
-      <!-- VALIDATION ERRORS -->
-      <div class="message error" th:if="${#fields.hasErrors('*')}" style="display:block">
-        Please fix the errors below.
-      </div>
-
-      <!-- ==== AVATAR SECTION (TOP) ==== -->
+      <!-- ==== AVATAR SECTION ==== -->
       <div class="avatar-section">
-        <!-- Current avatar (large) -->
         <img th:if="${currentAvatarUrl != null && !#strings.isEmpty(currentAvatarUrl)}"
              th:src="@{/{url}(url=${currentAvatarUrl})}"
              alt="Current Avatar"
              class="avatar-large"
              onerror="this.src='@{/images/default_avatar.png}'" />
 
-        <!-- Default avatar when none -->
         <img th:unless="${currentAvatarUrl != null && !#strings.isEmpty(currentAvatarUrl)}"
              th:src="@{/images/default_avatar.png}"
              alt="Default Avatar"
              class="avatar-large" />
 
-        <!-- File input (under the picture) -->
         <div class="form-group" style="margin-top:15px;">
           <label>Profile Picture <small class="text-muted">(optional – .jpg, .png, .svg)</small></label>
-          <input type="file" name="avatar" id="avatar" accept=".jpg,.jpeg,.png,.svg" style="padding:10px; border:2px dashed #e5e7eb; border-radius:8px; width:100%; cursor:pointer;" />
+          <input type="file" name="avatar" id="avatar" accept=".jpg,.jpeg,.png,.svg" />
           <span class="field-error" id="avatarError"></span>
         </div>
       </div>
@@ -191,7 +174,7 @@
       </div>
 
       <button type="submit" class="btn-submit" id="submitBtn">
-        <span th:text="${isEdit != null and isEdit ? 'Save Changes' : 'Save & Continue'}">Save & Continue</span>
+        Save Changes
       </button>
     </form>
 
