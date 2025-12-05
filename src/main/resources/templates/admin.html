@@ -43,7 +43,7 @@
                 <div class="header-title-section">
                     <h1 id="pageTitle">Dashboard</h1>
                     <p class="header-subtitle" id="headerSubtitle">
-                        Welcome back, Admin
+                        <span th:text="'Welcome back, ' + (${currentUser?.fullName ?: 'Admin'})">Welcome back, Admin</span>
                     </p>
                 </div>
             </div>
@@ -66,10 +66,10 @@
                     </button>
                 </div>
                 <div class="user-profile">
-                    <div class="avatar">A</div>
+                    <div class="avatar" th:text="${currentUser?.fullName != null ? currentUser.fullName.substring(0, 1).toUpperCase() : 'A'}">A</div>
                     <div class="user-info">
-                        <span class="user-name">Admin</span>
-                        <span class="user-role">Administrator</span>
+                        <span class="user-name" th:text="${currentUser?.fullName ?: 'Admin'}">Admin</span>
+                        <span class="user-role" th:text="${currentUser?.role?.name ?: 'Administrator'}">Administrator</span>
                     </div>
                     <div class="profile-dropdown">
                         <button class="dropdown-toggle">⋮</button>
@@ -339,23 +339,36 @@
         <section id="auditlog" class="content-section">
             <div class="section-header">
                 <h2>Audit Log</h2>
-                <div class="filter-group">
-                    <select class="filter-select" id="auditAction">
-                        <option value="all">All Actions</option>
-                        <option value="CREATE">Create</option>
-                        <option value="UPDATE">Update</option>
-                        <option value="DELETE">Delete</option>
-                        <option value="VIEW">View</option>
-                    </select>
-                    <select class="filter-select" id="auditEntity">
-                        <option value="all">All Entities</option>
-                        <option value="Product">Product</option>
-                        <option value="Brand">Brand</option>
-                        <option value="Order">Order</option>
-                        <option value="User">User</option>
-                    </select>
-                    <input type="date" class="filter-select" id="auditDate" />
-                    <button class="btn btn-secondary" onclick="clearAuditFilters()">Clear Filters</button>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <div class="filter-group">
+                        <select class="filter-select" id="auditAction">
+                            <option value="all">All Actions</option>
+                            <option value="CREATE">Create</option>
+                            <option value="UPDATE">Update</option>
+                            <option value="DELETE">Delete</option>
+                            <option value="VIEW">View</option>
+                        </select>
+                        <select class="filter-select" id="auditEntity">
+                            <option value="all">All Entities</option>
+                            <option value="Product">Product</option>
+                            <option value="Brand">Brand</option>
+                            <option value="Order">Order</option>
+                            <option value="User">User</option>
+                        </select>
+                        <input type="date" class="filter-select" id="auditDate" />
+                        <button class="btn btn-secondary" onclick="clearAuditFilters()">Clear Filters</button>
+                    </div>
+                    <button class="btn btn-secondary" id="multiDeleteModeBtn" onclick="toggleMultiDeleteMode()">
+                        <i class="bi bi-check2-square"></i> Multi Delete
+                    </button>
+                    <div id="multiDeleteActions" style="display: none; gap: 10px; align-items: center; flex-direction: row;">
+                        <button class="btn btn-danger" id="deleteSelectedBtn" onclick="deleteSelectedAuditLogs(); return false;">
+                            <i class="bi bi-trash"></i> Delete Selected (<span id="selectedCount">0</span>)
+                        </button>
+                        <button class="btn btn-secondary" id="cancelMultiDeleteBtn" onclick="cancelMultiDeleteMode(); return false;">
+                            <i class="bi bi-x"></i> Cancel
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="card">
@@ -363,6 +376,9 @@
                     <table class="data-table">
                         <thead>
                             <tr>
+                                <th class="checkbox-column" style="width: 40px; display: none;">
+                                    <input type="checkbox" id="selectAllAuditLogs" onchange="toggleSelectAllAuditLogs()" />
+                                </th>
                                 <th>ID</th>
                                 <th>Actor</th>
                                 <th>Role</th>
@@ -370,13 +386,18 @@
                                 <th>Entity</th>
                                 <th>Changes</th>
                                 <th>Timestamp</th>
+                                <th style="width: 80px;">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="auditLogTable">
                             <tr th:each="log : ${auditLogs}" 
                                 th:data-action="${log.action}"
                                 th:data-entity="${log.entity}"
-                                th:data-date="${#temporals.format(log.createdAt, 'yyyy-MM-dd')}">
+                                th:data-date="${#temporals.format(log.createdAt, 'yyyy-MM-dd')}"
+                                th:data-log-id="${log.id}">
+                                <td class="checkbox-column" style="display: none;">
+                                    <input type="checkbox" class="audit-log-checkbox" th:data-log-id="${log.id}" onchange="updateSelectedCount()" />
+                                </td>
                                 <td th:text="${log.id}"></td>
                                 <td th:text="${log.actor != null ? log.actor.fullName : 'System'}"></td>
                                 <td th:text="${log.actorRole}"></td>
@@ -386,12 +407,15 @@
                                         th:text="${log.action}"></span>
                                 </td>
                                 <td th:text="${log.entity}"></td>
-                                <td>
-                                    <span class="changes-preview"
-                                    th:utext="${#strings.abbreviate(log.getChangesDisplay(), 100)}"
-                                    th:title="${log.changes}"></span>
+                                <td class="changes-cell">
+                                    <div class="changes-content" th:utext="${log.getChangesDisplay()}"></div>
                                 </td>
                                 <td th:text="${#temporals.format(log.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                                <td>
+                                    <button class="btn btn-sm btn-danger" th:onclick="'deleteAuditLog(' + ${log.id} + ')'" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -1082,6 +1106,187 @@
             filterAuditLog();
         }
 
+        // AUDIT LOG DELETE FUNCTIONS
+        let multiDeleteMode = false;
+
+        function toggleMultiDeleteMode() {
+            multiDeleteMode = !multiDeleteMode;
+            const checkboxes = document.querySelectorAll('.checkbox-column');
+            const multiDeleteBtn = document.getElementById('multiDeleteModeBtn');
+            const multiDeleteActions = document.getElementById('multiDeleteActions');
+
+            if (multiDeleteMode) {
+                // Show checkboxes
+                checkboxes.forEach(col => col.style.display = '');
+                if (multiDeleteBtn) {
+                    multiDeleteBtn.style.display = 'none';
+                }
+                if (multiDeleteActions) {
+                    multiDeleteActions.style.display = 'flex';
+                    multiDeleteActions.style.gap = '10px';
+                    multiDeleteActions.style.alignItems = 'center';
+                    multiDeleteActions.style.flexDirection = 'row';
+                }
+            } else {
+                // Hide checkboxes
+                checkboxes.forEach(col => col.style.display = 'none');
+                // Uncheck all
+                document.querySelectorAll('.audit-log-checkbox').forEach(cb => cb.checked = false);
+                const selectAll = document.getElementById('selectAllAuditLogs');
+                if (selectAll) {
+                    selectAll.checked = false;
+                    selectAll.indeterminate = false;
+                }
+                if (multiDeleteBtn) {
+                    multiDeleteBtn.style.display = 'inline-flex';
+                }
+                if (multiDeleteActions) {
+                    multiDeleteActions.style.display = 'none';
+                }
+                updateSelectedCount();
+            }
+        }
+
+        function cancelMultiDeleteMode() {
+            if (!multiDeleteMode) return;
+            multiDeleteMode = false;
+            
+            const checkboxes = document.querySelectorAll('.checkbox-column');
+            const multiDeleteBtn = document.getElementById('multiDeleteModeBtn');
+            const multiDeleteActions = document.getElementById('multiDeleteActions');
+            
+            // Hide checkboxes
+            checkboxes.forEach(col => col.style.display = 'none');
+            // Uncheck all
+            document.querySelectorAll('.audit-log-checkbox').forEach(cb => cb.checked = false);
+            const selectAll = document.getElementById('selectAllAuditLogs');
+            if (selectAll) {
+                selectAll.checked = false;
+                selectAll.indeterminate = false;
+            }
+            if (multiDeleteBtn) {
+                multiDeleteBtn.style.display = 'inline-flex';
+            }
+            if (multiDeleteActions) {
+                multiDeleteActions.style.display = 'none';
+            }
+            updateSelectedCount();
+        }
+
+        function deleteAuditLog(id) {
+            if (!confirm('Are you sure you want to delete this audit log?')) {
+                return;
+            }
+
+            fetch(`${contextPath}admin/audit-log/${id}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Audit log deleted successfully', 'success');
+                    // Reload page after a short delay to show notification
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 500);
+                } else {
+                    showNotification(data.message || 'Failed to delete audit log', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error deleting audit log', 'error');
+            });
+        }
+
+        function toggleSelectAllAuditLogs() {
+            const selectAll = document.getElementById('selectAllAuditLogs');
+            const checkboxes = document.querySelectorAll('.audit-log-checkbox');
+            const isChecked = selectAll.checked;
+
+            checkboxes.forEach(checkbox => {
+                const row = checkbox.closest('tr');
+                if (row && row.style.display !== 'none') {
+                    checkbox.checked = isChecked;
+                }
+            });
+
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            const checkboxes = document.querySelectorAll('.audit-log-checkbox:checked');
+            const count = Array.from(checkboxes).filter(cb => {
+                const row = cb.closest('tr');
+                return row && row.style.display !== 'none';
+            }).length;
+
+            const deleteBtn = document.getElementById('deleteSelectedBtn');
+            const countSpan = document.getElementById('selectedCount');
+
+            if (countSpan) {
+                countSpan.textContent = count;
+            }
+
+            if (deleteBtn) {
+                deleteBtn.disabled = count === 0;
+            }
+
+            // Update select all checkbox
+            const selectAll = document.getElementById('selectAllAuditLogs');
+            if (selectAll) {
+                const visibleCheckboxes = Array.from(document.querySelectorAll('.audit-log-checkbox')).filter(cb => {
+                    const row = cb.closest('tr');
+                    return row && row.style.display !== 'none';
+                });
+                const checkedVisible = visibleCheckboxes.filter(cb => cb.checked).length;
+                selectAll.checked = visibleCheckboxes.length > 0 && checkedVisible === visibleCheckboxes.length;
+                selectAll.indeterminate = checkedVisible > 0 && checkedVisible < visibleCheckboxes.length;
+            }
+        }
+
+        function deleteSelectedAuditLogs() {
+            const checkboxes = document.querySelectorAll('.audit-log-checkbox:checked');
+            const selectedIds = Array.from(checkboxes)
+                .filter(cb => {
+                    const row = cb.closest('tr');
+                    return row && row.style.display !== 'none';
+                })
+                .map(cb => parseInt(cb.getAttribute('data-log-id')));
+
+            if (selectedIds.length === 0) {
+                showNotification('Please select at least one audit log to delete', 'warning');
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to delete ${selectedIds.length} audit log(s)?`)) {
+                return;
+            }
+
+            fetch(`${contextPath}admin/audit-log/bulk`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(selectedIds)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message || `${selectedIds.length} audit log(s) deleted successfully`, 'success');
+                    // Reload page after a short delay to show notification
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 500);
+                } else {
+                    showNotification(data.message || 'Failed to delete audit logs', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error deleting audit logs', 'error');
+            });
+        }
+
         // --- 4. Helpers & Init ---
         document.addEventListener("DOMContentLoaded", () => {
             const navItems = document.querySelectorAll(".nav-item");
@@ -1294,16 +1499,42 @@
             const svgNS = "http://www.w3.org/2000/svg";
             const width = Math.max(points.length * 40, container.clientWidth || 680);
             const height = 190;
-            const padding = { top: 10, right: 30, bottom: 30, left: 30 };
+            const padding = { top: 10, right: 30, bottom: 30, left: 50 }; // Increased left padding for Y-axis labels
 
             const svg = document.createElementNS(svgNS, "svg");
             svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
             svg.setAttribute("preserveAspectRatio", "none");
 
+            // Calculate Y-axis values
+            const gridCount = 4;
+            const yAxisValues = [];
+            for (let i = 0; i <= gridCount; i++) {
+                const value = maxRevenue * (1 - i / gridCount);
+                yAxisValues.push(value);
+            }
+
+            // Y-axis labels
+            const yAxisGroup = document.createElementNS(svgNS, "g");
+            yAxisGroup.setAttribute("class", "y-axis-labels");
+            for (let i = 0; i <= gridCount; i++) {
+                const y = padding.top + ((height - padding.top - padding.bottom) / gridCount) * i;
+                const value = yAxisValues[i];
+                
+                const label = document.createElementNS(svgNS, "text");
+                label.setAttribute("x", padding.left - 8);
+                label.setAttribute("y", y + 4);
+                label.setAttribute("text-anchor", "end");
+                label.setAttribute("class", "y-axis-label");
+                label.setAttribute("font-size", "11");
+                label.setAttribute("fill", "#6b7280");
+                label.textContent = formatCurrency(value);
+                yAxisGroup.appendChild(label);
+            }
+            svg.appendChild(yAxisGroup);
+
             // Grid lines
             const grid = document.createElementNS(svgNS, "g");
             grid.setAttribute("class", "sales-line-grid");
-            const gridCount = 4;
             for (let i = 0; i <= gridCount; i++) {
                 const y = padding.top + ((height - padding.top - padding.bottom) / gridCount) * i;
                 const line = document.createElementNS(svgNS, "line");

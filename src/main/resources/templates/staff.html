@@ -120,10 +120,10 @@
             </div>
             <div class="header-right">
                 <div class="user-profile">
-                    <div class="avatar">S</div>
+                    <div class="avatar" th:text="${currentUser?.fullName != null ? currentUser.fullName.substring(0, 1).toUpperCase() : 'S'}">S</div>
                     <div class="user-info">
-                        <span class="user-name">Staff</span>
-                        <span class="user-role">Staff Panel</span>
+                        <span class="user-name" th:text="${currentUser?.fullName ?: 'Staff'}">Staff</span>
+                        <span class="user-role" th:text="${currentUser?.role?.name ?: 'Staff'}">Staff</span>
                     </div>
                     <div class="profile-dropdown">
                         <button class="dropdown-toggle">⋮</button>
